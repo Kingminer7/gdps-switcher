@@ -40,7 +40,7 @@ class $modify(BoomRedirect, CCHttpClient)
 		std::string url = req->getUrl();
 		auto newUrl = Mod::get()->getSavedValue<std::string>("server");
 		if (newUrl.empty()) {
-			newUrl = "http://www.boomlings.com/database";
+			newUrl = "https://www.boomlings.com/database";
 			Mod::get()->setSavedValue("server", newUrl);
 		}
         if (url.starts_with("https://www.boomlings.com/database")) {

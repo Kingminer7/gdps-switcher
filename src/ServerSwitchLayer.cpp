@@ -34,7 +34,7 @@ bool ServerSwitchLayer::init()
     auto newUrl = Mod::get()->getSavedValue<std::string>("server");
     if (newUrl.empty())
     {
-        newUrl = "http://www.boomlings.com/database";
+        newUrl = "https://www.boomlings.com/database";
         Mod::get()->setSavedValue("server", newUrl);
     }
 
