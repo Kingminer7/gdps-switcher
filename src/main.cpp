@@ -33,9 +33,7 @@ class $modify(MyMenuLayer, MenuLayer) {
 	}
 };
 
-class $modify(BoomRedirect, CCHttpClient)
-{
-	void send(CCHttpRequest* req)
+void gdpsSend(CCHttpClient* self, CCHttpRequest* req)
     {
 		std::string url = req->getUrl();
 		auto newUrl = Mod::get()->getSavedValue<std::string>("server");
@@ -43,14 +41,31 @@ class $modify(BoomRedirect, CCHttpClient)
 			newUrl = "https://www.boomlings.com/database";
 			Mod::get()->setSavedValue("server", newUrl);
 		}
-        if (url.starts_with("https://www.boomlings.com/database/")) {
-			req->setUrl(url.replace(0, 35, newUrl).c_str());
-		} else if (url.starts_with("http://www.boomlings.com/database/") or url.starts_with("https://www.boomlings.com/database")) {
-			req->setUrl(url.replace(0, 34, newUrl).c_str());
-		} else if (url.starts_with("http://www.boomlings.com/database")) {
-			req->setUrl(url.replace(0, 33, newUrl).c_str());
+        if (newUrl.ends_with("/")) {
+			if (url.starts_with("https://www.boomlings.com/database/")) {
+				req->setUrl(url.replace(0, 35, newUrl).c_str());
+			} else if (url.starts_with("http://www.boomlings.com/database/")) {
+				req->setUrl(url.replace(0, 34, newUrl).c_str());
+			}
+		} else {
+			if (url.starts_with("https://www.boomlings.com/database")) {
+				req->setUrl(url.replace(0, 34, newUrl).c_str());
+			} else if (url.starts_with("http://www.boomlings.com/database")) {
+				req->setUrl(url.replace(0, 33, newUrl).c_str());
+			}
 		}
 		log::info("Sending request to {}", req->getUrl());
-        CCHttpClient::send(req);
+        self->send(req);
     }
-};
+
+$execute
+{
+    Mod::get()->hook(
+        reinterpret_cast<void*>(
+			geode::addresser::getNonVirtual(&cocos2d::extension::CCHttpClient::send)
+        ),
+        &gdpsSend,
+        "cocos2d::extension::CCHttpClient::send",
+        tulip::hook::TulipConvention::Thiscall
+    );
+}
