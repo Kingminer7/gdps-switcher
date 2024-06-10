@@ -9,7 +9,7 @@
 
 static CCSize LAYER_SIZE = {230.f, 190.f};
 
-gd::string latestValue;
+std::string latestValue;
 
 bool ServerSwitchLayer::init()
 {
@@ -31,7 +31,7 @@ bool ServerSwitchLayer::init()
     title->setID("title-text");
     this->addChild(title);
 
-    auto newUrl = Mod::get()->getSavedValue<gd::string>("server");
+    auto newUrl = Mod::get()->getSavedValue<std::string>("server");
     if (newUrl.empty())
     {
         newUrl = "http://www.boomlings.com/database";
@@ -132,7 +132,7 @@ void ServerSwitchLayer::onApply(CCObject *)
         input->setString("https://www.boomlings.com/database");
         newUrl = input->getString();
     }
-    Mod::get()->setSavedValue<gd::string>("server", newUrl);
+    Mod::get()->setSavedValue<std::string>("server", newUrl);
     latestValue = newUrl;
     auto url = newUrl.c_str();
     FLAlertLayer::create(
