@@ -13,7 +13,7 @@ class $modify(MyMenuLayer, MenuLayer) {
 		}
 
 		auto myButton = CCMenuItemSpriteExtra::create(
-			CircleButtonSprite::createWithSpriteFrameName("GJ_deleteServerBtn_001.png"),
+			CircleButtonSprite::createWithSpriteFrameName("switchServer.png"_spr),
 			this,
 			menu_selector(MyMenuLayer::onMyButton)
 		);

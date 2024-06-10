@@ -4,7 +4,7 @@
 		"win": "2.206",
 		"android": "2.206"
 	},
-	"version": "v1.0.0",
+	"version": "v0.1.0",
 	"id": "km7dev.gdps-switcher",
 	"name": "GDPS Switcher",
 	"developer": "km7dev",
@@ -17,5 +17,10 @@
 	"issues": {
 		"info": "Report issues on the github issues page.",
 		"url": "https://github.com/kingminer7/gdps-switcher/issues"
+	},
+	"resources": {
+		"sprites": [
+			"resources/switchServer.png"
+		]
 	}
 }
