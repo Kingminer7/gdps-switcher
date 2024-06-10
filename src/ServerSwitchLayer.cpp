@@ -9,7 +9,7 @@
 
 static CCSize LAYER_SIZE = {230.f, 190.f};
 
-gd::string latestValue;
+std::string latestValue;
 
 bool ServerSwitchLayer::init()
 {
@@ -134,7 +134,8 @@ void ServerSwitchLayer::onApply(CCObject *)
     }
     Mod::get()->setSavedValue("server", newUrl);
     latestValue = newUrl;
+    auto url = newUrl.c_str();
     FLAlertLayer::create(
-        "Set URL Successfully", "Server URL has been set to:\n" + newUrl, "OK")
+        "Set URL Successfully", "Server URL has been set.", "OK")
         ->show();
 }
