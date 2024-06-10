@@ -43,7 +43,9 @@ class $modify(BoomRedirect, CCHttpClient)
 			newUrl = "https://www.boomlings.com/database";
 			Mod::get()->setSavedValue("server", newUrl);
 		}
-        if (url.starts_with("https://www.boomlings.com/database")) {
+        if (url.starts_with("https://www.boomlings.com/database/")) {
+			req->setUrl(url.replace(0, 35, newUrl).c_str());
+		} else if (url.starts_with("http://www.boomlings.com/database/") or url.starts_with("https://www.boomlings.com/database")) {
 			req->setUrl(url.replace(0, 34, newUrl).c_str());
 		} else if (url.starts_with("http://www.boomlings.com/database")) {
 			req->setUrl(url.replace(0, 33, newUrl).c_str());
