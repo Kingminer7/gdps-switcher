@@ -10,12 +10,12 @@
 	"developer": "km7dev",
 	"description": "Lets you switch between GDPS servers easily.",
 	"tags": ["online"],
-	"repository": "https://github.com/km7dev/gdps-switcher",
+	"repository": "https://github.com/kingminer7/gdps-switcher",
 	"links": {
-		"source": "https://github.com/km7dev/gdps-switcher"
+		"source": "https://github.com/kingminer7/gdps-switcher"
 	},
 	"issues": {
 		"info": "Report issues on the github issues page.",
-		"url": "https://github.com/km7dev/gdps-switcher/issues"
+		"url": "https://github.com/kingminer7/gdps-switcher/issues"
 	}
 }
