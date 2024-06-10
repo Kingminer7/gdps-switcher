@@ -1,0 +1,21 @@
+{
+	"geode": "3.0.0-alpha.1",
+	"gd": {
+		"win": "2.206",
+		"android": "2.206"
+	},
+	"version": "v1.0.0",
+	"id": "km7dev.gdps-switcher",
+	"name": "GDPS Switcher",
+	"developer": "km7dev",
+	"description": "Lets you switch between GDPS servers easily.",
+	"tags": ["online"],
+	"repository": "https://github.com/km7dev/gdps-switcher",
+	"links": {
+		"source": "https://github.com/km7dev/gdps-switcher"
+	},
+	"issues": {
+		"info": "Report issues on the github issues page.",
+		"url": "https://github.com/km7dev/gdps-switcher/issues"
+	}
+}
