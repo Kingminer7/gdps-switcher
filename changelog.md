@@ -1,4 +1,4 @@
 # 1.0.0
 ### Full Release
-Add switching servers\n
+Add switching servers\
 Windows/Android/Mac support
