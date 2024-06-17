@@ -41,7 +41,7 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
         this,
         menu_selector(ServerNode::editServer));
     edit->setID("server-node-edit");
-    edit->setPosition({355, size.height / 2});
+    edit->setPosition({size.width - 60, size.height / 2});
     edit->setContentSize({31, 31});
     as<CCSprite*>(edit->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
     as<CCSprite*>(edit->getChildren()->objectAtIndex(0))->setScale(0.775f);
@@ -52,7 +52,7 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
         this,
         menu_selector(ServerNode::deleteServer));
     del->setID("server-node-delete");
-    del->setPosition({320, size.height / 2});
+    del->setPosition({size.width - 95, size.height / 2});
     del->setContentSize({31, 31});
     as<CCSprite*>(del->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
     as<CCSprite*>(del->getChildren()->objectAtIndex(0))->setScale(0.775f);
@@ -74,7 +74,7 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     }
 
     selectBtn->setID("server-node-select");
-    selectBtn->setPosition({390, size.height / 2});
+    selectBtn->setPosition({size.width - 25, size.height / 2});
     menu->addChild(selectBtn);
 
     return true;
