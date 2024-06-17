@@ -6,8 +6,9 @@ set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
 project(GDPSSwitcher VERSION 1.0.1)
 
 file(GLOB SOURCES
-src/*.cpp
-src/*.hpp
+    src/hooks/*.cpp
+    src/ui/*.cpp
+    src/ui/*.hpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})

@@ -56,3 +56,6 @@ build-*/
 
 # Visual Studio
 .vs/
+
+*.cpp-old
+*.hpp-old
