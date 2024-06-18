@@ -5,6 +5,7 @@ class InstanceManager
 protected:
     static InstanceManager instance;
     bool needsRestart = false;
+    bool inited = false;
     std::string server;
 
     void create() {
@@ -18,7 +19,8 @@ public:
     };
 
     static void init() {
-        if (instance != nullptr) return;
+        if (inited) return;
+        inited = true;
         instance = InstanceManager();
     };
 
