@@ -22,7 +22,7 @@ public:
     static void create() {
         if (inited) return;
         inited = true;
-        instance = InstanceManager();
+        instance = &InstanceManager();
         instance->init();
     };
 
@@ -30,6 +30,6 @@ public:
         needsRestart = true;
     };
 
-    std::string getServer() { return server };
+    std::string getServer() { return server; };
 
 }
