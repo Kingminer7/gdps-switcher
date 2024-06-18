@@ -1,4 +1,5 @@
 #include "ServerNode.hpp"
+#include "../utils/InstanceManager.hpp"
 
 ServerNode *ServerNode::create(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry entry, CCSize size)
 {
@@ -58,7 +59,7 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     as<CCSprite*>(del->getChildren()->objectAtIndex(0))->setScale(0.775f);
     menu->addChild(del);
 
-    if (Mod::get()->getSavedValue<std::string>("server") == entry.url)
+    if (InstanceManager::get().server == entry.url)
     {
         selectBtn = CCMenuItemSpriteExtra::create(
             CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
