@@ -6,7 +6,7 @@ class InstanceManager
 protected:
     static InstanceManager *instance;
     bool needsRestart = false;
-    static bool inited = false;
+    static bool inited;
     std::string server;
 
     void init() {
