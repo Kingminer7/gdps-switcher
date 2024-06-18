@@ -1,5 +1,4 @@
 #include <Geode/modify/CCHttpClient.hpp>
-#include "../utils/InstanceManager.hpp"
 
 using namespace geode::prelude;
 
