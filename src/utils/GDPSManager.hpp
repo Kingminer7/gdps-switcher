@@ -14,8 +14,8 @@ public:
     };
 
     static void init() {
+        if (instance) return;
         instance = GDPSManager();
-        instance
     };
 
     void create() {
