@@ -7,7 +7,7 @@ class $modify(http, CCHttpClient) {
 	void send(CCHttpRequest* req)
     {
 		std::string url = req->getUrl();
-		auto newUrl = InstanceManager::get()->getServer();
+		auto newUrl = Mod::get()->getSavedValue<std::string>("server");
 		if (newUrl.empty()) {
 			newUrl = "https://www.boomlings.com/database";
 			Mod::get()->setSavedValue("server", newUrl);
