@@ -1,6 +1,5 @@
 #pragma once
 #include <Geode/modify/GManager.hpp>
-#include "../utils/InstanceManager.hpp"
 
 using namespace geode::prelude;
 
@@ -17,7 +16,6 @@ class $modify(GDPSGManager, GManager) {
         return safe;
     }
     void setup() {
-        InstanceManager::create();
         auto url = Mod::get()->getSavedValue<std::string>("server");
         if (url.empty()) {
             url = "https://www.boomlings.com/database";
