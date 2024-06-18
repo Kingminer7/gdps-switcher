@@ -26,4 +26,6 @@ public:
         needsRestart = true;
     };
 
+    std::string getServer() { return server };
+
 }
