@@ -16,7 +16,6 @@ class $modify(GDPSGManager, GManager) {
         return safe;
     }
     void setup() {
-
         auto url = Mod::get()->getSavedValue<std::string>("server");
         if (url.empty()) {
             url = "https://www.boomlings.com/database";
