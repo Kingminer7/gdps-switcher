@@ -18,7 +18,7 @@ public:
     };
 
     static void init() {
-        if (instance) return;
+        if (instance != nullptr) return;
         instance = InstanceManager();
     };
 
