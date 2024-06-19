@@ -23,6 +23,9 @@ jobs:
           os: ubuntu-latest
           target: Android64
 
+        - name: MacOS (for the 2 users there are)
+          os: macos-latest
+
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
 
