@@ -14,17 +14,20 @@ protected:
     bool init(
         ServerSwitchLayer* layer,
         ServerSwitchLayer::ServerEntry entry,
-        CCSize size
+        CCSize size,
+        bool selected = false
     );
 
 public:
     static ServerNode* create(
         ServerSwitchLayer* layer,
         ServerSwitchLayer::ServerEntry entry,
-        CCSize size
+        CCSize size,
+        bool selected = false
     );
 
     void selectServer(CCObject*);
     void deleteServer(CCObject*);
     void editServer(CCObject*);
+    ServerSwitchLayer::ServerEntry getServer();
 };

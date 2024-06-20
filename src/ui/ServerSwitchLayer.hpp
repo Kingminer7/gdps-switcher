@@ -22,12 +22,13 @@ public:
     
     static ServerSwitchLayer *create();
     static cocos2d::CCLayer *scene();
-    CCTextInputNode *input;
     void onGoBack(CCObject *);
     void onApply(CCObject *);
     ScrollLayer *scroll;
     void update(std::vector<ServerEntry> const &servers, bool resetPos);
     void saveToList(CCObject *obj);
+    void selectServer(ServerNode *node);
+    void onNew(CCObject *);
 };
 
 template <>

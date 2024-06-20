@@ -1,9 +1,10 @@
 #include "ServerNode.hpp"
+#include "ServerPopup.hpp"
 
-ServerNode *ServerNode::create(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry entry, CCSize size)
+ServerNode *ServerNode::create(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry entry, CCSize size, bool selected)
 {
     auto ret = new ServerNode;
-    if (ret && ret->init(layer, entry, size))
+    if (ret && ret->init(layer, entry, size, selected))
     {
         ret->autorelease();
         return ret;
@@ -12,7 +13,7 @@ ServerNode *ServerNode::create(ServerSwitchLayer *layer, ServerSwitchLayer::Serv
     return nullptr;
 }
 
-bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry entry, CCSize size)
+bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry entry, CCSize size, bool selected)
 {
     if (!CCNode::init())
         return false;
@@ -30,6 +31,7 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     label->setScale(0.8f);
     label->setPosition(8, size.height / 2 + 2);
     label->setAnchorPoint({0, 0.5});
+    label->limitLabelWidth(size.width - 124, 0.8f, 0.1f);
     this->addChild(label);
 
     auto menu = CCMenu::create();
@@ -43,8 +45,8 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     edit->setID("server-node-edit");
     edit->setPosition({size.width - 60, size.height / 2});
     edit->setContentSize({31, 31});
-    as<CCSprite*>(edit->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
-    as<CCSprite*>(edit->getChildren()->objectAtIndex(0))->setScale(0.775f);
+    as<CCSprite *>(edit->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
+    as<CCSprite *>(edit->getChildren()->objectAtIndex(0))->setScale(0.775f);
     menu->addChild(edit);
 
     auto del = CCMenuItemSpriteExtra::create(
@@ -54,11 +56,11 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     del->setID("server-node-delete");
     del->setPosition({size.width - 95, size.height / 2});
     del->setContentSize({31, 31});
-    as<CCSprite*>(del->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
-    as<CCSprite*>(del->getChildren()->objectAtIndex(0))->setScale(0.775f);
+    as<CCSprite *>(del->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
+    as<CCSprite *>(del->getChildren()->objectAtIndex(0))->setScale(0.775f);
     menu->addChild(del);
 
-    if (Mod::get()->getSavedValue<std::string>("server") == entry.url)
+    if (selected)
     {
         selectBtn = CCMenuItemSpriteExtra::create(
             CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png"),
@@ -82,21 +84,31 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
 
 void ServerNode::deleteServer(CCObject *)
 {
-    auto servers = Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers");
-    servers.erase(std::remove_if(servers.begin(), servers.end(), [this](auto const &entry) {
-        return entry.url == server.url && entry.name == server.name;
-    }));
-    Mod::get()->setSavedValue("saved-servers", servers);
-    m_layer->update(servers, false);
+    geode::createQuickPopup("Delete Server", "Are you sure you want to delete this server? This cannot be undone!", "No", "Yes", [this](auto, bool yes)
+                            {
+        if (yes)
+        {
+            auto servers = Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers");
+            servers.erase(std::remove_if(servers.begin(), servers.end(), [this](auto const &entry) {
+                return entry.url == server.url && entry.name == server.name;
+            }));
+            Mod::get()->setSavedValue("saved-servers", servers);
+            m_layer->update(servers, false);
+        } });
 }
 
 void ServerNode::editServer(CCObject *)
 {
+    auto popup = ServerPopup::create(m_layer, this);
+    popup->show();
 }
 
 void ServerNode::selectServer(CCObject *)
 {
-    Mod::get()->setSavedValue("server", server.url);
-    auto servers = Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers");
-    m_layer->update(servers, false);
+    m_layer->selectServer(this);
+}
+
+ServerSwitchLayer::ServerEntry ServerNode::getServer()
+{
+    return server;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <Geode/modify/GManager.hpp>
+#include "../utils/DataManager.hpp"
 
 using namespace geode::prelude;
 
@@ -21,6 +22,7 @@ class $modify(GDPSGManager, GManager) {
             url = "https://www.boomlings.com/database";
             Mod::get()->setSavedValue("server", url);
         }
+        DataManager::get().initialize(url);
         std::transform(url.begin(), url.end(), url.begin(), ::tolower);
         if (!(
             url.starts_with("www.boomlings.com/database") 

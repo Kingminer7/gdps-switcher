@@ -1,5 +1,6 @@
 #include "ServerSwitchLayer.hpp"
 #include "ServerNode.hpp"
+#include "ServerPopup.hpp"
 
 #include <Geode/utils/cocos.hpp>
 
@@ -42,6 +43,7 @@ bool ServerSwitchLayer::init()
 
     applyBtn->setPosition(0, -135);
     applyBtn->setID("apply-button");
+    applyBtn->setOpacity(50);
     menu->addChild(applyBtn);
 
     this->addChild(menu);
@@ -62,9 +64,28 @@ bool ServerSwitchLayer::init()
 
     auto servers = Mod::get()->getSavedValue<std::vector<ServerEntry>>("saved-servers");
     log::info("Loaded {} servers", servers.size());
+    current = Mod::get()->getSavedValue<std::string>("server");
     update(servers, true);
 
+    auto cornerMenu = CCMenu::create();
+    cornerMenu->setID("corner-menu");
+    cornerMenu->setPosition(winSize.width - 30.5, 68.f);
+    cornerMenu->setLayout(ColumnLayout::create()->setAxisAlignment(AxisAlignment::Start));
+    cornerMenu->setContentSize({ 50.f, 130.f });
+    this->addChild(cornerMenu);
+
+    auto newBtn = CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_newBtn_001.png"),
+        this, menu_selector(ServerSwitchLayer::onNew));
+    newBtn->setID("new-button");
+    cornerMenu->addChild(newBtn);
+    cornerMenu->updateLayout();
+    
     return true;
+}
+
+void ServerSwitchLayer::onNew(CCObject *) {
+    ServerPopup::create(this, nullptr)->show();
 }
 
 void ServerSwitchLayer::keyBackClicked()
@@ -74,10 +95,10 @@ void ServerSwitchLayer::keyBackClicked()
 
 void ServerSwitchLayer::onGoBack(CCObject *)
 {
-    // if (latestValue == input->getString())
-    //{
-    CCDirector::get()->replaceScene(CCTransitionFade::create(0.5, MenuLayer::scene(false)));
-    /*}
+    if (current == Mod::get()->getSavedValue<std::string>("server"))
+    {
+        CCDirector::get()->replaceScene(CCTransitionFade::create(0.5, MenuLayer::scene(false)));
+    }
     else
     {
         geode::createQuickPopup(
@@ -91,7 +112,7 @@ void ServerSwitchLayer::onGoBack(CCObject *)
                     CCDirector::get()->replaceScene(CCTransitionFade::create(0.5, MenuLayer::scene(false)));
                 }
             });
-    }*/
+    }
 }
 
 ServerSwitchLayer *ServerSwitchLayer::create()
@@ -108,6 +129,25 @@ ServerSwitchLayer *ServerSwitchLayer::create()
 
 void ServerSwitchLayer::onApply(CCObject *)
 {
+    update(Mod::get()->getSavedValue<std::vector<ServerEntry>>("saved-servers"), false);
+    Mod::get()->setSavedValue("server", current);
+    geode::createQuickPopup(
+        "Restart to apply",
+        "You must restart the game for changes to take effect.",
+        "Later", "Restart",
+        [](auto, bool btn2)
+        {
+            if (btn2)
+            {
+                game::restart();
+            }
+        });
+}
+
+void ServerSwitchLayer::selectServer(ServerNode *node)
+{
+    current = node->getServer().url;
+    update(Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers"), false);
 }
 
 void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool resetPos)
@@ -116,21 +156,22 @@ void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool res
     float totalHeight = 0.f;
     std::vector<ServerNode *> rendered;
 
-    for (auto& server : servers)
+    for (auto &server : servers)
     {
-        auto node = ServerNode::create(this, server, {scroll->m_contentLayer->getContentSize().width, 45});
+        auto node = ServerNode::create(this, server, {scroll->m_contentLayer->getContentSize().width, 45}, server.url == current);
         node->setPosition(0, totalHeight);
         scroll->m_contentLayer->addChild(node);
-        totalHeight += 45;
+        totalHeight += 50;
         rendered.push_back(node);
     }
+    totalHeight -= 5;
 
     if (totalHeight < scroll->m_contentLayer->getContentSize().height)
     {
         totalHeight = scroll->m_contentLayer->getContentSize().height;
     }
 
-    for (auto& node : rendered)
+    for (auto &node : rendered)
     {
         node->setPositionY(totalHeight - node->getPositionY() - 45);
     }
