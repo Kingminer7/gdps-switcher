@@ -42,8 +42,8 @@ jobs:
   package:
     name: Package builds
     runs-on: ubuntu-latest
+    if: success() || failure()
     needs: ['build']
-
     steps:
       - uses: geode-sdk/build-geode-mod@combine
         id: build
