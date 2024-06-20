@@ -12,18 +12,18 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - name: Windows
+        - name: Cospylet platform
           os: windows-latest
 
-        - name: Android32
+        - name: Android 64/2
           os: ubuntu-latest
           target: Android32
 
-        - name: Android64
+        - name: Android64 my beloved
           os: ubuntu-latest
           target: Android64
 
-        - name: MacOS (for the 2 users there are)
+        - name: MacOS for the -4 users
           os: macos-latest
 
     name: ${{ matrix.config.name }}
