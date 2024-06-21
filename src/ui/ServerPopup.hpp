@@ -4,8 +4,8 @@ using namespace geode::prelude;
 class ServerPopup : public Popup<ServerSwitchLayer *, ServerNode *>
 {
 private:
-    CCTextInputNode *m_nameInput;
-    CCTextInputNode *m_urlInput;
+    TextInput *m_nameInput;
+    TextInput *m_urlInput;
     ServerSwitchLayer *m_layer;
     ServerNode *m_node;
 
@@ -33,30 +33,21 @@ protected:
         nameBg->setColor({0, 0, 0});
         menu->addChild(nameBg);
 
-        m_nameInput = CCTextInputNode::create(220.f, 30.f, "Enter a name", "bigFont.fnt");
-        m_nameInput->setLabelPlaceholderColor(ccColor3B{200, 200, 200});
+        m_nameInput = TextInput::create(220.f, "Enter a name", "bigFont.fnt");
+        m_nameInput->getInputNode()->setLabelPlaceholderColor(ccColor3B{200, 200, 200});
         m_nameInput->setPosition(ccp(0, 25));
         m_nameInput->setID("name-input");
-        m_nameInput->setAllowedChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;= ");
-        m_nameInput->setMaxLabelLength(24);
+        m_nameInput->getInputNode()->setAllowedChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;= ");
+        m_nameInput->getInputNode()->setMaxLabelLength(24);
         if (node != nullptr)
             m_nameInput->setString(node->getServer().name);
         menu->addChild(m_nameInput);
 
-        auto urlBg = CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
-        urlBg->setContentSize({440, 60});
-        urlBg->setScale(0.5f);
-        urlBg->setPosition(ccp(0, -15));
-        urlBg->setID("url-bg");
-        urlBg->setOpacity(50);
-        urlBg->setColor({0, 0, 0});
-        menu->addChild(urlBg);
-
-        m_urlInput = CCTextInputNode::create(220.f, 30.f, "Enter a URL", "bigFont.fnt");
-        m_urlInput->setLabelPlaceholderColor(ccColor3B{200, 200, 200});
+        m_urlInput = TextInput::create(220.f, "Enter a URL", "bigFont.fnt");
+        m_urlInput->getInputNode()->setLabelPlaceholderColor(ccColor3B{200, 200, 200});
         m_urlInput->setPosition(ccp(0, -15));
         m_urlInput->setID("url-input");
-        m_urlInput->setAllowedChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=");
+        m_urlInput->getInputNode()->setAllowedChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=");
         if (node != nullptr)
             m_urlInput->setString(node->getServer().url);
         menu->addChild(m_urlInput);
