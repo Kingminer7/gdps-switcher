@@ -120,48 +120,55 @@ void ServerSwitchLayer::importServers(CCObject *)
         });
 }
 
-void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event* event) {
-    if (event->isCancelled()) {
+void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *event)
+{
+    if (event->isCancelled())
+    {
         FLAlertLayer::create(
             "Error",
             "Failed to open file (Task Cancelled)",
-            "Ok"
-        )->show();
+            "Ok")
+            ->show();
         return;
-    } 
-    if (auto result = event->getValue()) {
-        if (!result->isOk()) {
+    }
+    if (auto result = event->getValue())
+    {
+        if (!result->isOk())
+        {
             FLAlertLayer::create(
                 "Error",
                 fmt::format("Failed to open file. Error: {}", result->err().value()),
-                "Ok"
-            )->show();
+                "Ok")
+                ->show();
             return;
         }
         std::ifstream inputFile(result->unwrap());
-        if (!inputFile.is_open()) {
+        if (!inputFile.is_open())
+        {
             FLAlertLayer::create(
                 "Error",
                 "Failed to open file.",
-                "Ok"
-            )->show();
+                "Ok")
+                ->show();
             return;
         }
         std::string file_contents;
         std::string line;
-        while (std::getline(inputFile, line)) {
+        while (std::getline(inputFile, line))
+        {
             file_contents += line;
         }
 
         inputFile.close();
 
         auto data = matjson::parse(file_contents);
-        if (!data.try_get("servers")) {
+        if (!data.try_get("servers"))
+        {
             FLAlertLayer::create(
                 "Error",
                 "Invalid file format.",
-                "Ok"
-            )->show();
+                "Ok")
+                ->show();
             return;
         }
 
@@ -171,13 +178,63 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event* e
         FLAlertLayer::create(
             "Success",
             "Servers imported successfully.",
-            "Ok"
-        )->show();
+            "Ok")
+            ->show();
     }
 }
 
 void ServerSwitchLayer::exportServers(CCObject *)
 {
+    file::FilePickOptions options = {
+        std::nullopt,
+        {{.description = "JSON Files",
+          .files = {"*.json"}}}};
+
+    m_pickListener.bind(this, &ServerSwitchLayer::onFileSave);
+    m_pickListener.setFilter(file::pick(file::PickMode::SaveFile, options));
+}
+
+void ServerSwitchLayer::onFileSave(Task<Result<std::filesystem::path>>::Event *event)
+{
+    if (event->isCancelled())
+    {
+        FLAlertLayer::create(
+            "Error",
+            "Failed to save file (Task Cancelled)",
+            "Ok")
+            ->show();
+        return;
+    }
+    if (auto result = event->getValue())
+    {
+        if (!result->isOk())
+        {
+            FLAlertLayer::create(
+                "Error",
+                fmt::format("Failed to save file. Error: {}", result->err().value()),
+                "Ok")
+                ->show();
+            return;
+        }
+        std::ofstream outputFile(result->unwrap());
+        if (!outputFile.is_open())
+        {
+            FLAlertLayer::create(
+                "Error",
+                "Failed to save file.",
+                "Ok")
+                ->show();
+            return;
+        }
+        auto servers = Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers");
+        outputFile << matjson::format_as(matjson::Object{{"servers", servers}});
+        outputFile.close();
+        FLAlertLayer::create(
+            "Success",
+            "Servers exported successfully.",
+            "Ok")
+            ->show();
+    }
 }
 
 void ServerSwitchLayer::onNew(CCObject *)
@@ -199,9 +256,9 @@ void ServerSwitchLayer::onGoBack(CCObject *)
     else
     {
         geode::createQuickPopup(
-            "Exit without saving?",      // title
-            "You have unsaved changes.", // content
-            "No", "Yes",                 // buttons
+            "Exit without saving?",      
+            "You have unsaved changes.", 
+            "No", "Yes",                 
             [](auto, bool btn2)
             {
                 if (btn2)

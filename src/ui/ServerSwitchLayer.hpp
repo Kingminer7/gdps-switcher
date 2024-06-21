@@ -36,6 +36,7 @@ public:
     void importServers(CCObject *);
     void exportServers(CCObject *);
     void onFileOpen(Task<Result<std::filesystem::path>>::Event* event);
+    void onFileSave(Task<Result<std::filesystem::path>>::Event* event);
 };
 
 template <>
