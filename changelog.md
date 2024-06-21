@@ -1,8 +1,11 @@
 # 1.1.0
-Semi-rebuild to improve the code and have a not hideous ui
+### Overhaul
+/ Redo the UI\
+\+ Importing/Exporting
 # 1.0.1
-Fix mac building
+### Bug Fix
+/ Fix mac building
 # 1.0.0
 ### Full Release
-Add switching servers\
-Windows/Android/Mac support
+\+ Add switching servers\
+\+ Windows/Android/Mac support
