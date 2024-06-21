@@ -3,6 +3,10 @@
 #include <Geode/Geode.hpp>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 
+#include "Geode/loader/Event.hpp"
+#include "Geode/utils/Result.hpp"
+#include "Geode/utils/Task.hpp"
+
 class ServerNode;
 
 using namespace geode::prelude;
@@ -12,14 +16,14 @@ class ServerSwitchLayer : public CCLayer
 protected:
     bool init() override;
     void keyBackClicked() override;
-
+    EventListener<Task<Result<std::filesystem::path>>> m_pickListener;
 public:
     struct ServerEntry
     {
         std::string name;
         std::string url;
     };
-    
+
     static ServerSwitchLayer *create();
     static cocos2d::CCLayer *scene();
     void onGoBack(CCObject *);
@@ -29,6 +33,9 @@ public:
     void saveToList(CCObject *obj);
     void selectServer(ServerNode *node);
     void onNew(CCObject *);
+    void importServers(CCObject *);
+    void exportServers(CCObject *);
+    void onFileOpen(Task<Result<std::filesystem::path>>::Event* event);
 };
 
 template <>

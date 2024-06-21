@@ -69,9 +69,11 @@ bool ServerSwitchLayer::init()
 
     auto cornerMenu = CCMenu::create();
     cornerMenu->setID("corner-menu");
-    cornerMenu->setPosition(winSize.width - 30.5, 68.f);
+    cornerMenu->setPosition(winSize.width - 19, 51.f);
+    cornerMenu->setZOrder(10);
+    cornerMenu->setScale(.75f);
     cornerMenu->setLayout(ColumnLayout::create()->setAxisAlignment(AxisAlignment::Start));
-    cornerMenu->setContentSize({ 50.f, 130.f });
+    cornerMenu->setContentSize({50.f, 130.f});
     this->addChild(cornerMenu);
 
     auto newBtn = CCMenuItemSpriteExtra::create(
@@ -79,12 +81,107 @@ bool ServerSwitchLayer::init()
         this, menu_selector(ServerSwitchLayer::onNew));
     newBtn->setID("new-button");
     cornerMenu->addChild(newBtn);
+
+    auto importBtn = CCMenuItemSpriteExtra::create(
+        CircleButtonSprite::createWithSpriteFrameName("import.png"_spr, 1.0f, CircleBaseColor::Pink, CircleBaseSize::Big),
+        this, menu_selector(ServerSwitchLayer::importServers));
+    importBtn->setID("import-button");
+    cornerMenu->addChild(importBtn);
+
+    auto exportBtn = CCMenuItemSpriteExtra::create(
+        CircleButtonSprite::createWithSpriteFrameName("export.png"_spr, 1.0f, CircleBaseColor::Green, CircleBaseSize::Big),
+        this, menu_selector(ServerSwitchLayer::exportServers));
+    exportBtn->setID("export-button");
+    cornerMenu->addChild(exportBtn);
+
     cornerMenu->updateLayout();
-    
+
     return true;
 }
 
-void ServerSwitchLayer::onNew(CCObject *) {
+void ServerSwitchLayer::importServers(CCObject *)
+{
+    geode::createQuickPopup(
+        "Import Servers",
+        "This will overwrite your current server list. Are you sure you want to continue?",
+        "No", "Yes",
+        [this](auto, bool yes)
+        {
+            if (yes)
+            {
+                file::FilePickOptions options = {
+                    std::nullopt,
+                    {{.description = "Server Lists",
+                      .files = {"*.json"}}}};
+
+                m_pickListener.bind(this, &ServerSwitchLayer::onFileOpen);
+                m_pickListener.setFilter(file::pick(file::PickMode::OpenFile, options));
+            }
+        });
+}
+
+void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event* event) {
+    if (event->isCancelled()) {
+        FLAlertLayer::create(
+            "Error",
+            "Failed to open file (Task Cancelled)",
+            "Ok"
+        )->show();
+        return;
+    } 
+    if (auto result = event->getValue()) {
+        if (!result->isOk()) {
+            FLAlertLayer::create(
+                "Error",
+                fmt::format("Failed to open file. Error: {}", result->err().value()),
+                "Ok"
+            )->show();
+            return;
+        }
+        std::ifstream inputFile(result->unwrap());
+        if (!inputFile.is_open()) {
+            FLAlertLayer::create(
+                "Error",
+                "Failed to open file.",
+                "Ok"
+            )->show();
+            return;
+        }
+        std::string file_contents;
+        std::string line;
+        while (std::getline(inputFile, line)) {
+            file_contents += line;
+        }
+
+        inputFile.close();
+
+        auto data = matjson::parse(file_contents);
+        if (!data.try_get("servers")) {
+            FLAlertLayer::create(
+                "Error",
+                "Invalid file format.",
+                "Ok"
+            )->show();
+            return;
+        }
+
+        auto servers = data["servers"].as<std::vector<ServerEntry>>();
+        Mod::get()->setSavedValue("saved-servers", servers);
+        update(servers, true);
+        FLAlertLayer::create(
+            "Success",
+            "Servers imported successfully.",
+            "Ok"
+        )->show();
+    }
+}
+
+void ServerSwitchLayer::exportServers(CCObject *)
+{
+}
+
+void ServerSwitchLayer::onNew(CCObject *)
+{
     ServerPopup::create(this, nullptr)->show();
 }
 
