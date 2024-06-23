@@ -57,7 +57,7 @@ bool ServerSwitchLayer::init()
     scrollBg->setID("server-scroll-bg");
     this->addChild(scrollBg);
 
-    scroll = ScrollLayer::create({winSize.width - 100, winSize.height - 100});
+    scroll = ScrollLayer::create({winSize.width - 85, winSize.height - 100});
     scroll->setPosition((winSize - scroll->getContentSize()) / 2);
     scroll->setID("server-scroll");
     this->addChild(scroll);
