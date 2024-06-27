@@ -1,5 +1,5 @@
 # GDPS Switcher
 Simple mod that lets you change your game servers.
 # Credits
-- Brift (@elbrift on discord) - Pencil icon
-- Geode discord - answering and helping with my stupid questions and issues
+- [Brift](https://x.com/BriftXD) - Pencil icon
+- [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
