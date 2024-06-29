@@ -24,11 +24,7 @@ class $modify(GDPSGManager, GManager) {
         }
         DataManager::get().initialize(url);
         std::transform(url.begin(), url.end(), url.begin(), ::tolower);
-        if (!(
-            url.starts_with("www.boomlings.com/database") 
-        || url.starts_with("http://www.boomlings.com/database")
-        || url.starts_with("https://www.boomlings.com/database") 
-        )) {
+        if (!DataManager::get().isBoomlings()) {
 
         auto filename = std::string(m_fileName);
 

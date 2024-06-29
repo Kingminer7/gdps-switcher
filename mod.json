@@ -5,11 +5,11 @@
 		"android": "2.206",
 		"mac": "2.206"
 	},
-	"version": "v1.1.0",
+	"version": "v1.1.1",
 	"id": "km7dev.gdps-switcher",
-	"name": "GDPS Switcher",
+	"name": "GDPS Manager",
 	"developer": "km7dev",
-	"description": "Lets you switch between GDPS servers easily.",
+	"description": "Lets you connect to GDPS servers easily.",
 	"tags": [
 		"customization",
 		"online"
