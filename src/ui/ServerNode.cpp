@@ -38,27 +38,27 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     menu->setPosition(0, 0);
     this->addChild(menu);
 
-    auto edit = CCMenuItemSpriteExtra::create(
+    editBtn = CCMenuItemSpriteExtra::create(
         CCSprite::createWithSpriteFrameName("editBtn.png"_spr),
         this,
         menu_selector(ServerNode::editServer));
-    edit->setID("server-node-edit");
-    edit->setPosition({size.width - 60, size.height / 2});
-    edit->setContentSize({31, 31});
-    as<CCSprite *>(edit->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
-    as<CCSprite *>(edit->getChildren()->objectAtIndex(0))->setScale(0.775f);
-    menu->addChild(edit);
+    editBtn->setID("server-node-edit");
+    editBtn->setPosition({size.width - 60, size.height / 2});
+    editBtn->setContentSize({31, 31});
+    as<CCSprite *>(editBtn->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
+    as<CCSprite *>(editBtn->getChildren()->objectAtIndex(0))->setScale(0.775f);
+    menu->addChild(editBtn);
 
-    auto del = CCMenuItemSpriteExtra::create(
+    delBtn = CCMenuItemSpriteExtra::create(
         CCSprite::createWithSpriteFrameName("deleteBtn.png"_spr),
         this,
         menu_selector(ServerNode::deleteServer));
-    del->setID("server-node-delete");
-    del->setPosition({size.width - 95, size.height / 2});
-    del->setContentSize({31, 31});
-    as<CCSprite *>(del->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
-    as<CCSprite *>(del->getChildren()->objectAtIndex(0))->setScale(0.775f);
-    menu->addChild(del);
+    delBtn->setID("server-node-delete");
+    delBtn->setPosition({size.width - 95, size.height / 2});
+    delBtn->setContentSize({31, 31});
+    as<CCSprite *>(delBtn->getChildren()->objectAtIndex(0))->setPosition({15.5, 15.5});
+    as<CCSprite *>(delBtn->getChildren()->objectAtIndex(0))->setScale(0.775f);
+    menu->addChild(delBtn);
 
     if (selected)
     {
@@ -80,6 +80,11 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     menu->addChild(selectBtn);
 
     return true;
+}
+
+void ServerNode::preventDelete() {
+    delBtn->setVisible(false);
+    editBtn->setVisible(false);
 }
 
 void ServerNode::deleteServer(CCObject *)

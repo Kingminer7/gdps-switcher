@@ -10,6 +10,8 @@ protected:
     ServerSwitchLayer* m_layer;
     ServerSwitchLayer::ServerEntry server;
     CCMenuItemSpriteExtra* selectBtn;
+    CCMenuItemSpriteExtra* delBtn;
+    CCMenuItemSpriteExtra* editBtn;
 
     bool init(
         ServerSwitchLayer* layer,
@@ -29,5 +31,6 @@ public:
     void selectServer(CCObject*);
     void deleteServer(CCObject*);
     void editServer(CCObject*);
+    void preventDelete();
     ServerSwitchLayer::ServerEntry getServer();
 };

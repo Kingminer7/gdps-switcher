@@ -124,11 +124,6 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *e
 {
     if (event->isCancelled())
     {
-        FLAlertLayer::create(
-            "Error",
-            "Failed to open file (Task Cancelled)",
-            "Ok")
-            ->show();
         return;
     }
     if (auto result = event->getValue())
@@ -198,11 +193,6 @@ void ServerSwitchLayer::onFileSave(Task<Result<std::filesystem::path>>::Event *e
 {
     if (event->isCancelled())
     {
-        FLAlertLayer::create(
-            "Error",
-            "Failed to save file (Task Cancelled)",
-            "Ok")
-            ->show();
         return;
     }
     if (auto result = event->getValue())
@@ -315,6 +305,13 @@ void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool res
     scroll->m_contentLayer->removeAllChildren();
     float totalHeight = 0.f;
     std::vector<ServerNode *> rendered;
+
+    auto node = ServerNode::create(this, {"Geometry Dash servers", "https://www.boomlings.com/database/"}, {scroll->m_contentLayer->getContentSize().width, 45}, "https://www.boomlings.com/database/" == current);
+    node->preventDelete();
+    node->setPosition(0, totalHeight);
+    scroll->m_contentLayer->addChild(node);
+    rendered.push_back(node);
+    totalHeight += 50;
 
     for (auto &server : servers)
     {

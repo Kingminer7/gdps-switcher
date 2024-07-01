@@ -2,7 +2,8 @@
 Add warning about globed not working\
 Change credits slightly to properly credit Brift\
 Fix server lists not properly exporting as json\
-Fix the Apply button on some aspect ratios
+Fix the Apply button on some aspect ratios\
+Pin GD servers to the list
 # 1.1.0
 ### Overhaul
 Redo the UI/
