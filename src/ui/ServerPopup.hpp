@@ -19,23 +19,20 @@ protected:
 
         this->setTitle((node == nullptr) ? "Add Server" : "Edit Server");
 
+        auto olderWarning = CCLabelBMFont::create("Server will only work\n  if it supports 2.2", "bigFont.fnt");
+        olderWarning->setColor({255, 127, 127});
+        olderWarning->setPosition(this->m_title->getPosition() - ccp(0, 20));
+        olderWarning->setScale(.35f);
+        m_mainLayer->addChild(olderWarning);
+
         auto menu = CCMenu::create();
         menu->setID("data-menu");
         menu->setZOrder(10);
         m_mainLayer->addChild(menu);
 
-        auto nameBg = CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
-        nameBg->setContentSize({440, 60});
-        nameBg->setScale(0.5f);
-        nameBg->setPosition(ccp(0, 25));
-        nameBg->setID("name-bg");
-        nameBg->setOpacity(50);
-        nameBg->setColor({0, 0, 0});
-        menu->addChild(nameBg);
-
         m_nameInput = TextInput::create(220.f, "Enter a name", "bigFont.fnt");
         m_nameInput->getInputNode()->setLabelPlaceholderColor(ccColor3B{200, 200, 200});
-        m_nameInput->setPosition(ccp(0, 25));
+        m_nameInput->setPosition(ccp(0, 20));
         m_nameInput->setID("name-input");
         m_nameInput->getInputNode()->setAllowedChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;= ");
         m_nameInput->getInputNode()->setMaxLabelLength(24);
@@ -45,7 +42,7 @@ protected:
 
         m_urlInput = TextInput::create(220.f, "Enter a URL", "bigFont.fnt");
         m_urlInput->getInputNode()->setLabelPlaceholderColor(ccColor3B{200, 200, 200});
-        m_urlInput->setPosition(ccp(0, -15));
+        m_urlInput->setPosition(ccp(0, -20));
         m_urlInput->setID("url-input");
         m_urlInput->getInputNode()->setAllowedChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=");
         if (node != nullptr)
@@ -55,7 +52,7 @@ protected:
         auto saveBtn = CCMenuItemSpriteExtra::create(
             ButtonSprite::create("Save", "goldFont.fnt", "GJ_button_01.png", .8f),
             this, menu_selector(ServerPopup::onSave));
-        saveBtn->setPosition(ccp(0, -53));
+        saveBtn->setPosition(ccp(0, -58));
         saveBtn->setID("save-button");
         menu->addChild(saveBtn);
 
@@ -125,8 +122,9 @@ protected:
         auto servers = Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers");
         if (m_node != nullptr)
         {
-            auto index = std::distance(servers.begin(), std::find_if(servers.begin(), servers.end(), [this](auto &entry)
-                                                                     { return entry.name == m_node->getServer().name; }));
+            auto index = std::distance(servers.begin(), std::find_if(servers.begin(), servers.end(), [this](auto &entry) {
+                return entry.name == m_node->getServer().name;
+            }));
             servers[index] = {name, url};
         }
         else
@@ -144,7 +142,7 @@ public:
     static ServerPopup *create(ServerSwitchLayer *layer, ServerNode *node = nullptr)
     {
         auto ret = new ServerPopup();
-        if (ret && ret->init(240.f, 160.f, layer, node))
+        if (ret && ret->init(240.f, 180.f, layer, node))
         {
             ret->autorelease();
             return ret;
