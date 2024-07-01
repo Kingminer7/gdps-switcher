@@ -7,9 +7,9 @@
 	},
 	"version": "v1.1.1",
 	"id": "km7dev.gdps-switcher",
-	"name": "GDPS Manager",
+	"name": "GDPS Switcher",
 	"developer": "km7dev",
-	"description": "Lets you connect to GDPS servers easily.",
+	"description": "Switch between GDPS servers easily.",
 	"tags": [
 		"customization",
 		"online"
