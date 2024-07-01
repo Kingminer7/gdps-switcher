@@ -41,7 +41,7 @@ bool ServerSwitchLayer::init()
         ButtonSprite::create("Apply", "goldFont.fnt", "GJ_button_01.png", .8f),
         this, menu_selector(ServerSwitchLayer::onApply));
 
-    applyBtn->setPosition(0, -135);
+    applyBtn->setPosition(0.f, -winSize.height / 2 + 25.f);
     applyBtn->setID("apply-button");
     applyBtn->setOpacity(50);
     menu->addChild(applyBtn);
@@ -216,7 +216,13 @@ void ServerSwitchLayer::onFileSave(Task<Result<std::filesystem::path>>::Event *e
                 ->show();
             return;
         }
-        std::ofstream outputFile(result->unwrap());
+        auto path = result->unwrap();
+        if (path.extension() != ".json")
+        {
+            path += ".json";
+        }
+        
+        std::ofstream outputFile(path);
         if (!outputFile.is_open())
         {
             FLAlertLayer::create(

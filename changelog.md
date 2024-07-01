@@ -1,6 +1,8 @@
 # 1.1.1
-Add warning about globed not working./
-Private server configurations (developers see [https://github.com/kingminer7/gdps-switcher/ServerIntegration.md])
+Add warning about globed not working/
+Change credits slightly to properly credit Brift\
+Fix server lists not properly exporting as json\
+Fix the Apply button on some aspect ratios
 # 1.1.0
 ### Overhaul
 Redo the UI/
