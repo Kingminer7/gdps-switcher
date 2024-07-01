@@ -1,4 +1,5 @@
 # 1.1.1
+### Bug Fix
 Add warning about globed not working\
 Change credits slightly to properly credit Brift\
 Fix server lists not properly exporting as json\
