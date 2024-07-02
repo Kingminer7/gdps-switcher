@@ -7,6 +7,8 @@ assignees: Kingminer7
 
 ---
 
+### Before making this report, check [known issues](https://github.com/Kingminer7/gdps-switcher/issues/5) and make sure there are no other reports about it.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
