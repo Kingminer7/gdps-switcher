@@ -32,7 +32,6 @@ class $modify(CCHttpClient) {
 
 web::WebTask webSend(web::WebRequest *self, std::string_view method, std::string_view givenUrl)
     {
-		log::info("{} request sent to {}", method, givenUrl);
 		auto url = std::string(givenUrl);
 		auto newUrl = DataManager::get().getServer();
 		if (newUrl.empty()) {
