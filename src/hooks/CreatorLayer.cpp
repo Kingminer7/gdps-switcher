@@ -1,4 +1,4 @@
-#ifdef GEODE_IS_MACOS
+#ifndef GEODE_IS_MACOS
 
 #include "../utils/DataManager.hpp"
 #include <Geode/modify/DailyLevelPage.hpp>
