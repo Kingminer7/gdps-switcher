@@ -29,5 +29,12 @@
 				"resources/*.png"
 			]
 		}
-	}
+	},
+	"dependencies": [
+		{
+			"id": "geode.node-ids",
+			"importance": "required",
+			"version": "1.13.1"
+		}
+	]
 }
