@@ -3,7 +3,7 @@ Simple mod that lets you change your game servers.
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
-- Event Level Support (Windows and Android exclusive for now)
+- Event Level Support
 - Server owner integration options
 ### Coming Soon
 - none at the moment
@@ -17,3 +17,4 @@ Simple mod that lets you change your game servers.
 - [Brift](https://x.com/BriftXD) - Pencil icon
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
 - [Uproxide](https://x.com/uproxide) - Event levels (Both the idea and some of the functionality)
+- [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
