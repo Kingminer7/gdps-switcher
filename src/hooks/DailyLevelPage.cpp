@@ -1,3 +1,5 @@
+#ifndef GEODE_IS_MACOS
+
 using namespace geode::prelude;
 
 #include <Geode/modify/DailyLevelPage.hpp>
@@ -11,3 +13,5 @@ class $modify(dLPage, DailyLevelPage) {
 		}
 	}
 };
+
+#endif
