@@ -3,7 +3,7 @@ Simple mod that lets you change your game servers.
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
-- Event Level Support
+- Event Level Support (Windows and Android exclusive for now)
 - Server owner integration options
 ### Coming Soon
 - none at the moment

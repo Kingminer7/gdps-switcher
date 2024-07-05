@@ -1,3 +1,5 @@
+#ifdef GEODE_IS_MACOS
+
 #include "../utils/DataManager.hpp"
 #include <Geode/modify/DailyLevelPage.hpp>
 
@@ -35,3 +37,5 @@ class $modify(creatorLayer, CreatorLayer) {
 		page->show();
 	}
 };
+
+#endif
