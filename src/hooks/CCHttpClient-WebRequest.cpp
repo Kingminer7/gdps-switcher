@@ -8,11 +8,7 @@ class $modify(CCHttpClient) {
 	void send(CCHttpRequest* req)
     {
 		std::string url = req->getUrl();
-		auto newUrl = DataManager::get().getServer();
-		if (newUrl.empty()) {
-			newUrl = "https://www.boomlings.com/database";
-			Mod::get()->setSavedValue("server", newUrl);
-		}
+		auto newUrl = DataManager::get()->getServer();
         if (newUrl.ends_with("/")) {
 			if (url.starts_with("https://www.boomlings.com/database/")) {
 				req->setUrl(url.replace(0, 35, newUrl).c_str());
@@ -33,11 +29,7 @@ class $modify(CCHttpClient) {
 web::WebTask webSend(web::WebRequest *self, std::string_view method, std::string_view givenUrl)
     {
 		auto url = std::string(givenUrl);
-		auto newUrl = DataManager::get().getServer();
-		if (newUrl.empty()) {
-			newUrl = "https://www.boomlings.com/database";
-			Mod::get()->setSavedValue("server", newUrl);
-		}
+		auto newUrl = DataManager::get()->getServer();
 		if (newUrl.ends_with("/")) {
 			if (url.starts_with("https://www.boomlings.com/database/")) {
 				url = url.replace(0, 35, newUrl);

@@ -7,7 +7,7 @@ class $modify(director, CCDirector) {
 	bool replaceScene(CCScene* scene)
     {
         if (!CCDirector::replaceScene(scene)) return false;
-        if (DataManager::get().isBoomlings()) return true;
+        if (DataManager::get()->isBoomlings()) return true;
         if (scene->getChildren() == nullptr || scene->getChildren()->count() == 0) return true;
         auto layer = scene->getChildren()->objectAtIndex(0);
         auto type = std::string(typeid(*layer).name());
