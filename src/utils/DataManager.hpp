@@ -25,8 +25,6 @@ private:
         web::WebRequest req = web::WebRequest();
         listener.bind([this] (web::WebTask::Event* e) {
             if (web::WebResponse* value = e->getValue()) {
-                log::info("important number tres");
-                log::info("fhghffffdfsfa {}", value->string().unwrapOr("-1"));
                 if (!value->ok()) {
                     if (value->code() >= 400 && value->code() < 500) {
                         serverChecked = true;
@@ -42,13 +40,11 @@ private:
                     return;
                 }
                 auto listType = resp.substr(0, resp.find(";"));
-                log::info("List type: {}", listType);
                 if (listType != "blacklist" && listType != "whitelist") {
                     log::error("Failed to check server.");
                     return;
                 }
                 auto listStr = resp.substr(resp.find(";") + 1);
-                log::info("List: {}", listStr);
                 if (listStr.empty()) {
                     log::error("Failed to check server.");
                     return;
@@ -76,9 +72,7 @@ private:
                 }
 
             } else if (web::WebProgress* progress = e->getProgress()) {
-                log::info("In progress...");
             } else if (e->isCancelled()) {
-                log::info("Request was cancelled.");
             }
         });
         listener.setFilter(req.post(url));
@@ -108,7 +102,6 @@ public:
 
     bool isBoomlings()
     {
-        log::info("{}", server);
         return server.starts_with("www.boomlings.com/database") || server.starts_with("http://www.boomlings.com/database") || server.starts_with("https://www.boomlings.com/database");
     }
 

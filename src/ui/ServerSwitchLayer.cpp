@@ -63,7 +63,6 @@ bool ServerSwitchLayer::init()
     this->addChild(scroll);
 
     auto servers = Mod::get()->getSavedValue<std::vector<ServerEntry>>("saved-servers");
-    log::info("Loaded {} servers", servers.size());
     current = Mod::get()->getSavedValue<std::string>("server");
     update(servers, true);
 
