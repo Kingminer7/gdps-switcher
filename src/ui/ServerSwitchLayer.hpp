@@ -3,11 +3,11 @@
 #include <Geode/Geode.hpp>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 
-#include "Geode/loader/Event.hpp"
-#include "Geode/utils/Result.hpp"
-#include "Geode/utils/Task.hpp"
+#include <Geode/loader/Event.hpp>
+#include <Geode/utils/Result.hpp>
+#include <Geode/utils/Task.hpp>
 
-class ServerNode;
+#include "./ServerNode.hpp"
 
 using namespace geode::prelude;
 

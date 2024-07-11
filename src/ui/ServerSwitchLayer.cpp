@@ -95,6 +95,16 @@ bool ServerSwitchLayer::init()
 
     cornerMenu->updateLayout();
 
+    if (!Mod::get()->hasSavedValue("shown_warning")) {
+        auto alert = FLAlertLayer::create(
+        "Warning",
+        "Some mods may not work on all servers. Check the mod description for known problems.",
+        "Ok");
+        alert->show();
+        alert->m_scene = this->getParent();
+        Mod::get()->setSavedValue("shown_warning", true);
+    }
+
     return true;
 }
 
