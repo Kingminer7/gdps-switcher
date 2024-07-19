@@ -30,5 +30,16 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 		auto scene = CCScene::create();
 		scene->addChild(ServerSwitchLayer::create());
 		CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.5, scene));
+		
+
+    if (!Mod::get()->hasSavedValue("shown_warning")) {
+        auto alert = FLAlertLayer::create(
+        "Warning",
+        "Some mods may not work on all servers. Check the mod description for known problems.",
+        "Ok");
+        alert->show();
+        alert->m_scene = this->getParent();
+        Mod::get()->setSavedValue("shown_warning", true);
+    }
 	}
 };
