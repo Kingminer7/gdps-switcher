@@ -7,7 +7,7 @@
 #include <Geode/utils/Result.hpp>
 #include <Geode/utils/Task.hpp>
 
-#include "./ServerNode.hpp"
+class ServerNode;
 
 using namespace geode::prelude;
 
