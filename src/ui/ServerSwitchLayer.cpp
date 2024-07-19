@@ -165,25 +165,24 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *e
 
         inputFile.close();
 
-        auto data = matjson::parse(file_contents);
-        if (!data.try_get("servers"))
-        {
+        try {
+            auto data = matjson::parse(file_contents);
+
+            auto servers = data["servers"].as<std::vector<ServerEntry>>();
+            Mod::get()->setSavedValue("saved-servers", servers);
+            update(servers, true);
+            FLAlertLayer::create(
+                "Success",
+                "Servers imported successfully.",
+                "Ok")
+                ->show();
+        } catch (matjson::JsonException e) {
             FLAlertLayer::create(
                 "Error",
                 "Invalid file format.",
                 "Ok")
                 ->show();
-            return;
         }
-
-        auto servers = data["servers"].as<std::vector<ServerEntry>>();
-        Mod::get()->setSavedValue("saved-servers", servers);
-        update(servers, true);
-        FLAlertLayer::create(
-            "Success",
-            "Servers imported successfully.",
-            "Ok")
-            ->show();
     }
 }
 
