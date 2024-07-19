@@ -1,8 +1,8 @@
-# 1.2.0
-### Server side configuration
+# 1.1.2
+### Fixes and Event Levels
 - Fix some other mods not connecting to private servers for stats (mods like Demons in Garage and Garage Plus),
-- Event Levels (thank you uproxide)
-- Server side options
+- Event Levels (thank you Uproxide and TheSilyDoggo)
+- Fix crash when importing invalid files
 - Change how mod warnings work
 # 1.1.1
 ### Bug Fix

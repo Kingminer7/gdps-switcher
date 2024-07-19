@@ -4,9 +4,8 @@ Simple mod that lets you change your game servers.
 - Separate saves for servers
 - Importing/exporting server lists
 - Event Level Support
-- Server owner integration options
 ### Coming Soon
-- none at the moment
+- Server owner integration options
 ## Credits
 - [Brift](https://x.com/BriftXD) - Pencil icon
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
