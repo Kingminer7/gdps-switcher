@@ -3,7 +3,7 @@
 - Fix some other mods not connecting to private servers for stats (mods like Demons in Garage and Garage Plus),
 - Event Levels (thank you Uproxide and TheSilyDoggo)
 - Fix crash when importing invalid files
-- Change how mod warnings work
+- Temporarily remove Globed warning
 # 1.1.1
 ### Bug Fix
 - Add warning about globed not working
