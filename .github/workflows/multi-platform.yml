@@ -36,7 +36,6 @@ jobs:
         with:
           combine: true
           target: ${{ matrix.config.target }}
-          bindings: "Kingminer7/bindings"
       
   package:
     name: Package builds
