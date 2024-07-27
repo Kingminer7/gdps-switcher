@@ -42,7 +42,7 @@ jobs:
         with:
           file: mod.json
           field: version
-          value: "${{ steps.json_properties.outputs.version }}-beta.${{github.sha}}"
+          value: "${{ steps.json_properties.outputs.version }}-beta.${{github.run_number}}"
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
