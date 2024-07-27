@@ -21,7 +21,7 @@ class $modify(creatorLayer, CreatorLayer) {
 			return true;
 		}
 		auto sprite = CCSprite::createWithSpriteFrameName("GJ_eventBtn_001.png");
-		sprite->setScale(.75);
+		//sprite->setScale(.75);
 		eventBtn->setSprite(sprite);
 
 		return true;
