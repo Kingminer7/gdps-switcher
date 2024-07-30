@@ -1,4 +1,3 @@
-#pragma once
 #include <Geode/modify/GManager.hpp>
 #include "../utils/DataManager.hpp"
 
