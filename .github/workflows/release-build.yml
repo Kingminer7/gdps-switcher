@@ -5,8 +5,8 @@ on:
 
 jobs:
   build:
+    continue-on-error: true
     strategy:
-      fail-fast: false
       matrix:
         config:
         - name: Cospylet platform
@@ -37,7 +37,6 @@ jobs:
   package:
     name: Package builds
     runs-on: ubuntu-latest
-    if: success() || failure()
     needs: ['build']
     steps:
       - uses: geode-sdk/build-geode-mod/combine@main
