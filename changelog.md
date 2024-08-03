@@ -4,6 +4,7 @@
 - Event Levels (thank you Uproxide and TheSilyDoggo)
 - Fix crash when importing invalid files
 - Temporarily remove Globed warning
+- Changed create server popup slightly
 # 1.1.1
 ### Bug Fix
 - Add warning about globed not working
