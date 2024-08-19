@@ -14,7 +14,7 @@ Simple mod that lets you change your game servers.
 - [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
 ### Server Owners: see [here](https://github.com/Kingminer7/gdps-switcher/blob/main/ServerIntegration.md)
 ## Known Problems
-- Globed needs its own server to work.
+- Globed needs a different server to work.
 - BetterProgression plays animations every time you switch servers.
 - Servers that don't support 2.2 will not work. (Will not fix)
-- Event levels only show if server owners set them.
+- Event levels only show if server owners set them. (Will not fix)
