@@ -1,6 +1,6 @@
 # 1.1.3
 ## IMPORTANT
-# Mark "sorkopiko.noratelimit" incompatible
+### Mark "sorkopiko.noratelimit" incompatible
 SorkoPiko's No Rate Limit causes a crash on startup. I've marked it as incompatible in this important update, so if possible, please update.
 # 1.1.2
 ### Fixes and Event Levels
