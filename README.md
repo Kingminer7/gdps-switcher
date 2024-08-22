@@ -18,4 +18,4 @@ Simple mod that lets you change your game servers.
 - BetterProgression plays animations every time you switch servers.
 - Servers that don't support 2.2 will not work. (Will not fix)
 - Event levels only show if server owners set them. (Will not fix)
-- Incompatible with SorkoPiku's No Rate Limit (Can not fix)
+- Incompatible with SorkoPiko's No Rate Limit (Can not fix)
