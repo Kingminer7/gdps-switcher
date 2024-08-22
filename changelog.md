@@ -1,3 +1,6 @@
+# 1.1.4
+### fix a name (sorry!)
+- fix SorkoPiko's name (sorry about that!)
 # 1.1.3
 ## IMPORTANT
 ### Mark "sorkopiko.noratelimit" incompatible
