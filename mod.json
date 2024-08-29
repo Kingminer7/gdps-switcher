@@ -35,6 +35,11 @@
 			"id": "geode.node-ids",
 			"importance": "required",
 			"version": "1.13.1"
+		},
+		{
+			"id": "km7dev.server_api",
+			"importance": "required",
+			"version": "1.0.0-alpha.1"
 		}
 	],
 	"incompatibilities": [
