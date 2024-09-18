@@ -1,5 +1,5 @@
-#include "../utils/DataManager.hpp"
 #include <Geode/modify/DailyLevelPage.hpp>
+#include "../utils/PSUtils.hpp"
 
 using namespace geode::prelude;
 
@@ -10,7 +10,7 @@ class $modify(creatorLayer, CreatorLayer) {
 			return false;
 		}
 
-		if (DataManager::get()->isBoomlings()) return true;
+		if (PSUtils::get()->isBoomlings()) return true;
 
 		CCMenu *menu = dynamic_cast<CCMenu*>(this->getChildByID("creator-buttons-menu"));
 		if (!menu) {
@@ -28,7 +28,7 @@ class $modify(creatorLayer, CreatorLayer) {
 	}
 
 	void onEventLevel(CCObject* h) {
-		if (DataManager::get()->isBoomlings()) {
+		if (PSUtils::get()->isBoomlings()) {
 			CreatorLayer::onEventLevel(h);
 			return;
 		}
