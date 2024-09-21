@@ -1,5 +1,9 @@
+# 1.2.0
+### Internal Changes & bug fixes
+- Move actual request handling to another mod (km7dev.server_api)
+- Remove geode::web hooking (May cause new/returning problems with other mods)
 # 1.1.4
-### fix a name (sorry!)
+### Fix a Name (sorry!)
 - fix SorkoPiko's name (sorry about that!)
 # 1.1.3
 ## IMPORTANT

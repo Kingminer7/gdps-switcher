@@ -9,24 +9,31 @@ jobs:
     strategy:
       matrix:
         config:
-        - name: Cospylet platform
+        - name: Windows
           os: windows-latest
 
-        - name: Android 64/2
+        - name: Android32
           os: ubuntu-latest
           target: Android32
 
-        - name: Android64 my beloved
+        - name: Android64
           os: ubuntu-latest
           target: Android64
 
-        - name: MacOS for the -4 users
+        - name: MacOS
           os: macos-latest
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Download Node IDs
+        run: |
+          mkdir -p build/geode-deps/km7dev.server_api/
+          curl -L -o ./km7dev.server_api.geode https://github.com/Kingminer7/server_api/releases/download/1.0.0/km7dev.server_api.geode
+          7z x './km7dev.server_api.geode' '-o./build/geode-deps/km7dev.server_api'
+          echo '{ "required": true }' > build/geode-deps/km7dev.server_api/geode-dep-options.json
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
