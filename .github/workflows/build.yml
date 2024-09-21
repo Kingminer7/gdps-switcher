@@ -33,8 +33,8 @@ jobs:
       - name: Download Server API
         run: |
           mkdir -p build/geode-deps/km7dev.server_api/
-          curl -L -o ./km7dev.server_api.zip https://github.com/Kingminer7/server_api/releases/download/1.0.0/km7dev.server_api.geode
-          7z x './km7dev.server_api.zip' '-o./build/geode-deps/km7dev.server_api'
+          curl -L -o ./km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/1.0.0/km7dev.server_api.geode
+          7z x './km7dev.server_api.geode' '-o./build/geode-deps/km7dev.server_api'
           echo '{ "required": true }' > build/geode-deps/km7dev.server_api/geode-dep-options.json
 
       - name: Build the mod
