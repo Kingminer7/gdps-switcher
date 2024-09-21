@@ -39,7 +39,7 @@ jobs:
           echo '{ "required": true }' > build/geode-deps/km7dev.server_api/geode-dep-options.json
 
       - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
+        uses: kingminer7/build-geode-mod@main
         with:
           combine: true
           target: ${{ matrix.config.target }}
