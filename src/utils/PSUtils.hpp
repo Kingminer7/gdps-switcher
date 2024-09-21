@@ -36,7 +36,7 @@ public:
 
     void initialize(std::string url)
     {
-        if (!isBoomlings()) this->serverId = ServerAPI::get()->setURL(url, -40);
+        if (!isBoomlings()) this->serverId = ServerAPI::get()->registerURL(url, -40);
     }
 
     int getId() {return serverId;}

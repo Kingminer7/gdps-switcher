@@ -16,6 +16,7 @@ class ServerSwitchLayer : public CCLayer
 protected:
     bool init() override;
     void keyBackClicked() override;
+    CCMenuItemSpriteExtra *applyBtn;
     EventListener<Task<Result<std::filesystem::path>>> m_pickListener;
 public:
     struct ServerEntry

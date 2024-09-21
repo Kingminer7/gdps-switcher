@@ -37,14 +37,20 @@ bool ServerSwitchLayer::init()
     backBtn->setID("back-button");
     menu->addChild(backBtn);
 
-    auto applyBtn = CCMenuItemSpriteExtra::create(
+    applyBtn = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Apply", "goldFont.fnt", "GJ_button_01.png", .8f),
         this, menu_selector(ServerSwitchLayer::onApply));
 
     applyBtn->setPosition(0.f, -winSize.height / 2 + 25.f);
     applyBtn->setID("apply-button");
-    applyBtn->setOpacity(50);
     menu->addChild(applyBtn);
+
+    auto spr = static_cast<CCSprite*>(applyBtn->getNormalImage());
+    applyBtn->setEnabled(false);
+    spr->setCascadeColorEnabled(true);
+    spr->setCascadeOpacityEnabled(true);
+    spr->setColor(ccGRAY);
+    spr->setOpacity(155);
 
     this->addChild(menu);
 
@@ -291,12 +297,31 @@ void ServerSwitchLayer::onApply(CCObject *)
                 game::restart();
             }
         });
+    auto spr = static_cast<CCSprite*>(applyBtn->getNormalImage());
+    applyBtn->setEnabled(false);
+    spr->setCascadeColorEnabled(true);
+    spr->setCascadeOpacityEnabled(true);
+    spr->setColor(ccGRAY);
+    spr->setOpacity(155);
+    
 }
 
 void ServerSwitchLayer::selectServer(ServerNode *node)
 {
     current = node->getServer().url;
     update(Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers"), false);
+    auto spr = static_cast<CCSprite*>(applyBtn->getNormalImage());
+    spr->setCascadeColorEnabled(true);
+    spr->setCascadeOpacityEnabled(true);
+    if (current == Mod::get()->getSavedValue<std::string>("server")) {
+        applyBtn->setEnabled(false);
+        spr->setColor(ccGRAY);
+        spr->setOpacity(155);
+    } else {
+        applyBtn->setEnabled(true);
+        spr->setColor(ccWHITE);
+        spr->setOpacity(255);
+    }
 }
 
 void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool resetPos)
