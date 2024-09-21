@@ -45,7 +45,7 @@ jobs:
           target: ${{ matrix.config.target }}
       - name: whyyyyyyy
         run: |
-          ls D:\a\gdps-switcher\gdps-switcher\
+          ls D:/a/gdps-switcher/gdps-switcher/output
       
   package:
     name: Package builds
