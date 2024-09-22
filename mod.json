@@ -15,7 +15,6 @@
 		"online"
 	],
 	"early-load": true,
-	"repository": "https://github.com/kingminer7/gdps-switcher",
 	"links": {
 		"source": "https://github.com/kingminer7/gdps-switcher"
 	},
@@ -40,13 +39,6 @@
 			"id": "km7dev.server_api",
 			"importance": "required",
 			"version": "1.0.0"
-		}
-	],
-	"incompatibilities": [
-		{
-			"id": "sorkopiko.noratelimit",
-			"importance": "breaking",
-			"version": "*"
 		}
 	]
 }
