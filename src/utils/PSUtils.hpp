@@ -1,7 +1,7 @@
 #pragma once
 
 #include <km7dev.server_api/include/ServerAPI.hpp>
-#include "ServerConfigManager.hpp"
+//#include "ServerConfigManager.hpp"
 
 using namespace geode::prelude;
 
@@ -41,7 +41,7 @@ public:
         if (this->initialized) return;
         this->initialized = true;
         if (!isBoomlings()) this->serverId = ServerAPI::get()->registerURL(url, -40);
-        ServerConfigManager::get();
+        //ServerConfigManager::get();
     }
 
     int getId() {return serverId;}
