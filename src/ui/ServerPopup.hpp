@@ -25,7 +25,7 @@ protected:
         m_mainLayer->addChildAtPosition(menu, Anchor::Center, ccp(0, 0));
 
         auto nameInpLab = CCLabelBMFont::create("Server Name", "bigFont.fnt");
-        nameInpLab->setPosition(ccp(0, 5));
+        nameInpLab->setPosition(ccp(0, 50));
         nameInpLab->setScale(.35f);
         nameInpLab->setID("name-label");
         nameInpLab->setAlignment(CCTextAlignment::kCCTextAlignmentCenter);
@@ -42,7 +42,7 @@ protected:
         menu->addChild(m_nameInput);
 
         auto urlInpLab = CCLabelBMFont::create("Server URL", "bigFont.fnt");
-        urlInpLab->setPosition(ccp(0, 50));
+        urlInpLab->setPosition(ccp(0, 5));
         urlInpLab->setScale(.35f);
         urlInpLab->setID("name-label");
         urlInpLab->setAlignment(CCTextAlignment::kCCTextAlignmentCenter);
