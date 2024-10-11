@@ -15,13 +15,15 @@
 		"online"
 	],
 	"early-load": true,
-	"links": {
-		"source": "https://github.com/kingminer7/gdps-switcher"
-	},
-	"issues": {
-		"info": "Report issues on the github issues page.",
-		"url": "https://github.com/kingminer7/gdps-switcher/issues"
-	},
+	  "links": {
+	    "source": "https://github.com/kingminer7/server-api",
+	    "community": "https://discord.gg/Vj5Mcennph",
+	    "homepage": "https://km7dev.tech"
+	  },
+	  "issues": {
+	    "info": "Report issues in my Discord server.",
+	    "url": "https://discord.gg/Vj5Mcennph"
+	  },
 	"resources": {
 		"spritesheets": {
 			"GS_serverSheet01": [
