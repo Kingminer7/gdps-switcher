@@ -35,7 +35,7 @@ jobs:
             echo "The version you're trying to release ($VERSION_INPUT) already exists! Make sure you know what you're doing!"
             exit 1
           else
-            echo "All good! :3"
+            echo "All good!"
           fi
           
   update-version:
@@ -99,6 +99,13 @@ jobs:
       
       - name: Catch up
         run: git pull origin ${{ github.ref }} --no-rebase
+
+      - name: Download Server API
+        run: |
+          mkdir -p ${{ github.workspace }}/cli-profile/geode/mods
+          curl -L -o ${{ github.workspace }}/cli-profile/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/1.0.0/km7dev.server_api.geode
+          mkdir -p ${{ github.workspace }}/cli-profile/Contents/geode/mods
+          curl -L -o ${{ github.workspace }}/cli-profile/Contents/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/1.0.0/km7dev.server_api.geode
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
