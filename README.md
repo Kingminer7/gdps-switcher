@@ -14,7 +14,7 @@ Note: GDPS Switcher doesn't create servers, only allows you to join existing one
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
 - [Uproxide](https://x.com/uproxide) - Event levels (Both the idea and some of the functionality)
 - [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
-### Server Owners: see [here](https://github.com/Kingminer7/gdps-switcher/blob/main/ServerIntegration.md)
+<### Server Owners: see [here](https://github.com/Kingminer7/gdps-switcher/blob/main/ServerIntegration.md)>
 ## Known Problems
 - Globed needs a different server to work.
 - BetterProgression plays animations every time you switch servers.
