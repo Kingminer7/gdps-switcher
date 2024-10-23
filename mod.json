@@ -1,46 +1,46 @@
 {
-	"geode": "3.8.1",
-	"gd": {
-		"win": "2.206",
-		"android": "2.206",
-		"mac": "2.206"
-	},
-	"version": "v1.2.0",
-	"id": "km7dev.gdps-switcher",
-	"name": "GDPS Switcher",
-	"developer": "km7dev",
-	"description": "Switch between GDPS servers easily.",
-	"tags": [
-		"customization",
-		"online"
-	],
-	"early-load": true,
-	  "links": {
-	    "source": "https://github.com/kingminer7/server-api",
-	    "community": "https://discord.gg/Vj5Mcennph",
-	    "homepage": "https://km7dev.tech"
-	  },
-	  "issues": {
-	    "info": "Report issues in my Discord server.",
-	    "url": "https://discord.gg/Vj5Mcennph"
-	  },
-	"resources": {
-		"spritesheets": {
-			"GS_serverSheet01": [
-				"resources/*.png"
-			]
-		}
-	},
-	"dependencies": [
-		{
-			"id": "geode.node-ids",
-			"importance": "required",
-			"version": "1.13.1"
-		},
-		{
-			"id": "km7dev.server_api",
-			"importance": "required",
-			"version": "1.0.0"
-		}
-	]
+  "geode": "3.8.1",
+  "gd": {
+    "win": "2.206",
+    "android": "2.206",
+    "mac": "2.206"
+  },
+  "version": "1.2.0",
+  "id": "km7dev.gdps-switcher",
+  "name": "GDPS Switcher",
+  "developer": "km7dev",
+  "description": "Switch between GDPS servers easily.",
+  "tags": [
+    "customization",
+    "online"
+  ],
+  "early-load": true,
+  "links": {
+    "source": "https://github.com/kingminer7/server-api",
+    "community": "https://discord.gg/Vj5Mcennph",
+    "homepage": "https://km7dev.tech"
+  },
+  "issues": {
+    "info": "Report issues in my Discord server.",
+    "url": "https://discord.gg/Vj5Mcennph"
+  },
+  "resources": {
+    "spritesheets": {
+      "GS_serverSheet01": [
+        "resources/*.png"
+      ]
+    }
+  },
+  "dependencies": [
+    {
+      "id": "geode.node-ids",
+      "importance": "required",
+      "version": "1.13.1"
+    },
+    {
+      "id": "km7dev.server_api",
+      "importance": "required",
+      "version": "1.0.0"
+    }
+  ]
 }
