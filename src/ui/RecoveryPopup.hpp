@@ -84,7 +84,11 @@ public:
   }
 
   void ignore(CCObject *) {
-    // TODO: Ignore logic
+    auto servers =
+        Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries");
+        servers.push_back(filename);
+        Mod::get()->setSavedValue("ignored-recoveries", servers);
+    }
   }
 };
 
