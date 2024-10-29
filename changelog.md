@@ -1,3 +1,7 @@
+# 1.2.1
+### Fix save data issues
+- ^^^
+
 # 1.2.0
 ### Internal Changes & bug fixes
 - Move actual request handling to another mod (km7dev.server_api)
