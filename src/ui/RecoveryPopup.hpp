@@ -52,14 +52,14 @@ protected:
         ButtonSprite::create("Use", "goldFont.fnt", "GJ_button_01.png", .75),
         this, menu_selector(RecoveryNode::recover));
     btn->setAnchorPoint({1, 0.5});
-    btn->setScale(2.f/3);
+    btn->setScale(2.f / 3);
     menu->addChildAtPosition(btn, Anchor::BottomRight, {-10, 25});
 
     auto btn2 = CCMenuItemSpriteExtra::create(
         ButtonSprite::create("Ignore", "goldFont.fnt", "GJ_button_06.png", .75),
         this, menu_selector(RecoveryNode::ignore));
     btn2->setAnchorPoint({1, 0.5});
-    btn2->setScale(2.f/3);
+    btn2->setScale(2.f / 3);
     menu->addChildAtPosition(btn2, Anchor::BottomRight, {-50, 25});
 
     return true;
@@ -84,17 +84,16 @@ public:
   }
 
   void ignore(CCObject *) {
-    auto servers =
-        Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries");
-        servers.push_back(filename);
-        Mod::get()->setSavedValue("ignored-recoveries", servers);
-    }
+    auto servers = Mod::get()->getSavedValue<std::vector<std::string>>(
+        "ignored-recoveries");
+    servers.push_back(filename);
+    Mod::get()->setSavedValue("ignored-recoveries", servers);
   }
 };
 
-class RecoveryPopup : public geode::Popup<> {
+class RecoveryPopup : public geode::Popup<bool> {
 protected:
-  bool setup() override {
+  bool setup(bool ignored) override {
     this->setTitle("GDPS Save Recovery");
 
     auto scroll = ScrollLayer::create({360, 220});
@@ -112,21 +111,27 @@ protected:
 
     int nodes = 0;
 
+    auto ignoredV = Mod::get()->getSavedValue<std::vector<std::string>>(
+        "ignored-recoveries");
+
     for (const auto &pair : PSUtils::get()->saveRecovery) {
-      auto node = RecoveryNode::create(pair.first, pair.second);
-      node->setAnchorPoint({0.5, 1});
-      scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top,
-                                                 {0, -nodes * 70.f});
-      nodes++;
+      if ((std::find(ignoredV.begin(), ignoredV.end(), pair.first) !=
+           ignoredV.end()) == ignored) {
+        auto node = RecoveryNode::create(pair.first, pair.second);
+        node->setAnchorPoint({0.5, 1});
+        scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top,
+                                                   {0, -nodes * 70.f});
+        nodes++;
+      }
     }
 
     return true;
   }
 
 public:
-  static RecoveryPopup *create() {
+  static RecoveryPopup *create(bool ignored) {
     auto ret = new RecoveryPopup();
-    if (ret->initAnchored(400.f, 280.f)) {
+    if (ret->initAnchored(400.f, 280.f, ignored)) {
       ret->autorelease();
       return ret;
     }
