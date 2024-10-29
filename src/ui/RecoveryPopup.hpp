@@ -1,10 +1,23 @@
 #include "../utils/PSUtils.hpp"
+#include "Geode/cocos/label_nodes/CCLabelBMFont.h"
 #include <Geode/ui/ScrollLayer.hpp>
 using namespace geode::prelude;
 
 class RecoveryNode : public CCNode {
 protected:
-    std::string filename;
+  std::string formatFileSize(std::uintmax_t size) {
+    const std::vector<std::string> units = {"B", "KB", "MB", "GB", "TB"};
+    int unitIndex = 0;
+
+    while (size >= 1024 && unitIndex < units.size() - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+
+    return std::to_string(size) + " " + units[unitIndex];
+  }
+
+  std::string filename;
   bool init(const std::string &url, const std::string &filename) {
     if (!CCNode::init()) {
       return false;
@@ -17,19 +30,37 @@ protected:
     bg->setContentSize({360, 70});
     this->addChildAtPosition(bg, Anchor::Center);
 
-    auto title = CCLabelBMFont::create(url.c_str(), "chatFont.fnt");
+    auto title = CCLabelBMFont::create(filename.c_str(), "chatFont.fnt");
     title->setAnchorPoint({0, 0.5});
     title->limitLabelWidth(300, 1.0, 0.2);
-    this->addChildAtPosition(title, Anchor::TopLeft, {7.5, -10});
+    this->addChildAtPosition(title, Anchor::TopLeft, {7.5, -12});
+
+    auto fileSize =
+        CCLabelBMFont::create(formatFileSize(std::filesystem::file_size(
+                                                 dirs::getSaveDir() / filename))
+                                  .c_str(),
+                              "chatFont.fnt");
+    fileSize->setAnchorPoint({0, 0.5});
+    fileSize->limitLabelWidth(300, 1.0, 0.2);
+    this->addChildAtPosition(fileSize, Anchor::BottomLeft, {7.5, 12});
 
     auto menu = CCMenu::create();
-    this->addChild(menu);
+    menu->setContentSize({360, 70});
+    this->addChildAtPosition(menu, Anchor::Center);
 
     auto btn = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Use", "chatFont.fnt", "GJ_button_04.png", 1.0),
+        ButtonSprite::create("Use", "goldFont.fnt", "GJ_button_01.png", .75),
         this, menu_selector(RecoveryNode::recover));
     btn->setAnchorPoint({1, 0.5});
-    menu->addChildAtPosition(btn, Anchor::TopRight);
+    btn->setScale(2.f/3);
+    menu->addChildAtPosition(btn, Anchor::BottomRight, {-10, 25});
+
+    auto btn2 = CCMenuItemSpriteExtra::create(
+        ButtonSprite::create("Ignore", "goldFont.fnt", "GJ_button_06.png", .75),
+        this, menu_selector(RecoveryNode::ignore));
+    btn2->setAnchorPoint({1, 0.5});
+    btn2->setScale(2.f/3);
+    menu->addChildAtPosition(btn2, Anchor::BottomRight, {-50, 25});
 
     return true;
   }
@@ -47,10 +78,14 @@ public:
     return nullptr;
   }
 
-    void recover(CCObject *) {
-        PSUtils::get()->recovering.push_back(filename);
-        this->removeFromParent();
-    }
+  void recover(CCObject *) {
+    PSUtils::get()->recovering.push_back(filename);
+    this->removeFromParent();
+  }
+
+  void ignore(CCObject *) {
+    // TODO: Ignore logic
+  }
 };
 
 class RecoveryPopup : public geode::Popup<> {
@@ -87,7 +122,7 @@ protected:
 public:
   static RecoveryPopup *create() {
     auto ret = new RecoveryPopup();
-    if (ret->initAnchored(700.f, 280.f)) {
+    if (ret->initAnchored(360.f, 280.f)) {
       ret->autorelease();
       return ret;
     }

@@ -34,7 +34,10 @@ class $modify(GDPSGManager, GManager) {
     void save() {
         if (std::find(PSUtils::get()->recovering.begin(), PSUtils::get()->recovering.end(), m_fileName.substr(0, m_fileName.size()-5) + ".dat") != PSUtils::get()->recovering.end()) {
             auto file = dirs::getSaveDir() / (m_fileName.substr(0, m_fileName.size()-5) + ".dat");
-            std::filesystem::rename(file, dirs::getSaveDir() / m_fileName);
+            // no crash 4 u
+            if (std::filesystem::exists(file))
+                std::filesystem::rename(file, dirs::getSaveDir() / m_fileName);
+
         } else {
             GManager::save();
         }
