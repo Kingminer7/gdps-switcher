@@ -122,7 +122,7 @@ protected:
 public:
   static RecoveryPopup *create() {
     auto ret = new RecoveryPopup();
-    if (ret->initAnchored(360.f, 280.f)) {
+    if (ret->initAnchored(400.f, 280.f)) {
       ret->autorelease();
       return ret;
     }
