@@ -28,7 +28,9 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 
 	if (PSUtils::get()->firstML == true) {
 		PSUtils::get()->firstML = false;
+		log::info("test 1");
 		if (PSUtils::get()->saveRecovery.size() > Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries").size()) {
+			log::info("test 2");
 			Loader::get()->queueInMainThread([this] {
 			geode::createQuickPopup(
 			"Save Recovery",
