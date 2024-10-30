@@ -28,8 +28,15 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 
 	if (PSUtils::get()->firstML == true) {
 		PSUtils::get()->firstML = false;
-		log::info("test 1");
-		if (PSUtils::get()->saveRecovery.size() > Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries").size()) {
+		bool allIgnored = true;
+		auto ignored = Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries");
+                for (std::string save : PSUtils::get()->saveRecovery) {
+                      if (std::find(ignored.begin(), ignored.end(), save) == ignored.end()) {
+			    allIgnored = false;
+		      }
+		}
+		
+		if (allIgnored == false) {
 			log::info("test 2");
 			Loader::get()->queueInMainThread([this] {
 			geode::createQuickPopup(
@@ -43,6 +50,7 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 				}
 			}, false)->show();
 			});
+		}
 		}
 	}
 
