@@ -102,8 +102,7 @@ public:
           if (yes) {
             log::info("overwriting");
             PSUtils::get()->recovering.push_back(filename);
-            for (const auto &pair : PSUtils::get()->saveRecovery) {
-
+            for (std::pair<std::string, std::string> pair : PSUtils::get()->saveRecovery) {
               if (pair.second == filename) {
                 PSUtils::get()->saveRecovery.remove(pair);
                 log::info("recovery list removed for recovery");
