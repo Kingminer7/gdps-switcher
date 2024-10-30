@@ -60,6 +60,8 @@ jobs:
           bindings-ref: main
           combine: true
           target: ${{ matrix.config.target }}
+          build-config: 'RelWithDebInfo'
+          export-pdb: true
   # build-2:
   #   name: Build 2
   #   runs-on: macos-latest
