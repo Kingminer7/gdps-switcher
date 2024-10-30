@@ -5,7 +5,7 @@
     "android": "2.206",
     "mac": "2.206"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "id": "km7dev.gdps-switcher",
   "name": "GDPS Switcher",
   "developer": "km7dev",
@@ -42,5 +42,15 @@
       "importance": "required",
       "version": "1.0.0"
     }
-  ]
+  ],
+  "settings": {
+    "open-recovery": {
+      "type": "custom:open-recovery",
+      "name": "Open Save Recovery Popup"
+    },
+    "open-ignored-recovery": {
+      "type": "custom:open-ignored",
+      "name": "Open Ignored Save Popup"
+    }
+  }
 }

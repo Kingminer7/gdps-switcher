@@ -1,4 +1,5 @@
 #include "../utils/PSUtils.hpp"
+#include "Geode/cocos/base_nodes/Layout.hpp"
 #include "Geode/cocos/label_nodes/CCLabelBMFont.h"
 #include <Geode/ui/ScrollLayer.hpp>
 using namespace geode::prelude;
@@ -18,7 +19,7 @@ protected:
   }
 
   std::string filename;
-  bool init(const std::string &url, const std::string &filename) {
+  bool init(const std::string &url, const std::string &filename, bool ignored) {
     if (!CCNode::init()) {
       return false;
     }
@@ -53,13 +54,26 @@ protected:
         this, menu_selector(RecoveryNode::recover));
     btn->setAnchorPoint({1, 0.5});
     btn->setScale(2.f / 3);
+    btn->m_baseScale = 2.f / 3;
     menu->addChildAtPosition(btn, Anchor::BottomRight, {-10, 25});
 
-    auto btn2 = CCMenuItemSpriteExtra::create(
-        ButtonSprite::create("Ignore", "goldFont.fnt", "GJ_button_06.png", .75),
-        this, menu_selector(RecoveryNode::ignore));
+    CCMenuItemSpriteExtra *btn2;
+
+    if (ignored) {
+      btn2 = CCMenuItemSpriteExtra::create(
+          ButtonSprite::create("Delete", "goldFont.fnt", "GJ_button_06.png",
+                               .75),
+          this, menu_selector(RecoveryNode::del));
+    } else {
+      btn2 = CCMenuItemSpriteExtra::create(
+          ButtonSprite::create("Ignore", "goldFont.fnt", "GJ_button_03.png",
+                               .75),
+          this, menu_selector(RecoveryNode::ignore));
+    }
+
     btn2->setAnchorPoint({1, 0.5});
     btn2->setScale(2.f / 3);
+    btn2->m_baseScale = 2.f / 3;
     menu->addChildAtPosition(btn2, Anchor::BottomRight, {-50, 25});
 
     return true;
@@ -67,9 +81,9 @@ protected:
 
 public:
   static RecoveryNode *create(const std::string &url,
-                              const std::string &filename) {
+                              const std::string &filename, bool ignored) {
     auto ret = new RecoveryNode();
-    if (ret->init(url, filename)) {
+    if (ret->init(url, filename, ignored)) {
       ret->autorelease();
       return ret;
     }
@@ -79,15 +93,62 @@ public:
   }
 
   void recover(CCObject *) {
-    PSUtils::get()->recovering.push_back(filename);
-    this->removeFromParent();
+    geode::createQuickPopup(
+        "Are you sure",
+        "Are you sure you want to use this save? This will overwrite your "
+        "current save.",
+        "No", "Yes",
+        [this](auto, bool yes) {
+          if (yes) {
+            PSUtils::get()->recovering.push_back(filename);
+            auto parent = this->getParent();
+            this->removeFromParent();
+            parent->updateLayout();
+          }
+        },
+        false)
+        ->show();
+  }
+
+  void del(CCObject *) {
+    geode::createQuickPopup(
+        "Are you sure",
+        "Are you sure you want to delete this save? You cannot recover it if "
+        "so.",
+        "No", "Yes",
+        [this](auto, bool yes) {
+          if (yes) {
+            if (std::filesystem::exists(dirs::getSaveDir() / filename))
+              std::filesystem::remove(dirs::getSaveDir() / filename);
+            auto parent = this->getParent();
+            this->removeFromParent();
+            parent->updateLayout();
+          }
+        },
+        false)
+        ->show();
   }
 
   void ignore(CCObject *) {
-    auto servers = Mod::get()->getSavedValue<std::vector<std::string>>(
-        "ignored-recoveries");
-    servers.push_back(filename);
-    Mod::get()->setSavedValue("ignored-recoveries", servers);
+    geode::createQuickPopup(
+        "Ignore?",
+        "Are you sure you want to ignore this save? If you change your mind, "
+        "you can review it with the ignored recoveries button in the mod "
+        "settings.",
+        "No", "Yes",
+        [this](auto, bool yes) {
+          if (yes) {
+            auto iRs = Mod::get()->getSavedValue<std::vector<std::string>>(
+                "ignored-recoveries");
+            iRs.push_back(filename);
+            Mod::get()->setSavedValue("ignored-recoveries", iRs);
+            auto parent = this->getParent();
+            this->removeFromParent();
+            parent->updateLayout();
+          }
+        },
+        false)
+        ->show();
   }
 };
 
@@ -100,6 +161,10 @@ protected:
     scroll->setID("scroll");
     scroll->ignoreAnchorPointForPosition(false);
     scroll->setZOrder(1);
+    auto layout = ColumnLayout::create();
+    layout->setGap(0);
+    layout->setAxisAlignment(AxisAlignment::End);
+    scroll->m_contentLayer->setLayout(layout);
     m_mainLayer->addChildAtPosition(scroll, Anchor::Center, {0, -10});
 
     auto scrollBg = CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
@@ -113,19 +178,44 @@ protected:
 
     auto ignoredV = Mod::get()->getSavedValue<std::vector<std::string>>(
         "ignored-recoveries");
-
+    log::info("{}", ignoredV);
     for (const auto &pair : PSUtils::get()->saveRecovery) {
-      if ((std::find(ignoredV.begin(), ignoredV.end(), pair.first) !=
-           ignoredV.end()) == ignored) {
-        auto node = RecoveryNode::create(pair.first, pair.second);
+      if ((std::find(ignoredV.begin(), ignoredV.end(), pair.second) !=
+           ignoredV.end()) == ignored &&
+          std::find(PSUtils::get()->recovering.begin(),
+                    PSUtils::get()->recovering.end(),
+                    pair.second) == PSUtils::get()->recovering.end()) {
+        auto node = RecoveryNode::create(pair.first, pair.second, ignored);
         node->setAnchorPoint({0.5, 1});
-        scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top,
-                                                   {0, -nodes * 70.f});
+        // scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top,
+        //                                            {0, -nodes * 70.f});
+        scroll->m_contentLayer->addChild(node);
         nodes++;
       }
     }
+    scroll->m_contentLayer->setContentHeight(std::max(nodes * 70 + 70, 220));
+    scroll->m_contentLayer->updateLayout();
+    scroll->scrollToTop();
 
     return true;
+  }
+
+  void onClose(CCObject *obj) override {
+    geode::Popup<bool>::onClose(obj);
+    if (PSUtils::get()->recovering.size() > 0) {
+      geode::createQuickPopup(
+          "Restart?",
+          "Restarting is recommended. Any data you save or change now will not "
+          "apply to recovered save files.",
+          "No", "Yes",
+          [](auto, bool yes) {
+            if (yes) {
+              game::restart();
+            }
+          },
+          false)
+          ->show();
+    }
   }
 
 public:

@@ -1,6 +1,7 @@
 # 1.2.1
 ### Fix save data issues
-- ^^^
+- Create a popup for save recovery - shows on servers with potentially lost data.
+  - This does not merge data. It restores it.
 
 # 1.2.0
 ### Internal Changes & bug fixes
