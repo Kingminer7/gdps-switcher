@@ -100,7 +100,23 @@ public:
         "No", "Yes",
         [this](auto, bool yes) {
           if (yes) {
+            log::info("overwriting");
             PSUtils::get()->recovering.push_back(filename);
+            for (const auto &pair : PSUtils::get()->saveRecovery) {
+
+              if (pair.second == filename) {
+                PSUtils::get()->saveRecovery.remove(pair);
+                log::info("recovery list removed for recovery");
+              }
+            }
+            auto iRs = Mod::get()->getSavedValue<std::vector<std::string>>(
+                "ignored-recoveries");
+            auto found = std::find(iRs.begin(), iRs.end(), filename);
+            if (found != iRs.end()) {
+              log::info("ignored removed for recovery");
+              iRs.erase(found);
+              Mod::get()->setSavedValue("ignored-recoveries", iRs);
+            }
             auto parent = this->getParent();
             this->removeFromParent();
             parent->updateLayout();
@@ -123,6 +139,20 @@ public:
             auto parent = this->getParent();
             this->removeFromParent();
             parent->updateLayout();
+            for (const auto &pair : PSUtils::get()->saveRecovery) {
+              if (pair.second == filename) {
+                PSUtils::get()->saveRecovery.remove(pair);
+                log::info("recovery list removed for deletion");
+              }
+            }
+            auto iRs = Mod::get()->getSavedValue<std::vector<std::string>>(
+                "ignored-recoveries");
+            auto found = std::find(iRs.begin(), iRs.end(), filename);
+            if (found != iRs.end()) {
+              log::info("ignored removed for deletion");
+              iRs.erase(found);
+              Mod::get()->setSavedValue("ignored-recoveries", iRs);
+            }
           }
         },
         false)
