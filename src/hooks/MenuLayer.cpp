@@ -51,7 +51,6 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 			}, false)->show();
 			});
 		}
-		}
 	}
 
     return true;
