@@ -30,8 +30,8 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 		PSUtils::get()->firstML = false;
 		bool allIgnored = true;
 		auto ignored = Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries");
-                for (std::string save : PSUtils::get()->saveRecovery) {
-                      if (std::find(ignored.begin(), ignored.end(), save) == ignored.end()) {
+                for (std::pair<std::string, std::string> save : PSUtils::get()->saveRecovery) {
+                      if (std::find(ignored.begin(), ignored.end(), save.second) == ignored.end()) {
 			    allIgnored = false;
 		      }
 		}
