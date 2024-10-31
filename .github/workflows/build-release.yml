@@ -3,7 +3,7 @@ name: Build and Publish (Production)
 on:
   push:
     branches:
-      - main 
+      - "**" 
 
 jobs:
   initial-checks:
