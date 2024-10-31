@@ -10,14 +10,14 @@ void onExit() {
       PSUtils::get()->switching == true) {
     log::info("Deleting music library and SFX library");
     log::info("Cache dir: {}", CCFileUtils::sharedFileUtils()->getWritablePath());
-    if (std::filesystem::exists(dirs::getSaveDir() / "musiclibrary.dat"))
-      std::filesystem::remove(dirs::getSaveDir() / "musiclibrary.dat");
+    if (std::filesystem::exists(CCFileUtils::sharedFileUtils()->getWritablePath() + "musiclibrary.dat"))
+      std::filesystem::remove(CCFileUtils::sharedFileUtils()->getWritablePath() + "musiclibrary.dat");
     else
-      log::info("Music libary was not at {}!", dirs::getSaveDir() / "musiclibrary.dat");
-    if (std::filesystem::exists(dirs::getSaveDir() / "sfxlibrary.dat"))
-      std::filesystem::remove(dirs::getSaveDir() / "sfxlibrary.dat");
+      log::info("Music library was not at {}!", CCFileUtils::sharedFileUtils()->getWritablePath() + "musiclibrary.dat");
+    if (std::filesystem::exists(CCFileUtils::sharedFileUtils()->getWritablePath() + "sfxlibrary.dat"))
+      std::filesystem::remove(CCFileUtils::sharedFileUtils()->getWritablePath() + "sfxlibrary.dat");
     else
-      log::info("SFX libary was not at {}!", dirs::getSaveDir() / "sfxlibrary.dat");
+      log::info("SFX library was not at {}!", CCFileUtils::sharedFileUtils()->getWritablePath() + "sfxlibrary.dat");
   }
 }
 
