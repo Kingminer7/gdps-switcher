@@ -104,7 +104,7 @@ public:
             PSUtils::get()->recovering.push_back(filename);
             for (std::pair<std::string, std::string> pair : PSUtils::get()->saveRecovery) {
               if (pair.second == filename) {
-                PSUtils::get()->saveRecovery.remove(pair);
+                // PSUtils::get()->saveRecovery.remove(pair);
                 log::info("recovery list removed for recovery");
               }
             }
