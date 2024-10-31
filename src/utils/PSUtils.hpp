@@ -10,6 +10,7 @@ private:
   bool initialized = false;
 public:
   bool firstML = true;
+  bool switching = false;
   static PSUtils *get();
   bool isBoomlings();
   void initialize(const std::string &url);

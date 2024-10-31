@@ -2,6 +2,7 @@
 ### Fix save data issues
 - Create a popup for save recovery - shows on servers with potentially lost data.
   - This does not merge data. It restores it.
+- Delete the music library and SFX library on server switch to fix issues
 
 # 1.2.0
 ### Internal Changes & bug fixes

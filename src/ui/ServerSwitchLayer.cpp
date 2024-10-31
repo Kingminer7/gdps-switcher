@@ -1,6 +1,7 @@
 #include "ServerSwitchLayer.hpp"
 #include "ServerNode.hpp"
 #include "ServerPopup.hpp"
+#include "../utils/PSUtils.hpp"
 
 #include <Geode/utils/cocos.hpp>
 
@@ -286,6 +287,7 @@ void ServerSwitchLayer::onApply(CCObject *)
 {
     update(Mod::get()->getSavedValue<std::vector<ServerEntry>>("saved-servers"), false);
     Mod::get()->setSavedValue("server", current);
+    PSUtils::get()->switching = true;
     geode::createQuickPopup(
         "Restart to apply",
         "You must restart the game for changes to take effect.",
