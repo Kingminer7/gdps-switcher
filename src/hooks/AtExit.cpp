@@ -9,7 +9,7 @@ void onExit() {
           ModRequestedAction::UninstallWithSaveData ||
       PSUtils::get()->switching == true) {
     log::info("Deleting music library and SFX library");
-    log::info("Cache dir: {}", CCFileUtils::getWriteablePath());
+    log::info("Cache dir: {}", CCFileUtils::sharedFileUtils()->getWritablePath());
     if (std::filesystem::exists(dirs::getSaveDir() / "musiclibrary.dat"))
       std::filesystem::remove(dirs::getSaveDir() / "musiclibrary.dat");
     else
