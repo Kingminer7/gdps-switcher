@@ -100,19 +100,18 @@ public:
         "No", "Yes",
         [this](auto, bool yes) {
           if (yes) {
-            log::info("overwriting");
             PSUtils::get()->recovering.push_back(filename);
+            std::pair<std::string, std::string> pr;
             for (std::pair<std::string, std::string> pair : PSUtils::get()->saveRecovery) {
               if (pair.second == filename) {
-                // PSUtils::get()->saveRecovery.remove(pair);
-                log::info("recovery list removed for recovery");
+                pr = pair;
               }
             }
+            PSUtils::get()->saveRecovery.remove(pr);
             auto iRs = Mod::get()->getSavedValue<std::vector<std::string>>(
                 "ignored-recoveries");
             auto found = std::find(iRs.begin(), iRs.end(), filename);
             if (found != iRs.end()) {
-              log::info("ignored removed for recovery");
               iRs.erase(found);
               Mod::get()->setSavedValue("ignored-recoveries", iRs);
             }
@@ -138,17 +137,17 @@ public:
             auto parent = this->getParent();
             this->removeFromParent();
             parent->updateLayout();
-            for (const auto &pair : PSUtils::get()->saveRecovery) {
+            std::pair<std::string, std::string> pr;
+            for (std::pair<std::string, std::string> pair : PSUtils::get()->saveRecovery) {
               if (pair.second == filename) {
-                PSUtils::get()->saveRecovery.remove(pair);
-                log::info("recovery list removed for deletion");
+                pr = pair;
               }
             }
+            PSUtils::get()->saveRecovery.remove(pr);
             auto iRs = Mod::get()->getSavedValue<std::vector<std::string>>(
                 "ignored-recoveries");
             auto found = std::find(iRs.begin(), iRs.end(), filename);
             if (found != iRs.end()) {
-              log::info("ignored removed for deletion");
               iRs.erase(found);
               Mod::get()->setSavedValue("ignored-recoveries", iRs);
             }
@@ -207,7 +206,6 @@ protected:
 
     auto ignoredV = Mod::get()->getSavedValue<std::vector<std::string>>(
         "ignored-recoveries");
-    log::info("{}", ignoredV);
     for (const auto &pair : PSUtils::get()->saveRecovery) {
       if ((std::find(ignoredV.begin(), ignoredV.end(), pair.second) !=
            ignoredV.end()) == ignored &&

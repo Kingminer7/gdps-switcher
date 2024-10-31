@@ -37,7 +37,6 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 		}
 		
 		if (allIgnored == false) {
-			log::info("test 2");
 			Loader::get()->queueInMainThread([this] {
 			geode::createQuickPopup(
 			"Save Recovery",
