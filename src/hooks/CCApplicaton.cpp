@@ -2,7 +2,7 @@
 
 using namespace geode::prelude;
 
-#include <Geode/modify/CCApplication>
+#include <Geode/modify/CCApplication.hpp>
 class $modify(CCApplication) {
   void shutdownApplication() {
     if (Mod::get()->getRequestedAction() == ModRequestedAction::Disable ||
