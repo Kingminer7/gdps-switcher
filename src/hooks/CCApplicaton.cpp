@@ -22,4 +22,4 @@ class $modify(CCApplication) {
         log::info("SFX library was not at {}!", std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) + "sfxlibrary.dat");
     }
   }
-}
+};
