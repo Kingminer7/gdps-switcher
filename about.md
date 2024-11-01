@@ -22,4 +22,3 @@ Note: GDPS Switcher doesn't create servers, only allows you to join existing one
 - Event levels only show if server owners set them. (Will not fix)
 - Incompatible with SorkoPiko's No Rate Limit (Can not fix)
 - Some mods may not function properly on private servers.
-- Music library may have issues (working on it)
