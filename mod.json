@@ -46,11 +46,11 @@
   "settings": {
     "open-recovery": {
       "type": "custom:open-recovery",
-      "name": "Open Save Recovery Popup"
+      "name": "Open Save Recovery"
     },
     "open-ignored-recovery": {
       "type": "custom:open-ignored",
-      "name": "Open Ignored Save Popup"
+      "name": "Open Ignored Save Recovery"
     }
   }
 }
