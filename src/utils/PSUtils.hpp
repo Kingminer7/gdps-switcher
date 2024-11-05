@@ -4,7 +4,6 @@ using namespace geode::prelude;
 
 class PSUtils {
 private:
-  int serverId;
   PSUtils() {}
   inline static PSUtils *instance = nullptr;
   bool initialized = false;
