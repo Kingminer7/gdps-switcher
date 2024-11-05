@@ -4,6 +4,7 @@
 #include "../utils/PSUtils.hpp"
 
 #include <Geode/utils/cocos.hpp>
+#include <km7dev.server_api/ServerAPI.hpp>
 
 std::string current;
 
@@ -287,18 +288,8 @@ void ServerSwitchLayer::onApply(CCObject *)
 {
     update(Mod::get()->getSavedValue<std::vector<ServerEntry>>("saved-servers"), false);
     Mod::get()->setSavedValue("server", current);
+    ServerAPI::get()->updateURL(PSUtils::get()->serverId, current);
     PSUtils::get()->switching = true;
-    geode::createQuickPopup(
-        "Restart to apply",
-        "You must restart the game for changes to take effect.",
-        "Later", "Restart",
-        [](auto, bool btn2)
-        {
-            if (btn2)
-            {
-                game::restart();
-            }
-        });
     auto spr = static_cast<CCSprite*>(applyBtn->getNormalImage());
     applyBtn->setEnabled(false);
     spr->setCascadeColorEnabled(true);
