@@ -4,11 +4,11 @@ using namespace geode::prelude;
 
 class PSUtils {
 private:
-  int serverId;
   PSUtils() {}
   inline static PSUtils *instance = nullptr;
   bool initialized = false;
 public:
+  int serverId;
   bool firstML = true;
   bool switching = false;
   static PSUtils *get();
