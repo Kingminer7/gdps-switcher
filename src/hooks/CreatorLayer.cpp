@@ -10,7 +10,7 @@ class $modify(creatorLayer, CreatorLayer) {
 			return false;
 		}
 
-		if (PSUtils::get()->isBoomlings()) return true;
+		//if (PSUtils::get()->isBoomlings()) return true;
 
 		CCMenu *menu = dynamic_cast<CCMenu*>(this->getChildByID("creator-buttons-menu"));
 		if (!menu) {
