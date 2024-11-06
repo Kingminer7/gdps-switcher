@@ -28,10 +28,10 @@ class $modify(creatorLayer, CreatorLayer) {
 	}
 
 	void onEventLevel(CCObject* h) {
-		if (PSUtils::get()->isBoomlings()) {
-			CreatorLayer::onEventLevel(h);
-			return;
-		}
+		//if (PSUtils::get()->isBoomlings()) {
+			//CreatorLayer::onEventLevel(h);
+			//return;
+		//}
 		auto page = DailyLevelPage::create(GJTimedLevelType::Event);
 		page->show();
 	}
