@@ -4,7 +4,7 @@
 #include "../utils/PSUtils.hpp"
 
 #include <Geode/utils/cocos.hpp>
-#include <km7dev.server_api/ServerAPI.hpp>
+#include <km7dev.server_api/include/ServerAPI.hpp>
 
 std::string current;
 
