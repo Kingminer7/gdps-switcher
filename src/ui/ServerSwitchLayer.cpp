@@ -161,10 +161,8 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *e
         }
 
         inputFile.close();
-
-            std::string err;
-            auto opt = matjson::parse(file_contents, err);
-            auto data = opt.value_or("err");
+            auto opt = matjson::parse(file_contents);
+            auto data = opt.unwrapOr("err");
             if (data == "err") {
                 FLAlertLayer::create(
                     "Error",
@@ -173,8 +171,19 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *e
                     ->show();
                 return;
             }
-            auto servers = data["servers"].as<std::vector<ServerEntry>>();
-            Mod::get()->setSavedValue("saved-servers", servers);
+            auto servs = data["servers"].as<std::vector<ServerEntry>>();
+            if (!servs.isOk())
+            {
+                FLAlertLayer::create(
+                    "Error",
+                    "Invalid file format.",
+                    "Ok")
+                    ->show();
+                return;
+            }
+            auto servers = servs.unwrapOr({});
+
+            auto v = Mod::get()->setSavedValue("saved-servers", servers);
             update(servers, true);
             FLAlertLayer::create(
                 "Success",
@@ -229,7 +238,7 @@ void ServerSwitchLayer::onFileSave(Task<Result<std::filesystem::path>>::Event *e
             return;
         }
         auto servers = Mod::get()->getSavedValue<std::vector<ServerSwitchLayer::ServerEntry>>("saved-servers");
-        outputFile << matjson::format_as(matjson::Object{{"servers", servers}});
+        outputFile << matjson::format_as(matjson::makeObject({{"servers", servers}}));
         outputFile.close();
         FLAlertLayer::create(
             "Success",

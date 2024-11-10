@@ -4,7 +4,7 @@
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 
 #include <Geode/loader/Event.hpp>
-#include <Geode/utils/Result.hpp>
+#include <Geode/Result.hpp>
 #include <Geode/utils/Task.hpp>
 
 class ServerNode;
@@ -43,18 +43,17 @@ public:
 template <>
 struct matjson::Serialize<ServerSwitchLayer::ServerEntry>
 {
-    static ServerSwitchLayer::ServerEntry from_json(matjson::Value const &value)
+    static Result<ServerSwitchLayer::ServerEntry> fromJson(matjson::Value const &value)
     {
-        return ServerSwitchLayer::ServerEntry{
-            .name = value["name"].as_string(),
-            .url = value["url"].as_string()};
+        return Ok(ServerSwitchLayer::ServerEntry{
+            .name = value["name"].asString().unwrapOr("Failed to load name."),
+            .url = value["url"].asString().unwrapOr("Failed to load url.")
+        });
     }
 
-    static matjson::Value to_json(ServerSwitchLayer::ServerEntry const &value)
+    static matjson::Value toJson(ServerSwitchLayer::ServerEntry const &value)
     {
-        auto obj = matjson::Object();
-        obj["name"] = value.name;
-        obj["url"] = value.url;
+        auto obj = matjson::makeObject({{"name", value.name}, {"url", value.url}});
         return obj;
     }
 };

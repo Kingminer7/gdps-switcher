@@ -1,5 +1,10 @@
-using namespace geode::prelude;
+#pragma once
+
+#include "Geode/ui/Popup.hpp"
 #include "ServerSwitchLayer.hpp"
+#include "ServerNode.hpp"
+
+using namespace geode::prelude;
 
 class ServerPopup : public Popup<ServerSwitchLayer *, ServerNode *>
 {

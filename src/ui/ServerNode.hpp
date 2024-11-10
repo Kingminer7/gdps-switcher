@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include "ServerSwitchLayer.hpp"
 

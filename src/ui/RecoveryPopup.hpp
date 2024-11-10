@@ -1,7 +1,13 @@
+#pragma once
+
 #include "../utils/PSUtils.hpp"
-#include "Geode/cocos/base_nodes/Layout.hpp"
+#include "Geode/binding/ButtonSprite.hpp"
 #include "Geode/cocos/label_nodes/CCLabelBMFont.h"
+#include "Geode/ui/Popup.hpp"
 #include <Geode/ui/ScrollLayer.hpp>
+#include <Geode/cocos/cocoa/CCObject.h>
+#include <Geode/loader/Dirs.hpp>
+
 using namespace geode::prelude;
 
 class RecoveryNode : public CCNode {
