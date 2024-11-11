@@ -54,7 +54,7 @@ jobs:
           value: "${{ steps.json_properties.outputs.version }}-alpha.${{github.run_number}}"
 
       - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
+        uses: kingminer7/build-geode-mod@main
         with:
           bindings: geode-sdk/bindings
           bindings-ref: main
