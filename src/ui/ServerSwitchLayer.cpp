@@ -144,24 +144,24 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *e
             return;
         }
         std::ifstream inputFile(result->unwrap());
-        if (!inputFile.is_open())
-        {
-            FLAlertLayer::create(
-                "Error",
-                "Failed to open file.",
-                "Ok")
-                ->show();
-            return;
-        }
-        std::string file_contents;
-        std::string line;
-        while (std::getline(inputFile, line))
-        {
-            file_contents += line;
-        }
+        // if (!inputFile.is_open())
+        // {
+        //     FLAlertLayer::create(
+        //         "Error",
+        //         "Failed to open file.",
+        //         "Ok")
+        //         ->show();
+        //     return;
+        // }
+        // std::string file_contents;
+        // std::string line;
+        // while (std::getline(inputFile, line))
+        // {
+        //     file_contents += line;
+        // }
 
-        inputFile.close();
-            auto opt = matjson::parse(file_contents);
+        // inputFile.close();
+            auto opt = matjson::parse(inputFile);
             auto data = opt.unwrapOr("err");
             if (data == "err") {
                 FLAlertLayer::create(
@@ -181,7 +181,7 @@ void ServerSwitchLayer::onFileOpen(Task<Result<std::filesystem::path>>::Event *e
                     ->show();
                 return;
             }
-            auto servers = servs.unwrapOr({});
+            auto servers = servs.unwrapOrDefault();
 
             auto v = Mod::get()->setSavedValue("saved-servers", servers);
             update(servers, true);
