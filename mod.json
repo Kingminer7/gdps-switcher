@@ -2,8 +2,7 @@
   "geode": "4.0.0-alpha.1",
   "gd": {
     "win": "2.2074",
-    "android": "2.2074",
-    "mac": "2.2074"
+    "android": "2.2074"
   },
   "version": "1.2.2",
   "id": "km7dev.gdps-switcher",
