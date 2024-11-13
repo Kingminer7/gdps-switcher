@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-    if:  ${{ !startsWith(github.event.head_commit.message, 'v') }}
     strategy:
       fail-fast: false
       matrix:
@@ -16,8 +15,8 @@ jobs:
         - name: Windows
           os: windows-latest
 
-        - name: macOS
-          os: macos-latest
+  #      - name: macOS
+  #        os: macos-latest
 
         - name: Android32
           os: ubuntu-latest
@@ -33,23 +32,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: get properties
-        id: json_properties
-        uses: ActionsTools/read-json-action@main
-        with:
-          file_path: "mod.json"
-
-      - name: Update mod.json version
-        uses: jossef/action-set-json-field@v2.1
-        with:
-          file: mod.json
-          field: version
-          value: "${{ steps.json_properties.outputs.version }}-alpha.${{github.run_number}}"
-
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: nightly
           bindings: geode-sdk/bindings
           bindings-ref: main
           combine: true
