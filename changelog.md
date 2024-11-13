@@ -1,3 +1,6 @@
+# 1.2.2
+### Update for 2.2074
+- Update to Geode 4.0.0-alpha.1 and GD 2.2074
 # 1.2.1
 ### Fix save data issues
 - Create a popup for save recovery - shows on servers with potentially lost data.
