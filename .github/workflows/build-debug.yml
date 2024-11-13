@@ -56,41 +56,13 @@ jobs:
       - name: Build the mod
         uses: kingminer7/build-geode-mod@main
         with:
+          sdk: nightly
           bindings: geode-sdk/bindings
           bindings-ref: main
           combine: true
-          target: ${{ matrix.config.target }}
           build-config: 'RelWithDebInfo'
           export-pdb: true
-  # build-2:
-  #   name: Build 2
-  #   runs-on: macos-latest
-  #   continue-on-error: true
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-
-  #     - name: get properties
-  #       id: json_properties
-  #       uses: ActionsTools/read-json-action@main
-  #       with:
-  #         file_path: "mod.json"
-
-  #     - name: Update mod.json version
-  #       uses: jossef/action-set-json-field@v2.1
-  #       with:
-  #         file: mod.json
-  #         field: version
-  #         value: "${{ steps.json_properties.outputs.version }}-alpha.${{github.run_number}}"
-
-  #     - name: Build 2
-  #       uses: geode-catgirls/build-geode-mod@main
-  #       with:
-  #         bindings: geode-catgirls/bindings
-  #         target: iOS
-  #         gh-pat: ${{ secrets.GH_PAT }}
+          target: ${{ matrix.config.target }}
 
   package:
     name: Package builds
