@@ -1,3 +1,7 @@
+# 1.2.3
+### Update for Geode 4.0.0-beta.1
+- Build for mac again
+- Geode 4.0.0-beta.1
 # 1.2.2
 ### Update for 2.2074
 - Update to Geode 4.0.0-alpha.1 and GD 2.2074
