@@ -34,6 +34,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      
+      - name: Download Server API
+        run: |
+          mkdir -p ${{ github.workspace }}/cli-profile/geode/mods
+          curl -L -o ${{ github.workspace }}/cli-profile/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/1.0.2/km7dev.server_api.geode
+          mkdir -p ${{ github.workspace }}/cli-profile/Contents/geode/mods
+          curl -L -o ${{ github.workspace }}/cli-profile/Contents/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/1.0.2/km7dev.server_api.geode
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
