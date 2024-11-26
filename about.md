@@ -6,7 +6,6 @@ Note: GDPS Switcher doesn't create servers, only allows you to join existing one
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
-- Event Level Support
 ### Coming Soon
 - Server owner integration options
 ## Credits
@@ -16,9 +15,6 @@ Note: GDPS Switcher doesn't create servers, only allows you to join existing one
 - [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
 <### Server Owners: see [here](https://github.com/Kingminer7/gdps-switcher/blob/main/ServerIntegration.md)>
 ## Known Problems
-- Globed needs a different server to work.
-- BetterProgression plays animations every time you switch servers.
-- Servers that don't support 2.2 will not work. (Will not fix)
-- Event levels only show if server owners set them. (Will not fix)
-- Incompatible with SorkoPiko's No Rate Limit (Can not fix)
+- Servers that don't support current GD will not work. (Will not fix)
 - Some mods may not function properly on private servers.
+- Fruitspace servers do not work.
