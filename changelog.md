@@ -1,3 +1,6 @@
+# 1.2.4
+### Update for Server API Update
+- Internal changes for Server API's update
 # 1.2.3
 ### Update for Geode 4.0.0-beta.1
 - Build for mac again

@@ -1,7 +1,7 @@
 #include <Geode/modify/GManager.hpp>
 #include "../utils/PSUtils.hpp"
 #include <filesystem>
-#include <km7dev.server_api/include/ServerAPI.hpp>
+#include <km7dev.server_api/include//ServerAPIEvents.hpp>
 
 using namespace geode::prelude;
 
@@ -19,7 +19,7 @@ class $modify(GDPSGManager, GManager) {
     }
     void setup() {
         if (!PSUtils::get()->isBoomlings()) {
-            auto url = ServerAPI::get()->getURLById(PSUtils::get()->getId());
+            auto url = PSUtils::get()->getServer().url;
             std::transform(url.begin(), url.end(), url.begin(), ::tolower);
             auto filename = std::string(m_fileName);
             filename.insert(std::string_view(filename).find(".dat"), "-" + urlToFilenameSafe(url));
