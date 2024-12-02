@@ -17,4 +17,3 @@ Note: GDPS Switcher doesn't create servers, only allows you to join existing one
 ## Known Problems
 - Servers that don't support current GD will not work. (Will not fix)
 - Some mods may not function properly on private servers.
-- Fruitspace servers do not work.
