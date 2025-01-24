@@ -19,6 +19,11 @@ else()
     message(STATUS "Found Geode: $ENV{GEODE_SDK}")
 endif()
 
+if (PROJECT_IS_TOP_LEVEL)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE GDPSUTILS_EXPORTS)
+endif()
+
+target_include_directories(${PROJECT_NAME} PRIVATE src include)
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 setup_geode_mod(${PROJECT_NAME})

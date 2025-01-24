@@ -1,5 +1,5 @@
 {
-  "geode": "4.0.1",
+  "geode": "4.2.0",
   "gd": {
     "win": "2.2074",
     "android": "2.2074",
@@ -31,18 +31,14 @@
       ]
     }
   },
-  "dependencies": [
-    {
-      "id": "geode.node-ids",
-      "importance": "required",
-      "version": "1.17.0"
-    },
-    {
-      "id": "km7dev.server_api",
-      "importance": "required",
-      "version": "1.0.2"
+  "dependencies": {
+    "geode.node-ids":  "1.17.0",
+    "km7dev.server_api": "1.0.4",
+    "camila314.geode-uri": {
+      "version": "1.0.0",
+      "importance": "suggested"
     }
-  ],
+  },
   "settings": {
     "open-recovery": {
       "type": "custom:open-recovery",
@@ -52,5 +48,10 @@
       "type": "custom:open-ignored",
       "name": "Open Ignored Save Recovery"
     }
+  },
+  "api": {
+    "include": [
+      "include/*.hpp"
+    ]
   }
 }
