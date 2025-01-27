@@ -151,7 +151,19 @@ protected:
     m_buttonSprite->setOpacity(shouldEnable ? 255 : 155);
     m_buttonSprite->setColor(shouldEnable ? ccWHITE : ccGRAY);
   }
-  void onButton(CCObject *) { RecoveryPopup::create(false)->show(); }
+  void onButton(CCObject *) {
+    auto conf = PSUtils::get()->getConflicts();
+    if (!conf.empty()) {
+        std::string result;
+        for (auto c : conf) {
+	          result.append("\n");
+            result.append(c);
+        }
+        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result).c_str(), "Ok")->show();
+        return;
+    }
+    RecoveryPopup::create(false)->show();
+  }
 
   void onCommit() override {}
   void onResetToDefault() override {}
