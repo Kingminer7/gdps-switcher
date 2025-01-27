@@ -71,7 +71,7 @@ protected:
 	          result.append("\n");
                   result.append(c);
               }
-              FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result).c_str(), "Ok")->show();
+              FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable {} to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result, conf.size() == 1 ? "it" : "them").c_str(), "Ok")->show();
               return;
           }
 	  RecoveryPopup::create(true)->show();
@@ -171,7 +171,7 @@ protected:
 	          result.append("\n");
             result.append(c);
         }
-        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result).c_str(), "Ok")->show();
+        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable {} to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result, conf.size() == 1 ? "it" : "them").c_str(), "Ok")->show();
         return;
     }
     RecoveryPopup::create(false)->show();
