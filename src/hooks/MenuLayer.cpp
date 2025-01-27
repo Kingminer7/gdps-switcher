@@ -65,7 +65,7 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 	    result.append("\n");
             result.append(c);
         }
-        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} are enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? "" : "s", result).c_str(), "Ok")->show();
+        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result).c_str(), "Ok")->show();
         return;
     }
     auto scene = CCScene::create();
