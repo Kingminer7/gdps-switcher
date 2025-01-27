@@ -1,3 +1,7 @@
+# 1.2.5
+### Small compatibility changes
+- Add api
+- Disable while certain mods are enabled, **most notably fangame mods**
 # 1.2.4
 ### Update for Server API Update
 - Internal changes for Server API's update
