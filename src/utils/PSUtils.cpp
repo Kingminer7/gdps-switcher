@@ -1,11 +1,12 @@
 #include "PSUtils.hpp"
+#include "km7dev.server_api/include/ServerAPIEvents.hpp"
 
 PSUtils *PSUtils::get() {
   if (!instance) {
     instance = new PSUtils();
     auto url = Mod::get()->getSavedValue<std::string>("server");
     if (url.empty()) {
-      url = "https://www.boomlings.com/database/";
+      url = ServerAPIEvents::getBaseUrl();
       Mod::get()->setSavedValue("server", url);
     }
     instance->initialize(url);
@@ -13,10 +14,8 @@ PSUtils *PSUtils::get() {
   return instance;
 }
 
-bool PSUtils::isBoomlings() {
-  return server.url.starts_with("www.boomlings.com/database") ||
-         server.url.starts_with("http://www.boomlings.com/database") ||
-         server.url.starts_with("https://www.boomlings.com/database");
+bool PSUtils::isBase() {
+  return server.url.starts_with(ServerAPIEvents::getBaseUrl());
 }
 
 void PSUtils::initialize(const std::string &url) {
@@ -29,7 +28,7 @@ void PSUtils::initialize(const std::string &url) {
     }
   }
   if (!conflicts.empty()) return;
-  if (!isBoomlings())
+  if (!isBase())
     this->server = ServerAPIEvents::registerServer(url, -40);
   // ServerConfigManager::get();
 }

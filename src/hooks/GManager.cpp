@@ -18,7 +18,7 @@ class $modify(GDPSGManager, GManager) {
         return safe;
     }
     void setup() {
-        if (!PSUtils::get()->isBoomlings() && PSUtils::get()->getConflicts().empty()) {
+        if (!PSUtils::get()->isBase() && PSUtils::get()->getConflicts().empty()) {
             auto url = PSUtils::get()->getServer().url;
             std::transform(url.begin(), url.end(), url.begin(), ::tolower);
             auto filename = std::string(m_fileName);

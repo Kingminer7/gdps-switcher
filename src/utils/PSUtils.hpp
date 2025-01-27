@@ -16,7 +16,7 @@ public:
   bool firstML = true;
   bool switching = false;
   static PSUtils *get();
-  bool isBoomlings();
+  bool isBase();
   void initialize(const std::string &url);
   ServerAPIEvents::Server getServer();
   std::list<std::pair<std::string, std::string>> saveRecovery = {};

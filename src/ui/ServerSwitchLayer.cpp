@@ -2,6 +2,7 @@
 #include "ServerNode.hpp"
 #include "ServerPopup.hpp"
 #include "../utils/PSUtils.hpp"
+#include "km7dev.server_api/include/ServerAPIEvents.hpp"
 
 #include <Geode/utils/cocos.hpp>
 
@@ -341,7 +342,9 @@ void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool res
     float totalHeight = 0.f;
     std::vector<ServerNode *> rendered;
 
-    auto node = ServerNode::create(this, {"Geometry Dash servers", "https://www.boomlings.com/database/"}, {scroll->m_contentLayer->getContentSize().width, 45}, "https://www.boomlings.com/database/" == current);
+    auto base = ServerAPIEvents::getBaseUrl();
+
+    auto node = ServerNode::create(this, {"Built in servers", base}, {scroll->m_contentLayer->getContentSize().width, 45}, base == current);
     node->preventDelete();
     node->setPosition(0, totalHeight);
     scroll->m_contentLayer->addChild(node);
