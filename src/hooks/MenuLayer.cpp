@@ -63,9 +63,8 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
         std::string result;
         for (auto c : conf) {
 	    result.append("\n");
-            result.append(c); 
+            result.append(c);
         }
-	if (!result.empty()) result.pop_back();
         FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} are enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? "" : "s", result).c_str(), "Ok")->show();
         return;
     }
