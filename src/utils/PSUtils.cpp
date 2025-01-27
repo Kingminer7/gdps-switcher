@@ -23,9 +23,19 @@ void PSUtils::initialize(const std::string &url) {
   if (this->initialized)
     return;
   this->initialized = true;
+  for (auto str : {"viper.geometry_dash_midnight", "teamtcm.geometry-dash-odyssey", "capeling.geometry-dash-lunar"}) {
+    if (Loader::get()->isModLoaded(str)) {
+      conflicts.push_back(str);
+    }
+  }
+  if (!conflicts.empty()) return;
   if (!isBoomlings())
     this->server = ServerAPIEvents::registerServer(url, -40);
   // ServerConfigManager::get();
+}
+
+std::vector<std::string> PSUtils::getConflicts() {
+  return conflicts;
 }
 
 ServerAPIEvents::Server PSUtils::getServer() { return server; }

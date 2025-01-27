@@ -10,6 +10,7 @@ private:
   PSUtils() {}
   inline static PSUtils *instance = nullptr;
   bool initialized = false;
+  std::vector<std::string> conflicts = {};
   ServerAPIEvents::Server server;
 public:
   bool firstML = true;
@@ -20,4 +21,5 @@ public:
   ServerAPIEvents::Server getServer();
   std::list<std::pair<std::string, std::string>> saveRecovery = {};
   std::list<std::string> recovering = {};
+  std::vector<std::string> getConflicts();
 };
