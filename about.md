@@ -1,13 +1,13 @@
 # GDPS Switcher
 Simple mod that lets you change your game servers.
 
-Note: GDPS Switcher doesn't create servers, only allows you to join existing ones.
+## Notes
+- GDPS Switcher doesn't create servers, only allows you to join existing ones.
+- GDPS Switcher automatically disables while specific mods are enabled, most notably *fangame mods*.
 ### Report issues [here](https://github.com/Kingminer7/gdps-switcher/issues).
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
-### Coming Soon
-- Server owner integration options
 ## Credits
 - [Brift](https://x.com/BriftXD) - Pencil icon
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
