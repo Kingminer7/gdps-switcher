@@ -25,7 +25,9 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
     gdpsswitchButton->setID("gdps-switch-button"_spr);
 
     menu->updateLayout();
-
+    if (!PSUtils::get()->getConflicts().empty()) {
+        return true;
+    }
 	if (PSUtils::get()->firstML == true) {
 		PSUtils::get()->firstML = false;
 		bool allIgnored = true;
@@ -56,6 +58,17 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
   }
 
   void onGDPSSwitchButton(CCObject *) {
+    auto conf = PSUtils::get()->getConflicts();
+    if (!conf.empty()) {
+        std::string result;
+        for (auto c : conf) {
+	    result.append("\n");
+            result.append(c); 
+        }
+	if (!result.empty()) result.pop_back();
+        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} are enabled: {}\nDisable them to use GDPS Switcher.", conf.size() == 1 ? "" : "s", result).c_str(), "Ok");
+        return;
+    }
     auto scene = CCScene::create();
     scene->addChild(ServerSwitchLayer::create());
     CCDirector::sharedDirector()->replaceScene(
