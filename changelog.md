@@ -1,3 +1,6 @@
+# 1.2.6
+### Patched EXE fix
+- Fix server automatically setting to RobTop's when on a url patched game
 # 1.2.5
 ### Small compatibility changes
 - Add api

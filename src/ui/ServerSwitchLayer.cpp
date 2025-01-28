@@ -2,7 +2,6 @@
 #include "ServerNode.hpp"
 #include "ServerPopup.hpp"
 #include "../utils/PSUtils.hpp"
-#include "km7dev.server_api/include/ServerAPIEvents.hpp"
 
 #include <Geode/utils/cocos.hpp>
 
@@ -342,9 +341,7 @@ void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool res
     float totalHeight = 0.f;
     std::vector<ServerNode *> rendered;
 
-    auto base = ServerAPIEvents::getBaseUrl();
-
-    auto node = ServerNode::create(this, {"Built in servers", base}, {scroll->m_contentLayer->getContentSize().width, 45}, base == current);
+    auto node = ServerNode::create(this, {"Built in servers", "builtin"}, {scroll->m_contentLayer->getContentSize().width, 45}, "builtin" == current);
     node->preventDelete();
     node->setPosition(0, totalHeight);
     scroll->m_contentLayer->addChild(node);

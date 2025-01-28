@@ -13,7 +13,6 @@ private:
   std::vector<std::string> conflicts = {};
   ServerAPIEvents::Server server;
 public:
-  bool firstML = true;
   bool switching = false;
   static PSUtils *get();
   bool isBase();

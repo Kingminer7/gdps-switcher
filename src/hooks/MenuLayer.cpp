@@ -1,5 +1,5 @@
-#include "../ui/ServerSwitchLayer.hpp"
 #include "../ui/RecoveryPopup.hpp"
+#include "../ui/ServerSwitchLayer.hpp"
 #include "../utils/PSUtils.hpp"
 #include <Geode/ui/BasedButtonSprite.hpp>
 
@@ -26,33 +26,40 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
 
     menu->updateLayout();
     if (!PSUtils::get()->getConflicts().empty()) {
-        return true;
+      return true;
     }
-	if (PSUtils::get()->firstML == true) {
-		PSUtils::get()->firstML = false;
-		bool allIgnored = true;
-		auto ignored = Mod::get()->getSavedValue<std::vector<std::string>>("ignored-recoveries");
-                for (std::pair<std::string, std::string> save : PSUtils::get()->saveRecovery) {
-                      if (std::find(ignored.begin(), ignored.end(), save.second) == ignored.end()) {
-			    allIgnored = false;
-		      }
-		}
-		
-		if (allIgnored == false) {
-			Loader::get()->queueInMainThread([this] {
-			geode::createQuickPopup(
-			"Save Recovery",
-			"Potentially lost saves from an older version of GDPS Switcher were found. Do you want to review them?",
-			"No",
-			"Yes",
-			[this](auto, bool yes) {
-				if (yes) {
-					RecoveryPopup::create(false)->show();
-				}
-			}, false)->show();
-			});
-		}
-	}
+    static bool first = true;
+    if (first) {
+      first = false;
+      if (!PSUtils::get()->isBase()) return true;
+      bool allIgnored = true;
+      auto ignored = Mod::get()->getSavedValue<std::vector<std::string>>(
+          "ignored-recoveries");
+      for (std::pair<std::string, std::string> save :
+           PSUtils::get()->saveRecovery) {
+        if (std::find(ignored.begin(), ignored.end(), save.second) ==
+            ignored.end()) {
+          allIgnored = false;
+        }
+      }
+
+      if (allIgnored == false) {
+        Loader::get()->queueInMainThread([this] {
+          geode::createQuickPopup(
+              "Save Recovery",
+              "Potentially lost saves from an older version of GDPS Switcher "
+              "were found. Do you want to review them?",
+              "No", "Yes",
+              [this](auto, bool yes) {
+                if (yes) {
+                  RecoveryPopup::create(false)->show();
+                }
+              },
+              false)
+              ->show();
+        });
+      }
+    }
 
     return true;
   }
@@ -60,13 +67,21 @@ class $modify(GDPSSwitchMenuLayer, MenuLayer) {
   void onGDPSSwitchButton(CCObject *) {
     auto conf = PSUtils::get()->getConflicts();
     if (!conf.empty()) {
-        std::string result;
-        for (auto c : conf) {
-	    result.append("\n");
-            result.append(c);
-        }
-        FLAlertLayer::create("GDPS Switcher", fmt::format("GDPS Switcher is disabled while the following mod{} enabled: {}\nDisable {} to use GDPS Switcher.", conf.size() == 1 ? " is" : "s are", result, conf.size() == 1 ? "it" : "them").c_str(), "Ok")->show();
-        return;
+      std::string result;
+      for (auto c : conf) {
+        result.append("\n");
+        result.append(c);
+      }
+      FLAlertLayer::create(
+          "GDPS Switcher",
+          fmt::format("GDPS Switcher is disabled while the following mod{} "
+                      "enabled: {}\nDisable {} to use GDPS Switcher.",
+                      conf.size() == 1 ? " is" : "s are", result,
+                      conf.size() == 1 ? "it" : "them")
+              .c_str(),
+          "Ok")
+          ->show();
+      return;
     }
     auto scene = CCScene::create();
     scene->addChild(ServerSwitchLayer::create());
