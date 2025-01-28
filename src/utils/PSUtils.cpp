@@ -16,7 +16,7 @@ PSUtils *PSUtils::get() {
 
 bool PSUtils::isBase() {
   log::info("{} - \"{}\" \"{}\"", server.url == "builtin", server.url, "builtin");
-  return server.url == "builtin";
+  return server.url == "builtin" || url == ServerAPIEvents::getBaseUrl();
 }
 
 void PSUtils::initialize(const std::string &url) {
