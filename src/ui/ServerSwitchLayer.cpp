@@ -70,7 +70,7 @@ bool ServerSwitchLayer::init()
     this->addChild(scroll);
 
     auto servers = Mod::get()->getSavedValue<std::vector<ServerEntry>>("saved-servers");
-    current = Mod::get()->getSavedValue<std::string>("server");
+    current = Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl());
     update(servers, true);
 
     auto cornerMenu = CCMenu::create();
@@ -260,7 +260,7 @@ void ServerSwitchLayer::keyBackClicked()
 
 void ServerSwitchLayer::onGoBack(CCObject *)
 {
-    if (current == Mod::get()->getSavedValue<std::string>("server"))
+    if (current == Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl()))
     {
         CCDirector::get()->replaceScene(CCTransitionFade::create(0.5, MenuLayer::scene(false)));
     }
@@ -324,7 +324,7 @@ void ServerSwitchLayer::selectServer(ServerNode *node)
     auto spr = static_cast<CCSprite*>(applyBtn->getNormalImage());
     spr->setCascadeColorEnabled(true);
     spr->setCascadeOpacityEnabled(true);
-    if (current == Mod::get()->getSavedValue<std::string>("server")) {
+    if (current == Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl())) {
         applyBtn->setEnabled(false);
         spr->setColor(ccGRAY);
         spr->setOpacity(155);
@@ -341,7 +341,8 @@ void ServerSwitchLayer::update(std::vector<ServerEntry> const &servers, bool res
     float totalHeight = 0.f;
     std::vector<ServerNode *> rendered;
 
-    auto node = ServerNode::create(this, {"Built in servers", "builtin"}, {scroll->m_contentLayer->getContentSize().width, 45}, "builtin" == current);
+    auto burl = ServerAPIEvents::getBaseUrl();
+    auto node = ServerNode::create(this, {"Built in servers", burl }, {scroll->m_contentLayer->getContentSize().width, 45}, burl == current);
     node->preventDelete();
     node->setPosition(0, totalHeight);
     scroll->m_contentLayer->addChild(node);

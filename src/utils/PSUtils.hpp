@@ -11,7 +11,12 @@ private:
   inline static PSUtils *instance = nullptr;
   bool initialized = false;
   std::vector<std::string> conflicts = {};
-  ServerAPIEvents::Server server;
+  // dummy server for when server not registered
+  ServerAPIEvents::Server server = {
+    .id = -1,
+    .url = ServerAPIEvents::getBaseUrl(),
+    .priority = -1,
+  };
 public:
   bool switching = false;
   static PSUtils *get();

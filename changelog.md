@@ -1,3 +1,6 @@
+# 1.2.7
+### CORRECTLY fix patched exes
+- Previous change except without the save file issues
 # 1.2.6
 ### Patched EXE fix
 - Fix server automatically setting to RobTop's when on a url patched game

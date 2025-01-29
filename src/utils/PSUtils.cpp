@@ -4,19 +4,15 @@
 PSUtils *PSUtils::get() {
   if (!instance) {
     instance = new PSUtils();
-    auto url = Mod::get()->getSavedValue<std::string>("server");
-    if (url.empty()) {
-      url = "builtin";
-      Mod::get()->setSavedValue("server", url);
-    }
+    auto url = Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl());
     instance->initialize(url);
   }
   return instance;
 }
 
 bool PSUtils::isBase() {
-  log::info("{} - \"{}\" \"{}\"", server.url == "builtin", server.url, "builtin");
-  return server.url == "builtin" || server.url == ServerAPIEvents::getBaseUrl();
+  log::info("{} == {} = {}", server.url, ServerAPIEvents::getBaseUrl(), server.url == ServerAPIEvents::getBaseUrl());
+  return server.url == ServerAPIEvents::getBaseUrl();
 }
 
 void PSUtils::initialize(const std::string &url) {
@@ -29,7 +25,7 @@ void PSUtils::initialize(const std::string &url) {
     }
   }
   if (!conflicts.empty()) return;
-  if (url != "builtin")
+  if (url != ServerAPIEvents::getBaseUrl())
     this->server = ServerAPIEvents::registerServer(url, -40);
   // ServerConfigManager::get();
 }
