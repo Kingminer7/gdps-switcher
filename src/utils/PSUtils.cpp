@@ -11,7 +11,6 @@ PSUtils *PSUtils::get() {
 }
 
 bool PSUtils::isBase() {
-  log::info("{} == {} = {}", server.url, ServerAPIEvents::getBaseUrl(), server.url == ServerAPIEvents::getBaseUrl());
   return server.url == ServerAPIEvents::getBaseUrl();
 }
 
