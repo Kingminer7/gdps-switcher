@@ -1,3 +1,6 @@
+# 1.2.8
+### Fix more save issues
+- Fix a save issue with certain values set in the save file (found by [RighteousRyan](https://github.com/RighteousRyan1))
 # 1.2.7
 ### CORRECTLY fix patched exes
 - Previous change except without the save file issues

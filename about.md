@@ -14,6 +14,7 @@ Simple mod that lets you change your game servers.
 - [Uproxide](https://x.com/uproxide) - Event levels (Both the idea and some of the functionality)
 - [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
 - [OmgRod](https://github.com/OmgRod) - Suggesting and initial implementation of the API
+- [RighteousRyan](https://github.com/RighteousRyan1) - Finding another save file bug and helping me test
 ## Known Problems
 - Servers that don't support current GD will not work. (Will not fix)
 - Some mods may not function properly on private servers.

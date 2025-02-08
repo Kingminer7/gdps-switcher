@@ -11,7 +11,7 @@ PSUtils *PSUtils::get() {
 }
 
 bool PSUtils::isBase() {
-  return server.url == ServerAPIEvents::getBaseUrl();
+  return server.url == ServerAPIEvents::getBaseUrl() || fmt::format("{}/", server.url) == ServerAPIEvents::getBaseUrl();
 }
 
 void PSUtils::initialize(const std::string &url) {
