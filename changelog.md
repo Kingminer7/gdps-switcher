@@ -1,3 +1,6 @@
+# 1.3.0
+### Add URI support
+- Added URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)
 # 1.2.8
 ### Fix more save issues
 - Fix a save issue with certain values set in the save file (found by [RighteousRyan](https://github.com/RighteousRyan1))

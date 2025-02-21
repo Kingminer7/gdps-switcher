@@ -5,7 +5,7 @@
     "android": "2.2074",
     "mac": "2.2074"
   },
-  "version": "1.2.8",
+  "version": "1.3.0",
   "id": "km7dev.gdps-switcher",
   "name": "GDPS Switcher",
   "developer": "km7dev",
@@ -33,9 +33,7 @@
   },
   "dependencies": {
     "geode.node-ids":  "1.17.0",
-    "km7dev.server_api": "2.0.0"
-  },
-  "removeddepstemp": {
+    "km7dev.server_api": "2.0.0",
     "camila314.geode-uri": {
       "version": "1.0.0",
       "importance": "suggested"

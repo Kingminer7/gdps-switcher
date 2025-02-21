@@ -8,6 +8,7 @@ Simple mod that lets you change your game servers.
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
+- URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)
 ## Credits
 - [Brift](https://x.com/BriftXD) - Pencil icon
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
