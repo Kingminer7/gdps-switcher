@@ -1,3 +1,7 @@
+# 1.4.0
+### UI improvement
+- Added regex to urls
+- Redo the UI code (TODO)
 # 1.3.0
 ### Add URI support
 - Added URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)

@@ -16,6 +16,7 @@ Simple mod that lets you change your game servers.
 - [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
 - [OmgRod](https://github.com/OmgRod) - Suggesting and initial implementation of the API
 - [RighteousRyan](https://github.com/RighteousRyan1) - Finding another save file bug and helping me test
+- [cdc](https://github.com/cdc-sys) - Regex for server URLs
 ## Known Problems
 - Servers that don't support current GD will not work. (Will not fix)
 - Some mods may not function properly on private servers.
