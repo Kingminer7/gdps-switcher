@@ -3,6 +3,7 @@
 #include "Geode/ui/Popup.hpp"
 #include "ServerSwitchLayer.hpp"
 #include "ServerNode.hpp"
+#include <regex>
 
 using namespace geode::prelude;
 
@@ -76,6 +77,41 @@ protected:
         saveBtn->setPosition(ccp(0, -66));
         saveBtn->setID("save-button");
         menu->addChild(saveBtn);
+        std::basic_regex urlRegex = std::regex("(http|https):\\/\\/([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:\\/~+#-]*[\\w@?^=%&\\/~+#-])");
+        m_urlInput->setCallback([this,saveBtn,urlRegex](std::string input){
+            if (!std::regex_match(input, urlRegex)&&m_nameInput->getString().size()>0){
+                saveBtn->setEnabled(false);
+                auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
+                spr->setCascadeColorEnabled(true);
+                spr->setCascadeOpacityEnabled(true);
+                spr->setColor(ccGRAY);
+                spr->setOpacity(155);
+            }
+            else{
+                saveBtn->setEnabled(true);
+                auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
+                spr->setCascadeColorEnabled(true);
+                spr->setCascadeOpacityEnabled(true);
+                spr->setColor({255,255,255});
+                spr->setOpacity(255);
+            }
+        });
+        if (!std::regex_match(m_urlInput->getString(), urlRegex)&&m_nameInput->getString().size()>0){
+            saveBtn->setEnabled(false);
+            auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
+            spr->setCascadeColorEnabled(true);
+            spr->setCascadeOpacityEnabled(true);
+            spr->setColor(ccGRAY);
+            spr->setOpacity(155);
+        }
+        else{
+            saveBtn->setEnabled(true);
+            auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
+            spr->setCascadeColorEnabled(true);
+            spr->setCascadeOpacityEnabled(true);
+            spr->setColor({255,255,255});
+            spr->setOpacity(255);
+        }
 
         return true;
     }
