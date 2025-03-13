@@ -79,7 +79,8 @@ protected:
         menu->addChild(saveBtn);
         std::basic_regex urlRegex = std::regex("(http|https):\\/\\/([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:\\/~+#-]*[\\w@?^=%&\\/~+#-])");
         m_urlInput->setCallback([this,saveBtn,urlRegex](std::string input){
-            if (!std::regex_match(input, urlRegex)&&m_nameInput->getString().size()>0){
+            if (!std::regex_match(input, urlRegex)){
+                m_urlInput->getInputNode()->setLabelNormalColor({255,100,100});
                 saveBtn->setEnabled(false);
                 auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
                 spr->setCascadeColorEnabled(true);
@@ -88,6 +89,7 @@ protected:
                 spr->setOpacity(155);
             }
             else{
+                m_urlInput->getInputNode()->setLabelNormalColor({255,255,255});
                 saveBtn->setEnabled(true);
                 auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
                 spr->setCascadeColorEnabled(true);
@@ -96,7 +98,8 @@ protected:
                 spr->setOpacity(255);
             }
         });
-        if (!std::regex_match(m_urlInput->getString(), urlRegex)&&m_nameInput->getString().size()>0){
+        if (!std::regex_match(m_urlInput->getString(), urlRegex)){
+            m_urlInput->getInputNode()->setLabelNormalColor({255,100,100});
             saveBtn->setEnabled(false);
             auto spr = static_cast<CCSprite*>(saveBtn->getNormalImage());
             spr->setCascadeColorEnabled(true);
