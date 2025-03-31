@@ -1,3 +1,6 @@
+# 1.3.1
+### Secrets
+- Added some secrets
 # 1.3.0
 ### Add URI support
 - Added URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)
