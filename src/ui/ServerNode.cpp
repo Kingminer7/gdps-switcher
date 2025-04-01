@@ -25,6 +25,9 @@ bool ServerNode::init(ServerSwitchLayer *layer, ServerSwitchLayer::ServerEntry e
     bg->setContentSize(size);
     bg->setPosition(size / 2);
     bg->setID("server-node-bg");
+    #ifdef APRIL_FOOLS
+    bg->setColor({255,0,0});
+    #endif
     this->addChild(bg);
 
     auto label = CCLabelBMFont::create(entry.name.c_str(), "bigFont.fnt");

@@ -5,6 +5,8 @@ set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
 
 project(GDPSSwitcher VERSION 1.2.0)
 
+add_definitions(-DAPRIL_FOOLS)
+
 file(GLOB SOURCES
     src/utils/*.cpp
     src/hooks/*.cpp

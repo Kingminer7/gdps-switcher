@@ -18,11 +18,17 @@ bool ServerSwitchLayer::init()
 
     auto background = createLayerBG();
     background->setID("background");
+    background->setColor({0, 228, 255});
     this->addChild(background);
 
     auto winSize = CCDirector::get()->getWinSize();
 
+    
+    #ifdef APRIL_FOOLS
+    auto title = CCLabelBMFont::create("Nintendo Switcher", "goldFont.fnt");
+    #else
     auto title = CCLabelBMFont::create("Private Server Switcher", "goldFont.fnt");
+    #endif
     title->setPosition(winSize.width / 2, winSize.height - 22.5f);
     title->setID("title-text");
     this->addChild(title);
