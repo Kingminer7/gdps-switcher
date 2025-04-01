@@ -3,9 +3,10 @@
   "gd": {
     "win": "2.2074",
     "android": "2.2074",
-    "mac": "2.2074"
+    "mac": "2.2074",
+    "ios": "2.2074"
   },
-  "version": "1.3.0",
+  "version": "1.3.2",
   "id": "km7dev.gdps-switcher",
   "name": "GDPS Switcher",
   "developer": "km7dev",
