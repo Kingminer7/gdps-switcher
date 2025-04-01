@@ -38,7 +38,7 @@ jobs:
 
         - name: iOS
           os: macos-latest
-          target: iOS
+          target: ios
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
