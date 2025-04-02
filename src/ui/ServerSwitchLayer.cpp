@@ -18,7 +18,9 @@ bool ServerSwitchLayer::init()
 
     auto background = createLayerBG();
     background->setID("background");
+    #ifdef APRIL_FOOLS
     background->setColor({0, 228, 255});
+    #endif
     this->addChild(background);
 
     auto winSize = CCDirector::get()->getWinSize();
