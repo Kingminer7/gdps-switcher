@@ -1,3 +1,7 @@
+# 1.3.2
+### No more Nintendo
+- nintendo saw my code and said "nah we dont want it"
+- oh yeah also ios support
 # 1.3.1
 ### Rebrand
 - Nintendo bought GDPS Switcher real no scam working 2025
