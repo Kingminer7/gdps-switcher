@@ -1,3 +1,4 @@
+## 1.3.3 fixed me forgetting to add ios to one place.
 # 1.3.2
 ### No more Nintendo
 - nintendo saw my code and said "nah we dont want it"
