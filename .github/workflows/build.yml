@@ -59,7 +59,7 @@ jobs:
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          bindings: geode-sdk/bindings
+          bindings: qm7dev/bindings
           bindings-ref: main
           combine: true
           sdk: nightly
