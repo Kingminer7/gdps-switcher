@@ -18,7 +18,7 @@ void PSUtils::initialize(const std::string &url) {
   if (this->initialized)
     return;
   this->initialized = true;
-  for (auto str : {"viper.geometry_dash_midnight", "teamtcm.geometry-dash-odyssey", "capeling.geometry-dash-lunar"}) {
+  for (auto str : {"viper.geometry_dash_midnight", "teamtcm.geometry-dash-odyssey", "capeling.geometry-dash-lunar", "chumiiu.geometry_dash_time_reborn"}) {
     if (Loader::get()->isModLoaded(str)) {
       conflicts.push_back(str);
     }
