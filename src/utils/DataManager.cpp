@@ -1,0 +1,83 @@
+#include "DataManager.hpp"
+
+#include "Geode/loader/Dirs.hpp"
+#include "Geode/loader/Log.hpp"
+#include "Geode/loader/Mod.hpp"
+#include <filesystem>
+#include <fmt/format.h>
+
+geode::Result<> DataManager::setup() {
+    auto savePath = geode::dirs::getSaveDir() / "gdpses";
+
+    if (!std::filesystem::exists(savePath)) {
+        std::error_code ec;
+        if (!std::filesystem::create_directory(savePath, ec)) {
+            return geode::Err(fmt::format("Failed to create directory '{}': {}", savePath.string(), ec.message()));
+        }
+    } else if (!std::filesystem::is_directory(savePath)) {
+        return geode::Err(fmt::format("'{}' exists but is not a directory.", savePath.string()));
+    }
+
+    if (geode::Mod::get()->getSavedValue<std::string>("latest") != "1.4.0") {
+        migrateData();
+    }
+
+    return geode::Ok();
+}
+
+std::string DataManager::urlToFilenameSafe(const std::string url) {
+    std::string ret = "";
+    for (char c : url) {
+        if (std::isalnum(c) || c == '.' || c == '-' || c == '_') {
+            ret += c;
+        } else {
+            ret += '_';
+        }
+    }
+    return ret;
+}
+
+void DataManager::migrateData() {
+    auto savePath = geode::dirs::getSaveDir();
+    std::vector<std::string> servers;
+
+    auto gdpsPath = savePath / "gdpses";
+
+    for (const auto& entry : std::filesystem::directory_iterator(savePath)) {
+        if (!entry.is_regular_file()) continue;
+
+        auto fname = entry.path().filename().string();
+        if ((fname.starts_with("CCGameManager-") || fname.starts_with("CCLocalLevels-")) && fname.ends_with(".dat")) {
+            auto start = fname.find('-') + 1;
+            auto end = fname.rfind(".dat");
+            if (start == std::string::npos || end == std::string::npos || start >= end) continue;
+
+            auto name = fname.substr(start, end - start);
+            auto isBackup = name.ends_with("2");
+            if (isBackup) {
+                name = name.substr(0, name.size() - 1);
+            }
+
+            auto dir = gdpsPath / name;
+
+            std::error_code ec;
+            if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, ec)) {
+                geode::log::error("Failed to create directory '{}': {}", dir.string(), ec.message());
+                continue;
+            }
+
+            auto newName = fname.substr(0, start - 1) + (isBackup ? "2" : "") + fname.substr(end);
+            auto newPath = dir / newName;
+
+            std::filesystem::rename(savePath / fname, newPath, ec);
+            if (ec) {
+                geode::log::error("Failed to move file '{}' to '{}': {}", fname, newPath.string(), ec.message());
+            }
+        }
+    }
+}
+
+$on_mod(Loaded) {
+    auto sm = std::make_unique<DataManager>();
+    sm->setup();
+}

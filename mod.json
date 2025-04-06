@@ -1,0 +1,58 @@
+{
+	"geode": "4.3.1",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"version": "1.4.0-alpha.1",
+	"id": "km7dev.gdps-switcher",
+	"name": "GDPS Switcher",
+	"developer": "km7dev",
+	"description": "Switch between GDPS servers easily.",
+	"tags": [
+		"customization",
+		"online"
+	],
+	"early-load": true,
+	"links": {
+		"source": "https://github.com/kingminer7/gdps-switcher",
+		"community": "https://discord.gg/Vj5Mcennph",
+		"homepage": "https://km7dev.tech"
+	},
+	"issues": {
+		"info": "Report issues in my Discord server.",
+		"url": "https://discord.gg/Vj5Mcennph"
+	},
+	"resources": {
+		"spritesheets": {
+			"GS_serverSheet01": [
+				"resources/*.png"
+			]
+		}
+	},
+	"dependencies": {
+		"geode.node-ids": "1.17.0",
+		"km7dev.server_api": "2.0.0",
+		"camila314.geode-uri": {
+			"version": "1.0.0",
+			"importance": "suggested"
+		}
+	},
+	"settings": {
+		"open-recovery": {
+			"type": "custom:open-recovery",
+			"name": "Open Save Recovery"
+		},
+		"open-ignored-recovery": {
+			"type": "custom:open-ignored",
+			"name": "Open Ignored Save Recovery"
+		}
+	},
+	"api": {
+		"include": [
+			"include/*.hpp"
+		]
+	}
+}
