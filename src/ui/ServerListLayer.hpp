@@ -11,7 +11,8 @@ class ServerListLayer : public cocos2d::CCLayer {
         void keyBackClicked() override;
 
         cocos2d::CCMenu *m_backMenu = nullptr;
-        
+        geode::ScrollLayer *m_scroll = nullptr;
+        geode::Scrollbar *m_scrollbar = nullptr;
 
         int page = 1;
         int showing = 10;

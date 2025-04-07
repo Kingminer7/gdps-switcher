@@ -15,12 +15,13 @@
 
 namespace GDPSTypes {
     struct Server {
-        std::string name;
-        std::string url;
+        std::string name = "";
+        std::string url = "";
         // this doesnt get saved
         int serverApiId = -1;
 
         Server(std::string name, std::string url) : url(url), name(name) {}
+        Server() {}
     };
 }
 
