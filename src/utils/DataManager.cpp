@@ -79,5 +79,5 @@ void DataManager::migrateData() {
 
 $on_mod(Loaded) {
     auto sm = std::make_unique<DataManager>();
-    sm->setup();
+    auto a = sm->setup();
 }

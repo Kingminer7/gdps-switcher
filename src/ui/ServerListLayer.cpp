@@ -5,7 +5,6 @@
 #include "Geode/cocos/cocoa/CCObject.h"
 #include "Geode/cocos/layers_scenes_transitions_nodes/CCTransition.h"
 #include "Geode/cocos/misc_nodes/CCClippingNode.h"
-#include "Geode/loader/Loader.hpp"
 #include "Geode/loader/Mod.hpp"
 #include "Geode/ui/Layout.hpp"
 #include "Geode/ui/ScrollLayer.hpp"

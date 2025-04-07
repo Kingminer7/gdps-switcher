@@ -22,6 +22,15 @@ namespace GDPSTypes {
 
         Server(std::string name, std::string url) : url(url), name(name) {}
         Server() {}
+
+        // Comparison operators
+        bool operator==(const Server& other) const {
+            return name == other.name && url == other.url && serverApiId == other.serverApiId;
+        }
+
+        bool operator!=(const Server& other) const {
+            return !(*this == other);
+        }
     };
 }
 
