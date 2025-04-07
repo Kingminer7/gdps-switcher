@@ -17,10 +17,12 @@ bool ServerNode::init(Server server, cocos2d::CCSize size) {
     bg->setID("background");
     this->addChildAtPosition(bg, geode::Anchor::Center);
 
-    auto label = cocos2d::CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
-    label->limitLabelWidth(size.width - 50, .7f, 0.f);
-    label->setAnchorPoint({0.f, 0.5f});
-    addChildAtPosition(label, geode::Anchor::TopLeft, {8, -1 - label->getContentHeight() / 2});
+    auto nameLab = cocos2d::CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
+    nameLab->limitLabelWidth(size.width - 50, .7f, 0.f);
+    nameLab->setAnchorPoint({0.f, 0.5f});
+    addChildAtPosition(nameLab, geode::Anchor::TopLeft, {8, -1 - nameLab->getContentHeight() / 2});
+
+    
 
     return true;
 };
