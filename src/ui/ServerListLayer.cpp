@@ -54,7 +54,7 @@
     scrollBg->setID("server-scroll-bg");
     this->addChildAtPosition(scrollBg, geode::Anchor::Center, {0, 0}, false);
     
-    m_scroll = geode::ScrollLayer::create({360, 235});
+    m_scroll = geode::ScrollLayer::create({363, 235});
     m_scroll->setID("server-scroll");
     m_scroll->ignoreAnchorPointForPosition(false);
     m_scrollbar = geode::Scrollbar::create(m_scroll);
@@ -64,25 +64,25 @@
     auto clip = cocos2d::CCClippingNode::create();
     clip->setID("server-list");
     clip->setZOrder(1);
-    clip->setContentSize({383, 235});
+    clip->setContentSize({377, 235});
     clip->setAnchorPoint({0.5, 0.5});
     clip->setAlphaThreshold(0.05f);
     clip->addChildAtPosition(m_scroll, geode::Anchor::Center, {-5.f, 0.f});
     clip->addChildAtPosition(m_scrollbar, geode::Anchor::Right, {-6.f, 0.f});
-    addChildAtPosition(clip, geode::Anchor::Center, { -.5f, 0.f}, false);
+    addChildAtPosition(clip, geode::Anchor::Center, { 1.f, 0.f}, false);
 
     auto stencil = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
-    stencil->setContentSize({380, 235});
+    stencil->setContentSize({377, 235});
     stencil->setPosition({190.f, 117.5f});
     clip->setStencil(stencil);
 
     auto servers = geode::Mod::get()->getSavedValue<std::vector<GDPSTypes::Server>>("saved-servers");
     servers.insert(servers.begin(), {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
-    m_scroll->m_contentLayer->setContentSize({360, std::max(servers.size() * 80.f - 5.f, 235.f)});
+    m_scroll->m_contentLayer->setContentSize({363, std::max(servers.size() * 80.f - 5.f, 235.f)});
     m_scroll->scrollToTop();
     float y = -5.f;
     for (auto server : servers) {
-        auto node = ServerNode::create(server, {360, 75});
+        auto node = ServerNode::create(server, {363, 75});
         y += 80.f;
         m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top, {0, 37.5f - y}, false);
     }
