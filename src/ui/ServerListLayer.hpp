@@ -4,6 +4,9 @@
 #include "Geode/cocos/layers_scenes_transitions_nodes/CCScene.h"
 #include "Geode/ui/ScrollLayer.hpp"
 #include "Geode/ui/Scrollbar.hpp"
+#include "Types.hpp"
+
+class ServerNode;
 
 class ServerListLayer : public cocos2d::CCLayer {
     protected:
@@ -14,6 +17,8 @@ class ServerListLayer : public cocos2d::CCLayer {
         geode::ScrollLayer *m_scroll = nullptr;
         geode::Scrollbar *m_scrollbar = nullptr;
 
+        GDPSTypes::Server m_selectedServer;
+
         int page = 1;
         int showing = 10;
     public:
@@ -21,4 +26,7 @@ class ServerListLayer : public cocos2d::CCLayer {
         static cocos2d::CCScene *scene();
         
         void onBack(CCObject *sender);
+        void onSelect(GDPSTypes::Server server);
+
+        GDPSTypes::Server getSelected();
 };

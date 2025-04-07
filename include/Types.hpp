@@ -25,7 +25,7 @@ namespace GDPSTypes {
 
         // Comparison operators
         bool operator==(const Server& other) const {
-            return name == other.name && url == other.url && serverApiId == other.serverApiId;
+            return name == other.name && url == other.url;
         }
 
         bool operator!=(const Server& other) const {

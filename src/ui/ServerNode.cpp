@@ -1,6 +1,7 @@
 #include "ServerNode.hpp"
 #include "../utils/GDPSMain.hpp"
 #include "GUI/CCControlExtension/CCScale9Sprite.h"
+#include "Geode/binding/ButtonSprite.hpp"
 #include "Geode/binding/CCMenuItemSpriteExtra.hpp"
 #include "Geode/cocos/label_nodes/CCLabelBMFont.h"
 #include "Geode/cocos/menu_nodes/CCMenu.h"
@@ -8,10 +9,11 @@
 
 using namespace GDPSTypes;
 
-bool ServerNode::init(Server server, cocos2d::CCSize size) {
+bool ServerNode::init(Server server, cocos2d::CCSize size, ServerListLayer *list) {
     if (!CCNode::init()) return false;
-    m_server = server;
-    this->setID(fmt::format("server-node-{}", server.name));
+    this->m_listLayer = list;
+    this->m_server = server;
+    this->setID(fmt::format("server-node", server.name));
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
 
@@ -33,24 +35,27 @@ bool ServerNode::init(Server server, cocos2d::CCSize size) {
     m_menu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_menu, geode::Anchor::Right, {-8, 0});
 
-    auto editSpr = ButtonSprite::create("Use");
-    editSpr->setScale(.7f);
-    if (GDPSMain::get()->getServer() == server) {
-      editSpr->updateBGImage("GJ_button_05.png");
+    auto useSpr = ButtonSprite::create("Use");
+    useSpr->setScale(.7f);
+    auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
+    useBtn->setID("select-btn");
+    useSpr->setCascadeOpacityEnabled(true);
+    if (list->getSelected() == server) {
+      useSpr->updateBGImage("GJ_button_05.png");
+      useBtn->setEnabled(false);
+      useSpr->setOpacity(127);
     } else {
-      editSpr->updateBGImage("GJ_button_04.png");
+      useSpr->updateBGImage("GJ_button_04.png");
     }
-    auto editBtn = CCMenuItemSpriteExtra::create(editSpr, this, menu_selector(ServerNode::onSelect));
-    editBtn->setID("select-btn");
-    m_menu->addChild(editBtn);
+    m_menu->addChild(useBtn);
     m_menu->updateLayout();
 
     return true;
 };
 
-ServerNode *ServerNode::create(Server server, cocos2d::CCSize size) {
+ServerNode *ServerNode::create(Server server, cocos2d::CCSize size, ServerListLayer *list) {
     auto ret = new ServerNode;
-    if (ret && ret->init(server, size)) {
+    if (ret && ret->init(server, size, list)) {
       ret->autorelease();
       return ret;
     }
@@ -59,5 +64,19 @@ ServerNode *ServerNode::create(Server server, cocos2d::CCSize size) {
 }
 
 void ServerNode::onSelect(CCObject *sender) {
+    m_listLayer->onSelect(m_server);
+}
 
+void ServerNode::updateVisual(GDPSTypes::Server server) {
+  auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("select-btn"));
+  auto spr = btn->getChildByType<ButtonSprite *>(0);
+  if (server == m_server) {
+    spr->updateBGImage("GJ_button_05.png");
+    btn->setEnabled(false);
+    spr->setOpacity(127);
+  } else {
+    spr->updateBGImage("GJ_button_04.png");
+    btn->setEnabled(true);
+    spr->setOpacity(255);
+  }
 }

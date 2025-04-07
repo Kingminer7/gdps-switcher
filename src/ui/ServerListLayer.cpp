@@ -12,10 +12,13 @@
 #include "Types.hpp"
 #include "km7dev.server_api/include/ServerAPIEvents.hpp"
 #include "ui/ServerNode.hpp"
+#include "../utils/GDPSMain.hpp"
 #include <algorithm>
 
   bool ServerListLayer::init() {
     if (!CCLayer::init()) return false;
+
+    m_selectedServer = GDPSMain::get()->getServer();
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     this->setID("ServerListLayer"_spr);
@@ -81,7 +84,7 @@
     m_scroll->scrollToTop();
     float y = -5.f;
     for (auto server : servers) {
-        auto node = ServerNode::create(server, {363, 75});
+        auto node = ServerNode::create(server, {363, 75}, this);
         y += 80.f;
         m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top, {0, 37.5f - y}, false);
     }
@@ -111,4 +114,16 @@ cocos2d::CCScene *ServerListLayer::scene() {
     auto scene = cocos2d::CCScene::create();
     scene->addChild(ServerListLayer::create());
     return scene;
+}
+
+void ServerListLayer::onSelect(GDPSTypes::Server server) {
+    m_selectedServer = server;
+    for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
+        if (!node) return;
+        node->updateVisual(server);
+    }
+}
+
+GDPSTypes::Server ServerListLayer::getSelected() {
+    return m_selectedServer;
 }
