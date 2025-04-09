@@ -7,18 +7,22 @@
 #include "Geode/cocos/misc_nodes/CCClippingNode.h"
 #include "Geode/loader/Mod.hpp"
 #include "Geode/ui/Layout.hpp"
+#include "Geode/ui/Popup.hpp"
 #include "Geode/ui/ScrollLayer.hpp"
 #include "Geode/ui/Scrollbar.hpp"
+#include "Geode/utils/general.hpp"
 #include "Types.hpp"
 #include "km7dev.server_api/include/ServerAPIEvents.hpp"
 #include "ui/ServerNode.hpp"
 #include "../utils/GDPSMain.hpp"
 #include <algorithm>
 
-  bool ServerListLayer::init() {
+Server ServerListLayer::m_selectedServer = {"", ""};
+
+bool ServerListLayer::init() {
     if (!CCLayer::init()) return false;
 
-    m_selectedServer = GDPSMain::get()->getServer();
+    if (m_selectedServer.url == "") m_selectedServer = GDPSMain::get()->getServer();
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     this->setID("ServerListLayer"_spr);
@@ -97,7 +101,17 @@ void ServerListLayer::keyBackClicked() {
 }
 
 void ServerListLayer::onBack(cocos2d::CCObject *sender) {
-    cocos2d::CCDirector::get()->replaceScene(cocos2d::CCTransitionFade::create(.5f, MenuLayer::scene(false)));
+    if (m_selectedServer != GDPSMain::get()->getServer()) {
+        geode::createQuickPopup("GDPS Switcher", "Switching servers requires a restart.", "Restart later", "Restart now", [this](auto, bool now) {
+            if (now) {
+                geode::utils::game::restart();
+            } else {
+                cocos2d::CCDirector::get()->replaceScene(cocos2d::CCTransitionFade::create(.5f, MenuLayer::scene(false)));
+            }
+        });
+    } else {
+        cocos2d::CCDirector::get()->replaceScene(cocos2d::CCTransitionFade::create(.5f, MenuLayer::scene(false)));
+    }
 }
 
 ServerListLayer *ServerListLayer::create() {
@@ -121,6 +135,7 @@ void ServerListLayer::onSelect(GDPSTypes::Server server) {
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
         node->updateVisual(server);
+        Mod::get()->setSavedValue("server", server.url);
     }
 }
 

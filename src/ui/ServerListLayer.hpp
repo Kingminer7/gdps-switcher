@@ -13,11 +13,11 @@ class ServerListLayer : public cocos2d::CCLayer {
         bool init() override;
         void keyBackClicked() override;
 
+        static GDPSTypes::Server m_selectedServer;
+
         cocos2d::CCMenu *m_backMenu = nullptr;
         geode::ScrollLayer *m_scroll = nullptr;
         geode::Scrollbar *m_scrollbar = nullptr;
-
-        GDPSTypes::Server m_selectedServer;
 
         int page = 1;
         int showing = 10;

@@ -17,7 +17,9 @@ namespace GDPSTypes {
     struct Server {
         std::string name = "";
         std::string url = "";
-        // this doesnt get saved
+
+        // Doesn't save below
+        std::string motd = "No MOTD provided.";
         int serverApiId = -1;
 
         Server(std::string name, std::string url) : url(url), name(name) {}
@@ -30,6 +32,14 @@ namespace GDPSTypes {
 
         bool operator!=(const Server& other) const {
             return !(*this == other);
+        }
+
+        bool operator<(const Server& other) const {
+            return name < other.name || (name == other.name && url < other.url);
+        }
+
+        bool operator>(const Server& other) const {
+            return other < *this;
         }
     };
 }
