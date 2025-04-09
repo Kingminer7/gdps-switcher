@@ -11,5 +11,5 @@ class ServerInfoManager {
         std::map<GDPSTypes::Server, geode::EventListener<geode::utils::web::WebTask>> m_listeners;
     public:
         static ServerInfoManager *get();
-        void getInfoForServer(GDPSTypes::Server server, std::function<void ()> onComplete);
+        void getInfoForServer(GDPSTypes::Server server, std::function<void (std::string motd)> onComplete);
 };

@@ -19,9 +19,6 @@ bool ServerNode::init(Server server, cocos2d::CCSize size, ServerListLayer *list
     this->setID(fmt::format("server-node", server.name));
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
-    ServerInfoManager::get()->getInfoForServer(server, [this]() {
-      
-    });
 
     auto bg = cocos2d::extension::CCScale9Sprite::create("GJ_square07.png", {0, 0, 80, 80});
     bg->setContentSize(size);
@@ -49,6 +46,16 @@ bool ServerNode::init(Server server, cocos2d::CCSize size, ServerListLayer *list
     motdArea->setContentSize({250.f, height});
     motdArea->setAnchorPoint({0.f, 1.f});
     this->addChildAtPosition(motdArea, geode::Anchor::Left, {8.f, 9.f});
+    
+    ServerInfoManager::get()->getInfoForServer(server, [this, motdArea](std::string motd) {
+        if (motdArea) {
+            motdArea->setString(motd);
+            auto mlbmf = motdArea->getChildByType<MultilineBitmapFont>(0);
+            float height = mlbmf->getChildrenCount() * 13.f;
+            motdArea->setContentSize({250.f, height});
+            motdArea->setAnchorPoint({0.f, 1.f});
+        }
+    });
 
     m_menu = cocos2d::CCMenu::create();
     m_menu->setID("button-menu");

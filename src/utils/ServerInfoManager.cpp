@@ -8,13 +8,14 @@ ServerInfoManager *ServerInfoManager::get() {
     return m_instance;
 }
 
-void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, std::function<void ()> onComplete) {
+void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, std::function<void (std::string motd)> onComplete) {
     if (server.url == "") return;
-    m_listeners[server].bind([server] (geode::utils::web::WebTask::Event* e) {
+    m_listeners[server].bind([server, onComplete] (geode::utils::web::WebTask::Event* e) {
         if (auto* res = dynamic_cast<geode::utils::web::WebResponse*>(e->getValue())) {
             if (res->ok()) {
                 auto motd = res->json().unwrapOrDefault()["motd"].asString().unwrapOr("No MOTD provided.");
                 geode::log::info("{}", motd);
+                if (onComplete) onComplete(motd);
             } else {
                 geode::log::warn("Failed to load MOTD for {} - {}", server.url, res->string().unwrapOrDefault());
             }
