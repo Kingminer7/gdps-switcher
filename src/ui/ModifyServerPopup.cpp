@@ -11,8 +11,17 @@
 
 bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer) {
     this->m_listLayer = layer;
+    this->m_isNew = server.empty();
+    this->m_server = server;
+    this->setTitle(this->m_isNew ? "Add Server" : "Edit Server");
+    this->setID("ModifyServerPopup"_spr);
+    m_buttonMenu->setID("button-menu");
+    m_closeBtn->setID("close-button");
+    m_mainLayer->setID("main-layer");
+    m_title->setID("title");
 
     m_nameInput = geode::TextInput::create(m_mainLayer->getContentWidth() - 40, "Server Name");
+    m_nameInput->setID("name-input");
     m_nameInput->setString(server.name);
     m_nameInput->setCallback([this](const std::string &text) {
         m_server.name = text;
@@ -21,6 +30,7 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     m_mainLayer->addChildAtPosition(m_nameInput, geode::Anchor::Center, {0.f, 25.f});
 
     m_urlInput = geode::TextInput::create(m_mainLayer->getContentWidth() - 40, "Server URL");
+    m_urlInput->setID("url-input");
     m_urlInput->setString(server.url);
     m_urlInput->setFilter("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=");
     m_urlInput->setCallback([this](const std::string &text) {
@@ -28,17 +38,14 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     });
     m_mainLayer->addChildAtPosition(m_urlInput, geode::Anchor::Center, {0.f, -15.f});
 
-    m_isNew = server.empty();
-
     auto saveSpr = ButtonSprite::create("Save","bigFont.fnt","geode.loader/GE_button_05.png", .75f);
     saveSpr->setScale(.8f);
     auto saveBtn = CCMenuItemSpriteExtra::create(
         saveSpr,
         this, menu_selector(ModifyServerPopup::onSave)
     );
+    saveBtn->setID("save-button");
     m_buttonMenu->addChildAtPosition(saveBtn, geode::Anchor::Bottom, {0, saveBtn->getContentHeight() - 2.f});
-
-    m_server = server;
 
     return true;
 };

@@ -56,7 +56,7 @@ bool ServerListLayer::init() {
     this->addChildAtPosition(m_backMenu, geode::Anchor::TopLeft, ccp(25.f, -25.f / 4.f), false);
 
     auto m_bottomMenu = cocos2d::CCMenu::create();
-    m_bottomMenu->setID("bottom-menu");
+    m_bottomMenu->setID("edit-menu");
     m_bottomMenu->setContentHeight(125.f);
     m_bottomMenu->setAnchorPoint({ .5f, 0.f });
 

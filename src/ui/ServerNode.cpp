@@ -3,8 +3,6 @@
 #include "GUI/CCControlExtension/CCScale9Sprite.h"
 #include "Geode/binding/ButtonSprite.hpp"
 #include "Geode/binding/CCMenuItemSpriteExtra.hpp"
-#include "Geode/binding/MultilineBitmapFont.hpp"
-#include "Geode/binding/TextArea.hpp"
 #include "Geode/cocos/label_nodes/CCLabelBMFont.h"
 #include "Geode/cocos/menu_nodes/CCMenu.h"
 #include "Geode/ui/Layout.hpp"
@@ -17,7 +15,7 @@ bool ServerNode::init(Server server, cocos2d::CCSize size, ServerListLayer *list
     if (!CCNode::init()) return false;
     this->m_listLayer = list;
     this->m_server = server;
-    this->setID(fmt::format("server-node", server.name));
+    this->setID("server-node");
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
 
