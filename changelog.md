@@ -1,7 +1,11 @@
 # 1.4.0
-### UI improvement
-- Added regex to urls
+### Major changes
+- Added regex to urls (TODO REIMPL)
 - Redo the UI code (TODO)
+- Server integration support (TODO)
+- Clean up includes (TODO) (REMOVE THIS)
+- Reimpl URI support (TODO) (REMOVE THIS)
+- Migrate to Prevter's label (TODO) (REMOVE THIS)
 # 1.3.0
 ### Add URI support
 - Added URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)

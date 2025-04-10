@@ -59,7 +59,6 @@ void DataManager::migrateData() {
             }
 
             auto dir = gdpsPath / name;
-
             std::error_code ec;
             if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, ec)) {
                 geode::log::error("Failed to create directory '{}': {}", dir.string(), ec.message());
@@ -75,6 +74,7 @@ void DataManager::migrateData() {
             }
         }
     }
+    geode::Mod::get()->setSavedValue<std::string>("latest", "1.4.0");
 }
 
 $on_mod(Loaded) {

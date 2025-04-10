@@ -1,5 +1,7 @@
 #include "ServerInfoManager.hpp"
 #include "Geode/loader/Log.hpp"
+#include "GDPSMain.hpp"
+#include "Geode/ui/MDTextArea.hpp"
 
 ServerInfoManager *ServerInfoManager::m_instance = nullptr;
 
@@ -8,21 +10,39 @@ ServerInfoManager *ServerInfoManager::get() {
     return m_instance;
 }
 
-void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, std::function<void (std::string motd)> onComplete) {
-    if (server.url == "") return;
-    m_listeners[server].bind([server, onComplete] (geode::utils::web::WebTask::Event* e) {
-        if (auto* res = dynamic_cast<geode::utils::web::WebResponse*>(e->getValue())) {
-            if (res->ok()) {
-                auto motd = res->json().unwrapOrDefault()["motd"].asString().unwrapOr("No MOTD provided.");
-                geode::log::info("{}", motd);
-                if (onComplete) onComplete(motd);
-            } else {
-                geode::log::warn("Failed to load MOTD for {} - {}", server.url, res->string().unwrapOrDefault());
-            }
-        }
-    });
+void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, geode::MDTextArea *area) {
+    if (server.empty()) return;
+    auto& sdata = m_listeners[server];
+    sdata.second = area;
 
-    auto req = geode::utils::web::WebRequest();
-    geode::log::info("{}",m_listeners[server].getFilter().isNull());
-    m_listeners[server].setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
+    server.motd = "test";
+
+    if (sdata.first.getFilter().isNull()) {
+
+        sdata.first.bind([server, sdata] (geode::utils::web::WebTask::Event* e) {
+            if (auto* res = dynamic_cast<geode::utils::web::WebResponse*>(e->getValue())) {
+                std::string motd;
+                if (res->ok()) {
+                    if (res->json().isErr()) {
+                        motd = "Failed to parse MOTD.";
+                        geode::log::warn("Failed to parse MOTD for {}: {}", server.url, res->json().err());
+                    } else {
+                        auto info = res->json().unwrapOrDefault();
+                        motd = info["motd"].asString().unwrapOr("No MOTD found.");
+                    }
+                    auto serverIt = std::find_if(
+                        GDPSMain::get()->m_servers.begin(),
+                        GDPSMain::get()->m_servers.end(),
+                        [&server](const auto& srv) { return srv.url == server.url; }
+                    );
+                    if (serverIt != GDPSMain::get()->m_servers.end()) {
+                        serverIt->motd = motd;
+                    }
+                    if (sdata.second) sdata.second->setString(motd.c_str());
+                }
+            }
+        });
+        auto req = geode::utils::web::WebRequest();
+        sdata.first.setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
+    }
 }

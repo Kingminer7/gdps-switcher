@@ -8,6 +8,7 @@
 #include "Geode/cocos/label_nodes/CCLabelBMFont.h"
 #include "Geode/cocos/menu_nodes/CCMenu.h"
 #include "Geode/ui/Layout.hpp"
+#include "Geode/ui/MDTextArea.hpp"
 #include "utils/ServerInfoManager.hpp"
 
 using namespace GDPSTypes;
@@ -31,51 +32,38 @@ bool ServerNode::init(Server server, cocos2d::CCSize size, ServerListLayer *list
     nameLab->setAnchorPoint({0.f, 0.5f});
     this->addChildAtPosition(nameLab, geode::Anchor::TopLeft, {8, -1 - nameLab->getContentHeight() / 2});
 
-    auto motdArea = TextArea::create(
-      server.motd, 
-      "chatFont.fnt", 
-      .7f, 
-      250.f, 
-      {0.f, 0.f}, 
-      13.f, 
-      false
-    );
+    // auto motdArea = TextArea::create(
+    //   server.motd, 
+    //   "chatFont.fnt", 
+    //   .7f, 
+    //   250.f, 
+    //   {0.f, 0.f}, 
+    //   13.f, 
+    //   false
+    // );
+    // TODO: maybe use prevter's label
+    auto motdArea = geode::MDTextArea::create(server.motd, {250.f, 37.5f});
     motdArea->setID("motd");
-    auto mlbmf = motdArea->getChildByType<MultilineBitmapFont>(0);
-    float height = mlbmf->getChildrenCount() * 13.f;
-    motdArea->setContentSize({250.f, height});
+    motdArea->getScrollLayer()->setTouchEnabled(false);
+    motdArea->getScrollLayer()->setMouseEnabled(false);
     motdArea->setAnchorPoint({0.f, 1.f});
     this->addChildAtPosition(motdArea, geode::Anchor::Left, {8.f, 9.f});
     
-    ServerInfoManager::get()->getInfoForServer(server, [this, motdArea](std::string motd) {
-        if (motdArea) {
-            motdArea->setString(motd);
-            auto mlbmf = motdArea->getChildByType<MultilineBitmapFont>(0);
-            float height = mlbmf->getChildrenCount() * 13.f;
-            motdArea->setContentSize({250.f, height});
-            motdArea->setAnchorPoint({0.f, 1.f});
-        }
-    });
+    ServerInfoManager::get()->getInfoForServer(server, motdArea);
 
     m_menu = cocos2d::CCMenu::create();
     m_menu->setID("button-menu");
     m_menu->setContentSize({size.width / 2 - 4, size.height});
     m_menu->setLayout(geode::RowLayout::create()->setAxisAlignment(geode::AxisAlignment::End)->setAxisReverse(true));
     m_menu->setAnchorPoint({1.f, 0.5f});
-    this->addChildAtPosition(m_menu, geode::Anchor::Right, {-4, 0});
+    this->addChildAtPosition(m_menu, geode::Anchor::Right, {-6, 0});
 
-    auto useSpr = ButtonSprite::create("Use");
-    useSpr->setScale(.8f);
+    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server ? "GJ_button_02.png" : "GJ_button_01.png");
+    useSpr->setScale(.6f);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("select-btn");
     useSpr->setCascadeOpacityEnabled(true);
-    if (list->getSelected() == server) {
-      useSpr->updateBGImage("GJ_button_02.png");
-      useBtn->setEnabled(false);
-      // useSpr->setOpacity(127);
-    } else {
-      useSpr->updateBGImage("GJ_button_01.png");
-    }
+    useBtn->setEnabled(list->m_selectedServer != server);
     m_menu->addChild(useBtn);
     m_menu->updateLayout();
 
@@ -108,4 +96,8 @@ void ServerNode::updateVisual(GDPSTypes::Server server) {
     btn->setEnabled(true);
     // spr->setOpacity(255);
   }
+}
+
+GDPSTypes::Server ServerNode::getServer() {
+  return m_server;
 }

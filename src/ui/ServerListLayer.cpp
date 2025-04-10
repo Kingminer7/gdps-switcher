@@ -6,6 +6,7 @@
 #include "Geode/cocos/layers_scenes_transitions_nodes/CCTransition.h"
 #include "Geode/cocos/misc_nodes/CCClippingNode.h"
 #include "Geode/loader/Mod.hpp"
+#include "Geode/ui/BasedButtonSprite.hpp"
 #include "Geode/ui/Layout.hpp"
 #include "Geode/ui/Popup.hpp"
 #include "Geode/ui/ScrollLayer.hpp"
@@ -13,16 +14,18 @@
 #include "Geode/utils/general.hpp"
 #include "Types.hpp"
 #include "km7dev.server_api/include/ServerAPIEvents.hpp"
+#include "ui/ModifyServerPopup.hpp"
 #include "ui/ServerNode.hpp"
 #include "../utils/GDPSMain.hpp"
 #include <algorithm>
+#include "EditServersPopup.hpp"
 
 Server ServerListLayer::m_selectedServer = {"", ""};
 
 bool ServerListLayer::init() {
     if (!CCLayer::init()) return false;
 
-    if (m_selectedServer.url == "") m_selectedServer = GDPSMain::get()->getServer();
+    if (m_selectedServer.empty()) m_selectedServer = GDPSMain::get()->m_currentServer;
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     this->setID("ServerListLayer"_spr);
@@ -51,6 +54,37 @@ bool ServerListLayer::init() {
             ->setAxisReverse(true)
     );
     this->addChildAtPosition(m_backMenu, geode::Anchor::TopLeft, ccp(25.f, -25.f / 4.f), false);
+
+    auto m_bottomMenu = cocos2d::CCMenu::create();
+    m_bottomMenu->setID("bottom-menu");
+    m_bottomMenu->setContentHeight(125.f);
+    m_bottomMenu->setAnchorPoint({ .5f, 0.f });
+
+    auto addSpr = cocos2d::CCSprite::createWithSpriteFrameName("GJ_newBtn_001.png");
+    addSpr->setScale(.7f);
+    auto addBtn = CCMenuItemSpriteExtra::create(
+        addSpr, this, menu_selector(ServerListLayer::onAdd)
+    );
+    addBtn->setID("add-button");
+    m_bottomMenu->addChild(addBtn);
+
+    auto editSpr = CCSprite::createWithSpriteFrameName("edit.png"_spr);
+    auto editCircle = CircleButtonSprite::create(editSpr, CircleBaseColor::Green, CircleBaseSize::Big);
+    editSpr->setScale(1.4f);
+    editCircle->setScale(.7f);
+    auto editBtn = CCMenuItemSpriteExtra::create(
+        editCircle, this, menu_selector(ServerListLayer::onEdit)
+    );
+    editBtn->setID("edit-button");
+    m_bottomMenu->addChild(editBtn);
+
+    m_bottomMenu->setLayout(
+        geode::ColumnLayout::create()
+            ->setAxisAlignment(geode::AxisAlignment::Start)
+            ->setAxisReverse(false)
+            ->setGap(3.f)
+    );
+    this->addChildAtPosition(m_bottomMenu, geode::Anchor::BottomRight, ccp(-25.f, 25.f / 4.f), false);
 
     auto scrollBg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
     scrollBg->setColor({0, 0, 0});
@@ -82,18 +116,23 @@ bool ServerListLayer::init() {
     stencil->setPosition({190.f, 117.5f});
     clip->setStencil(stencil);
 
-    auto servers = geode::Mod::get()->getSavedValue<std::vector<GDPSTypes::Server>>("saved-servers");
-    servers.insert(servers.begin(), {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
-    m_scroll->m_contentLayer->setContentSize({363, std::max(servers.size() * 80.f - 5.f, 235.f)});
+    updateList();
+
+    return true;
+}
+
+void ServerListLayer::updateList() {
+    m_servers = GDPSMain::get()->m_servers;
+    m_servers.insert(m_servers.begin(), {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
+    m_scroll->m_contentLayer->removeAllChildren();
+    m_scroll->m_contentLayer->setContentSize({363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
     m_scroll->scrollToTop();
     float y = -5.f;
-    for (auto server : servers) {
+    for (auto server : m_servers) {
         auto node = ServerNode::create(server, {363, 75}, this);
         y += 80.f;
         m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top, {0, 37.5f - y}, false);
     }
-
-    return true;
 }
 
 void ServerListLayer::keyBackClicked() {
@@ -101,7 +140,7 @@ void ServerListLayer::keyBackClicked() {
 }
 
 void ServerListLayer::onBack(cocos2d::CCObject *sender) {
-    if (m_selectedServer != GDPSMain::get()->getServer()) {
+    if (m_selectedServer != GDPSMain::get()->m_currentServer) {
         geode::createQuickPopup("GDPS Switcher", "Switching servers requires a restart.", "Restart later", "Restart now", [this](auto, bool now) {
             if (now) {
                 geode::utils::game::restart();
@@ -139,6 +178,10 @@ void ServerListLayer::onSelect(GDPSTypes::Server server) {
     }
 }
 
-GDPSTypes::Server ServerListLayer::getSelected() {
-    return m_selectedServer;
+void ServerListLayer::onAdd(CCObject *sender) {
+    ModifyServerPopup::create({"", ""}, this)->show();
+}
+
+void ServerListLayer::onEdit(CCObject *sender) {
+    EditServersPopup::create(m_servers)->show();
 }

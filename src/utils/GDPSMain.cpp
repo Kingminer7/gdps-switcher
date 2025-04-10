@@ -1,4 +1,5 @@
 #include "GDPSMain.hpp"
+#include "Types.hpp"
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 bool GDPSMain::isActive() {
@@ -18,7 +19,7 @@ void GDPSMain::registerIssue(std::string issue) {
 GDPSMain *GDPSMain::m_instance = nullptr;
 
 void GDPSMain::init() {
-    auto servers =
+    m_servers =
         Mod::get()->getSavedValue<std::vector<Server>>("saved-servers");
     auto targetUrl = Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl());
     bool found = false;
@@ -28,7 +29,7 @@ void GDPSMain::init() {
             targetUrl
         };
     } else {
-        for (const auto &server : servers) {
+        for (const auto &server : m_servers) {
             if (server.url == targetUrl) {
                 m_currentServer = server;
                 found = true;
@@ -60,8 +61,4 @@ bool GDPSMain::isBase(std::string url) {
     return 
         url == ServerAPIEvents::getBaseUrl()
     ||  fmt::format("{}/", url) == ServerAPIEvents::getBaseUrl();
-}
-
-Server GDPSMain::getServer() {
-    return m_currentServer;
 }

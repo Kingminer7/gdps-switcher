@@ -8,7 +8,7 @@
 
 class ServerNode : public cocos2d::CCNode {
     protected:
-        GDPSTypes::Server m_server = {"", ""};
+        GDPSTypes::Server m_server;
         cocos2d::CCMenu *m_menu = nullptr;
         ServerListLayer *m_listLayer = nullptr;
 
@@ -16,6 +16,8 @@ class ServerNode : public cocos2d::CCNode {
     public:
         void onSelect(CCObject *sender);
         void updateVisual(GDPSTypes::Server server);
+
+        GDPSTypes::Server getServer();
 
         static ServerNode *create(GDPSTypes::Server server, cocos2d::CCSize size, ServerListLayer *list);
 };

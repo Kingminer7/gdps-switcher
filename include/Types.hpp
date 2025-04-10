@@ -19,7 +19,7 @@ namespace GDPSTypes {
         std::string url = "";
 
         // Doesn't save below
-        std::string motd = "No MOTD provided.";
+        std::string motd = "No MOTD found.";
         int serverApiId = -1;
 
         Server(std::string name, std::string url) : url(url), name(name) {}
@@ -40,6 +40,11 @@ namespace GDPSTypes {
 
         bool operator>(const Server& other) const {
             return other < *this;
+        }
+
+        // idc that geode docs want me to use bool const instead, johnny cena
+        bool empty() {
+            return name == "" && url == "";
         }
     };
 }

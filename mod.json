@@ -33,7 +33,6 @@
 		}
 	},
 	"dependencies": {
-		"geode.node-ids": "1.17.0",
 		"km7dev.server_api": "2.0.0",
 		"camila314.geode-uri": {
 			"version": "1.0.0",
