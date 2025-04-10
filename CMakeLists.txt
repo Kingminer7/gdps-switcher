@@ -25,7 +25,7 @@ else()
 endif()
 
 if (PROJECT_IS_TOP_LEVEL)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE GDPSUTILS_EXPORTS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE GDPSSwitcher_EXPORTS)
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE src include)

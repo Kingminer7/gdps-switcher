@@ -2,11 +2,14 @@
 
 #pragma once
 
-#include <Geode/Result.hpp>
+#include <Geode/Geode.hpp>
+
+using namespace geode::prelude;
+
 class DataManager {
     protected:
         void migrateData();
     public:
-        geode::Result<> setup();
+        Result<> setup();
         static std::string urlToFilenameSafe(std::string url);
 };

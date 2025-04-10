@@ -2,7 +2,7 @@
 #define GDPSUTILS_HPP
 
 #ifdef GEODE_IS_WINDOWS
-    #ifdef GDPSUTILS_EXPORTS
+    #ifdef GDPSSwitcher_EXPORTS
         #define GDPSUTILS_API __declspec(dllexport)
     #else
         #define GDPSUTILS_API __declspec(dllimport)

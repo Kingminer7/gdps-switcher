@@ -1,7 +1,5 @@
 #include "ServerInfoManager.hpp"
-#include "Geode/loader/Log.hpp"
 #include "GDPSMain.hpp"
-#include "Geode/ui/MDTextArea.hpp"
 
 ServerInfoManager *ServerInfoManager::m_instance = nullptr;
 
@@ -10,7 +8,7 @@ ServerInfoManager *ServerInfoManager::get() {
     return m_instance;
 }
 
-void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, geode::MDTextArea *area) {
+void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, MDTextArea *area) {
     if (server.empty()) return;
     auto& sdata = m_listeners[server];
     sdata.second = area;
@@ -19,13 +17,13 @@ void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, geode::MDText
 
     if (sdata.first.getFilter().isNull()) {
 
-        sdata.first.bind([server, sdata] (geode::utils::web::WebTask::Event* e) {
-            if (auto* res = dynamic_cast<geode::utils::web::WebResponse*>(e->getValue())) {
+        sdata.first.bind([server, sdata] (utils::web::WebTask::Event* e) {
+            if (auto* res = dynamic_cast<web::WebResponse*>(e->getValue())) {
                 std::string motd;
                 if (res->ok()) {
                     if (res->json().isErr()) {
                         motd = "Failed to parse MOTD.";
-                        geode::log::warn("Failed to parse MOTD for {}: {}", server.url, res->json().err());
+                        log::warn("Failed to parse MOTD for {}: {}", server.url, res->json().err());
                     } else {
                         auto info = res->json().unwrapOrDefault();
                         motd = info["motd"].asString().unwrapOr("No MOTD found.");
@@ -42,7 +40,7 @@ void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, geode::MDText
                 }
             }
         });
-        auto req = geode::utils::web::WebRequest();
+        auto req = web::WebRequest();
         sdata.first.setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
     }
 }

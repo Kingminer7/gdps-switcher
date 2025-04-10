@@ -1,28 +1,22 @@
 #include "DataManager.hpp"
 
-#include "Geode/loader/Dirs.hpp"
-#include "Geode/loader/Log.hpp"
-#include "Geode/loader/Mod.hpp"
-#include <filesystem>
-#include <fmt/format.h>
-
-geode::Result<> DataManager::setup() {
-    auto savePath = geode::dirs::getSaveDir() / "gdpses";
+Result<> DataManager::setup() {
+    auto savePath = dirs::getSaveDir() / "gdpses";
 
     if (!std::filesystem::exists(savePath)) {
         std::error_code ec;
         if (!std::filesystem::create_directory(savePath, ec)) {
-            return geode::Err(fmt::format("Failed to create directory '{}': {}", savePath.string(), ec.message()));
+            return Err(fmt::format("Failed to create directory '{}': {}", savePath.string(), ec.message()));
         }
     } else if (!std::filesystem::is_directory(savePath)) {
-        return geode::Err(fmt::format("'{}' exists but is not a directory.", savePath.string()));
+        return Err(fmt::format("'{}' exists but is not a directory.", savePath.string()));
     }
 
-    if (geode::Mod::get()->getSavedValue<std::string>("latest") != "1.4.0") {
+    if (Mod::get()->getSavedValue<std::string>("latest") != "1.4.0") {
         migrateData();
     }
 
-    return geode::Ok();
+    return Ok();
 }
 
 std::string DataManager::urlToFilenameSafe(const std::string url) {
@@ -38,7 +32,7 @@ std::string DataManager::urlToFilenameSafe(const std::string url) {
 }
 
 void DataManager::migrateData() {
-    auto savePath = geode::dirs::getSaveDir();
+    auto savePath = dirs::getSaveDir();
     std::vector<std::string> servers;
 
     auto gdpsPath = savePath / "gdpses";
@@ -61,7 +55,7 @@ void DataManager::migrateData() {
             auto dir = gdpsPath / name;
             std::error_code ec;
             if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, ec)) {
-                geode::log::error("Failed to create directory '{}': {}", dir.string(), ec.message());
+                log::error("Failed to create directory '{}': {}", dir.string(), ec.message());
                 continue;
             }
 
@@ -70,11 +64,11 @@ void DataManager::migrateData() {
 
             std::filesystem::rename(savePath / fname, newPath, ec);
             if (ec) {
-                geode::log::error("Failed to move file '{}' to '{}': {}", fname, newPath.string(), ec.message());
+                log::error("Failed to move file '{}' to '{}': {}", fname, newPath.string(), ec.message());
             }
         }
     }
-    geode::Mod::get()->setSavedValue<std::string>("latest", "1.4.0");
+    Mod::get()->setSavedValue<std::string>("latest", "1.4.0");
 }
 
 $on_mod(Loaded) {

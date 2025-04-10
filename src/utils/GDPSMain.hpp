@@ -1,6 +1,8 @@
-#include <Types.hpp>
+#include "Types.hpp"
 
-using namespace GDPSTypes;
+#include <Geode/Geode.hpp>
+
+using namespace geode::prelude;
 
 class GDPSMain {
     protected:
@@ -15,6 +17,6 @@ class GDPSMain {
 
         static GDPSMain *get();
 
-        std::vector<Server> m_servers;
-        Server m_currentServer;
+        std::vector<GDPSTypes::Server> m_servers;
+        GDPSTypes::Server m_currentServer;
 };

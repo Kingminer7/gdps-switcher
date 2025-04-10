@@ -1,10 +1,13 @@
 #include "GDPSMain.hpp"
 #include "Types.hpp"
+
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
+#include <Geode/Geode.hpp>
+
+using namespace geode::prelude;
+
 bool GDPSMain::isActive() {
-    geode::log::info("Issues: {}", m_issues);
-    geode::log::info("Is base url?: {}", isBase());
     if (m_issues.size() > 0)
         return false;
     if (isBase())
@@ -20,7 +23,7 @@ GDPSMain *GDPSMain::m_instance = nullptr;
 
 void GDPSMain::init() {
     m_servers =
-        Mod::get()->getSavedValue<std::vector<Server>>("saved-servers");
+        Mod::get()->getSavedValue<std::vector<GDPSTypes::Server>>("saved-servers");
     auto targetUrl = Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl());
     bool found = false;
     if (isBase(targetUrl)) {

@@ -1,16 +1,16 @@
 #pragma once
 
-#ifndef GDPSUTILS_HPP
-#define GDPSUTILS_HPP
+#ifndef GDPSTYPES_HPP
+#define GDPSTYPES_HPP
 
 #ifdef GEODE_IS_WINDOWS
-    #ifdef GDPSUTILS_EXPORTS
-        #define GDPSUTILS_API __declspec(dllexport)
+    #ifdef GDPSSwitcher_EXPORTS
+        #define GDPSTYPES __declspec(dllexport)
     #else
-        #define GDPSUTILS_API __declspec(dllimport)
+        #define GDPSTYPES __declspec(dllimport)
     #endif
 #else
-    #define GDPSUTILS_API
+    #define GDPSTYPES
 #endif
 
 namespace GDPSTypes {

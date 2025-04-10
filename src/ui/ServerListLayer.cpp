@@ -1,26 +1,13 @@
 #include "ServerListLayer.hpp"
-#include "GUI/CCControlExtension/CCScale9Sprite.h"
-#include "Geode/binding/MenuLayer.hpp"
-#include "Geode/cocos/CCDirector.h"
-#include "Geode/cocos/cocoa/CCObject.h"
-#include "Geode/cocos/layers_scenes_transitions_nodes/CCTransition.h"
-#include "Geode/cocos/misc_nodes/CCClippingNode.h"
-#include "Geode/loader/Mod.hpp"
-#include "Geode/ui/BasedButtonSprite.hpp"
-#include "Geode/ui/Layout.hpp"
-#include "Geode/ui/Popup.hpp"
-#include "Geode/ui/ScrollLayer.hpp"
-#include "Geode/ui/Scrollbar.hpp"
-#include "Geode/utils/general.hpp"
 #include "Types.hpp"
-#include "km7dev.server_api/include/ServerAPIEvents.hpp"
 #include "ui/ModifyServerPopup.hpp"
 #include "ui/ServerNode.hpp"
 #include "../utils/GDPSMain.hpp"
-#include <algorithm>
 #include "EditServersPopup.hpp"
 
-Server ServerListLayer::m_selectedServer = {"", ""};
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
+
+GDPSTypes::Server ServerListLayer::m_selectedServer = {"", ""};
 
 bool ServerListLayer::init() {
     if (!CCLayer::init()) return false;
