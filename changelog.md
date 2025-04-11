@@ -6,6 +6,7 @@
 - Clean up includes (TODO) (REMOVE THIS)
 - Reimpl URI support (TODO) (REMOVE THIS)
 - Migrate to Prevter's label (TODO) (REMOVE THIS)
+- Bonus settings (TODO) (REMOVE THIS)
 # 1.3.0
 ### Add URI support
 - Added URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)

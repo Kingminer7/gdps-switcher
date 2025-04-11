@@ -13,6 +13,7 @@ class ServerListLayer : public CCLayer {
         bool init() override;
         void keyBackClicked() override;
 
+        int m_eePos = 0;
 
         CCMenu *m_backMenu = nullptr;
         ScrollLayer *m_scroll = nullptr;
@@ -20,6 +21,8 @@ class ServerListLayer : public CCLayer {
 
         int page = 1;
         int showing = 10;
+
+        virtual void keyDown(enumKeyCodes key) override;
     public:
         static ServerListLayer *create();
         static CCScene *scene();

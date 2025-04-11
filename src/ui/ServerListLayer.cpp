@@ -1,9 +1,9 @@
 #include "ServerListLayer.hpp"
-#include "Types.hpp"
-#include "ui/ModifyServerPopup.hpp"
-#include "ui/ServerNode.hpp"
-#include "../utils/GDPSMain.hpp"
+#include "ModifyServerPopup.hpp"
 #include "EditServersPopup.hpp"
+#include "ServerNode.hpp"
+#include "Types.hpp"
+#include "utils/GDPSMain.hpp"
 
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
@@ -170,5 +170,30 @@ void ServerListLayer::onAdd(CCObject *sender) {
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {
-    EditServersPopup::create(m_servers)->show();
+    EditServersPopup::create(this)->show();
+}
+
+void ServerListLayer::keyDown(enumKeyCodes code) {
+    CCLayer::keyDown(code);
+    static const std::vector<enumKeyCodes> sequence = {
+        enumKeyCodes::KEY_Up, enumKeyCodes::KEY_Up, 
+        enumKeyCodes::KEY_Down, enumKeyCodes::KEY_Down, 
+        enumKeyCodes::KEY_Left, enumKeyCodes::KEY_Right, 
+        enumKeyCodes::KEY_Left, enumKeyCodes::KEY_Right, 
+        enumKeyCodes::KEY_B, enumKeyCodes::KEY_A, 
+        enumKeyCodes::KEY_Space, enumKeyCodes::KEY_Enter
+    };
+
+    if (m_eePos >= sequence.size()) return;
+
+    if (code == sequence[m_eePos]) {
+        m_eePos++;
+    } else {
+        m_eePos = 0;
+        return;
+    }
+
+    if (m_eePos == sequence.size()) {
+        // TODO: impl this
+    }
 }

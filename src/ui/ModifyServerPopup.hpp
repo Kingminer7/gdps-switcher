@@ -5,14 +5,17 @@
 
 #pragma once
 
-#include "Geode/ui/TextInput.hpp"
-#include "Types.hpp"
 #include "ui/ServerListLayer.hpp"
+#include "Types.hpp"
 
-class ModifyServerPopup : public geode::Popup<GDPSTypes::Server, ServerListLayer *> {
+#include <Geode/Geode.hpp>
+
+using namespace geode::prelude;
+
+class ModifyServerPopup : public Popup<GDPSTypes::Server, ServerListLayer *> {
     protected:
-        geode::TextInput *m_nameInput = nullptr;
-        geode::TextInput *m_urlInput = nullptr;
+        TextInput *m_nameInput = nullptr;
+        TextInput *m_urlInput = nullptr;
         ServerListLayer *m_listLayer = nullptr;
         GDPSTypes::Server m_server;
 

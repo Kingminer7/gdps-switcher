@@ -1,8 +1,10 @@
-#include <Geode/modify/GManager.hpp>
 #include "../utils/GDPSMain.hpp"
 #include "../utils/DataManager.hpp"
-#include "Geode/loader/Dirs.hpp"
-#include "Geode/loader/Log.hpp"
+
+#include <Geode/Geode.hpp>
+#include <Geode/modify/GManager.hpp>
+
+using namespace geode::prelude;
 
 class GSGManager : public geode::Modify<GSGManager, GManager> {
     public:
