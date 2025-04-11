@@ -25,19 +25,23 @@ void DragLayer::reorder(DragNode *node, int place) {
     if (m_nodes.size() < place) return log::warn("Tried reordering node to place {} when there are only {}, it will not be added.", place, m_nodes.size());
     auto it = std::find(m_nodes.begin(), m_nodes.end(), node);
     if (it != m_nodes.end()) {
-        log::info("Moving {} from {} to {}", node->getID(), std::distance(m_nodes.begin(), it), place);
+        int currentPlace = std::distance(m_nodes.begin(), it);
         m_nodes.erase(it);
+        if (place > currentPlace) {
+            place -= 1;
+        }
         m_nodes.insert(m_nodes.begin() + place, node);
         float y = getContentHeight() - m_nodes[0]->getContentHeight() * m_nodes[0]->getAnchorPoint().y;
         for (auto node : m_nodes) {
-            log::info("{}", y);
+
+            node->stopAllActions();
             node->runAction(CCEaseSineOut::create(CCMoveTo::create(.3f, {node->getPositionX(), y})));
             y -= node->getContentHeight() + m_gap;
         }
     }
 }
 
-void DragLayer::reorder(DragNode *node) {
+void DragLayer::reorder(DragNode *node, CCPoint pos) {
     auto it = std::find(m_nodes.begin(), m_nodes.end(), node);
     if (it != m_nodes.end()) {
         int currentPlace = std::distance(m_nodes.begin(), it);
@@ -45,13 +49,7 @@ void DragLayer::reorder(DragNode *node) {
 
         for (size_t i = 0; i < m_nodes.size(); ++i) {
             if (i != currentPlace) {
-                auto otherNode = m_nodes[i];
-                auto nodeWorldPosY = node->getParent()->convertToWorldSpace(node->getPosition()).y;
-                auto otherNodeWorldPosY = otherNode->getParent()->convertToWorldSpace(otherNode->getPosition()).y;
-    
-                log::info("Node {} world position: {}", node, nodeWorldPosY);
-                log::info("OtherNode {} world position: {}", otherNode, otherNodeWorldPosY);
-                if (node->getParent()->convertToWorldSpace(node->getPosition()).y > otherNode->getParent()->convertToWorldSpace(otherNode->getPosition()).y) {
+                if (pos.y > m_nodes[i]->getParent()->convertToWorldSpace(m_nodes[i]->getPosition()).y) {
                     break;
                 }
                 newPlace = i + 1;
@@ -111,11 +109,10 @@ bool DragNode::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
 
 void DragNode::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
     this->stopAllActions();
+    m_layer->reorder(this, touch->getLocation());
+    this->setZOrder(this->getZOrder() - 1);
     this->runAction(cocos2d::CCEaseSineOut::create(
         cocos2d::CCScaleTo::create(0.3f, m_baseScale)));
-    this->setZOrder(this->getZOrder() - 1);
-
-    m_layer->reorder(this);
 }
 
 void DragNode::ccTouchMoved(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {

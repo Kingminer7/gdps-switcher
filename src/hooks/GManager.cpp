@@ -22,7 +22,6 @@ class GSGManager : public geode::Modify<GSGManager, GManager> {
         }
 
         void save() {
-            geode::log::info("{}", m_fileName);
             GManager::save();
         }
 };

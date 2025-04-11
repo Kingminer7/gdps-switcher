@@ -16,7 +16,7 @@ class DragLayer : public GenericContentLayer {
         virtual void addNode(DragNode *node);
         virtual void addNode(DragNode *node, int place);
 
-        virtual void reorder(DragNode *node);
+        virtual void reorder(DragNode *node, CCPoint pos);
         virtual void reorder(DragNode *node, int place);
 
         static DragLayer *create(float width, float height);
