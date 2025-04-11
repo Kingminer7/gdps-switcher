@@ -41,7 +41,7 @@ void DragLayer::reorder(DragNode *node) {
     auto it = std::find(m_nodes.begin(), m_nodes.end(), node);
     if (it != m_nodes.end()) {
         int currentPlace = std::distance(m_nodes.begin(), it);
-        int newPlace = currentPlace;
+        int newPlace = 0;
 
         for (size_t i = 0; i < m_nodes.size(); ++i) {
             if (i != currentPlace) {
@@ -54,8 +54,8 @@ void DragLayer::reorder(DragNode *node) {
                 if (node->getParent()->convertToWorldSpace(node->getPosition()).y > otherNode->getParent()->convertToWorldSpace(otherNode->getPosition()).y) {
                     break;
                 }
+                newPlace = i + 1;
             }
-            newPlace = i;
         }
         reorder(node, newPlace);
     }
