@@ -1,7 +1,8 @@
 #include "Drag.hpp"
 
-DragLayer *DragLayer::create(float width, float height) {
+DragLayer *DragLayer::create(float width, float height, std::function<void(std::vector<DragNode *> nodes)> onReorder) {
     auto ret = new DragLayer();
+    ret->m_onReorder = onReorder;
     if (ret->initWithColor({0, 0, 0, 0}, width, height)) {
         ret->autorelease();
         return ret;
@@ -38,6 +39,7 @@ void DragLayer::reorder(DragNode *node, int place) {
             node->runAction(CCEaseSineOut::create(CCMoveTo::create(.3f, {node->getPositionX(), y})));
             y -= node->getContentHeight() + m_gap;
         }
+        if (m_onReorder) m_onReorder(m_nodes);
     }
 }
 
@@ -90,7 +92,7 @@ DragNode *DragNode::create(DragLayer *layer, int place) {
 }
 
 void DragNode::registerWithTouchDispatcher() {
-    cocos2d::CCTouchDispatcher::get()->addTargetedDelegate(this, -10710955, true);
+    cocos2d::CCTouchDispatcher::get()->addTargetedDelegate(this, 0, true);
 }
 
 bool DragNode::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {

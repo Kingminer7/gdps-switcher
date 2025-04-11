@@ -65,6 +65,10 @@ bool ServerEditNode::init(GDPSTypes::Server server, EditServersPopup *popup) {
     return true;
 }
 
+GDPSTypes::Server ServerEditNode::getServer() {
+    return m_server;
+}
+
 ServerEditNode *ServerEditNode::create(GDPSTypes::Server server, EditServersPopup *popup) {
     auto ret = new ServerEditNode();
     if (ret->init(server, popup)) {
@@ -136,7 +140,16 @@ bool EditServersPopup::setup(ServerListLayer *layer) {
     m_scroll->setID("server-scroll");
     m_scroll->ignoreAnchorPointForPosition(false);
     m_scroll->m_contentLayer->removeFromParent();
-    auto dragLayer = DragLayer::create(290, 200);
+    auto dragLayer = DragLayer::create(290, 200, [this](std::vector<DragNode *> nodes) {
+        std::vector<GDPSTypes::Server> newOrder;
+        for (auto node : nodes) {
+            if (auto serverNode = dynamic_cast<ServerEditNode *>(node)) {
+                newOrder.push_back(serverNode->getServer());
+            }
+        }
+        GDPSMain::get()->m_servers = newOrder;
+        updateList();
+    });
     dragLayer->setID("content-layer");
     dragLayer->setAnchorPoint({ 0, 0 });
     m_scroll->m_contentLayer = dragLayer;

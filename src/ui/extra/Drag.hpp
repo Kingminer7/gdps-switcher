@@ -9,6 +9,7 @@ class DragNode;
 class DragLayer : public GenericContentLayer {
     protected:
         std::vector<DragNode *> m_nodes;
+        std::function<void(std::vector<DragNode *> nodes)> m_onReorder = nullptr;
     public:
         bool m_isX = false;
         float m_gap = 0;
@@ -19,7 +20,7 @@ class DragLayer : public GenericContentLayer {
         virtual void reorder(DragNode *node, CCPoint pos);
         virtual void reorder(DragNode *node, int place);
 
-        static DragLayer *create(float width, float height);
+        static DragLayer *create(float width, float height, std::function<void(std::vector<DragNode *> nodes)> onReorder);
 };
 
 class DragNode : public CCMenu {
