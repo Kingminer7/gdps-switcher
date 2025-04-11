@@ -2,6 +2,7 @@
 
 #include "Types.hpp"
 #include "ServerListLayer.hpp"
+#include "extra/Drag.hpp"
 
 #include <Geode/Geode.hpp>
 
@@ -11,9 +12,7 @@ class ServerEditNode;
 
 class EditServersPopup : public Popup<ServerListLayer *> {
     protected:
-        bool setup(ServerListLayer *layer) override;
-
-        ScrollLayer *m_scroll = nullptr;        
+        bool setup(ServerListLayer *layer) override;      
     public:
         void updateList();
         virtual void onExit() override;
@@ -21,9 +20,10 @@ class EditServersPopup : public Popup<ServerListLayer *> {
         static EditServersPopup* create(ServerListLayer *layer);
 
         ServerListLayer *m_listLayer = nullptr;
+        ScrollLayer *m_scroll = nullptr;  
 };
 
-class ServerEditNode : public CCNode {
+class ServerEditNode : public DragNode {
     protected:
         GDPSTypes::Server m_server;
         CCMenu *m_menu = nullptr;

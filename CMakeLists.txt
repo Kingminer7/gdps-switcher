@@ -10,7 +10,7 @@ endif()
 
 project(GDPSSwitcher VERSION 1.4.0)
 
-file(GLOB SOURCES
+file(GLOB_RECURSE SOURCES
     src/utils/*.cpp
     src/hooks/*.cpp
     src/ui/*.cpp

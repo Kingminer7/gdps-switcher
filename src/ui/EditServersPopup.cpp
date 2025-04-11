@@ -1,22 +1,26 @@
 #include "EditServersPopup.hpp"
 #include "ModifyServerPopup.hpp"
 #include "utils/GDPSMain.hpp"
+#include "extra/Drag.hpp"
 
 bool ServerEditNode::init(GDPSTypes::Server server, EditServersPopup *popup) {
-    if (!CCNode::init()) return false;
+    if (!DragNode::init(static_cast<DragLayer*>(popup->m_scroll->m_contentLayer))) return false;
     this->m_popup = popup;
     this->setAnchorPoint({0.5, 0.5});
     this->setContentSize({290.f, 30.f});
+    this->setID("server-edit-node");
 
-    auto bg = cocos2d::extension::CCScale9Sprite::create("square02b_small.png", {0, 0, 40, 40});
+    auto bg = cocos2d::extension::CCScale9Sprite::create("square.png", {0, 0, 40, 40});
     bg->setContentSize({290.f, 30.f});
-    bg->setOpacity(30);
-    bg->setColor({94, 94, 255});
+    bg->setOpacity(60);
+    bg->setColor({0, 0, 0});
+    bg->setID("background");
     this->addChildAtPosition(bg, Anchor::Center);
 
     m_name = CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
-    m_name->setAnchorPoint({0,0.5});
+    m_name->setAnchorPoint({0, 0.5});
     m_name->limitLabelWidth(200, .7f, .1f);
+    m_name->setID("server-name-label");
     this->addChildAtPosition(m_name, Anchor::Left, {3, 0});
 
     m_menu = CCMenu::create();
@@ -24,26 +28,32 @@ bool ServerEditNode::init(GDPSTypes::Server server, EditServersPopup *popup) {
     m_menu->setContentSize({85, 25});
     m_menu->ignoreAnchorPointForPosition(false);
     m_menu->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::End)->setAxisReverse(true)->setGap(2));
+    m_menu->setID("server-menu");
     this->addChildAtPosition(m_menu, Anchor::Right, {-3, 0});
 
-    auto editSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("edit.png"_spr), EditorBaseColor::Gray);
-    editSpr->setScale(.75f);
+    auto editSpr = CCSprite::create("geode.loader/GE_button_05.png");
+    editSpr->setScale(.575f);
+    auto editIcon = CCSprite::createWithSpriteFrameName("edit.png"_spr);
+    editIcon->setScale(editSpr->getContentHeight() / editIcon->getContentHeight() * .8f);
+    editSpr->addChildAtPosition(editIcon, Anchor::Center, {0.f, 0.f}, false);
     auto editBtn = CCMenuItemSpriteExtra::create(
         editSpr,
         this,
         menu_selector(ServerEditNode::onEdit)
     );
+    editBtn->setID("edit-button");
 
-    auto deleteSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"), EditorBaseColor::Gray);
-    deleteSpr->setScale(.75f);
-    if (auto x = deleteSpr->getChildByType<CCSprite *>(0)) {
-        x->setScale(x->getScale() * .9);
-    }
+    auto deleteSpr = CCSprite::create("geode.loader/GE_button_05.png");
+    deleteSpr->setScale(.575f);
+    auto deleteIcon = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    deleteIcon->setScale(deleteSpr->getContentHeight() / deleteIcon->getContentHeight() * .8f);
+    deleteSpr->addChildAtPosition(deleteIcon, Anchor::Center, {0.f, 0.f}, false);
     auto deleteBtn = CCMenuItemSpriteExtra::create(
         deleteSpr,
         this,
         menu_selector(ServerEditNode::onDelete)
     );
+    deleteBtn->setID("delete-button");
 
     m_menu->addChild(deleteBtn);
     m_menu->addChild(editBtn);
@@ -67,7 +77,7 @@ ServerEditNode *ServerEditNode::create(GDPSTypes::Server server, EditServersPopu
 }
 
 void ServerEditNode::onEdit(CCObject *sender) {
-    ModifyServerPopup::create(m_server, m_popup->m_listLayer)->show();
+    ModifyServerPopup::create(m_server, m_popup)->show();
 }
 
 void ServerEditNode::onDelete(CCObject *sender) {
@@ -101,8 +111,11 @@ void EditServersPopup::updateList() {
     for (auto server : servers) {
         i++;
         auto node = ServerEditNode::create(server, this);
-
-        m_scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top, {0, -i * 33.f + 18.f});
+        if (auto bg = static_cast<CCSprite *>(node->getChildByID("background"))) {
+            bg->setOpacity(i % 2 == 0 ? 0 : 60);
+        }
+        node->setID(server.name);
+        m_scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top, {0, -i * 30.f + 15.f});
     }
 
     m_scroll->scrollToTop();
@@ -113,7 +126,7 @@ bool EditServersPopup::setup(ServerListLayer *layer) {
 
     auto scrollBg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
     scrollBg->setColor({0, 0, 0});
-    scrollBg->setOpacity(90);
+    scrollBg->setOpacity(40);
     scrollBg->setContentSize({304, 204});
     scrollBg->ignoreAnchorPointForPosition(false);
     scrollBg->setID("server-scroll-bg");
@@ -122,6 +135,13 @@ bool EditServersPopup::setup(ServerListLayer *layer) {
     m_scroll = geode::ScrollLayer::create({290, 200});
     m_scroll->setID("server-scroll");
     m_scroll->ignoreAnchorPointForPosition(false);
+    m_scroll->m_contentLayer->removeFromParent();
+    auto dragLayer = DragLayer::create(290, 200);
+    dragLayer->setID("content-layer");
+    dragLayer->setAnchorPoint({ 0, 0 });
+    m_scroll->m_contentLayer = dragLayer;
+    m_scroll->addChild(dragLayer);
+    
     auto scrollbar = geode::Scrollbar::create(m_scroll);
     scrollbar->setID("scrollbar");
     scrollbar->setScaleY(.95f);
@@ -148,7 +168,7 @@ bool EditServersPopup::setup(ServerListLayer *layer) {
 
 EditServersPopup *EditServersPopup::create(ServerListLayer *layer) {
     auto ret = new EditServersPopup();
-    if (ret->initAnchored(360.f, 260.f, layer, "geode.loader/GE_square01.png")) {
+    if (ret->initAnchored(360.f, 260.f, layer, "geode.loader/GE_square03.png")) {
         ret->autorelease();
         return ret;
     }

@@ -2,8 +2,7 @@
 #include "utils/GDPSMain.hpp"
 #include "Types.hpp"
 
-bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer) {
-    this->m_listLayer = layer;
+bool ModifyServerPopup::setup(GDPSTypes::Server server) {
     this->m_isNew = server.empty();
     this->m_server = server;
     this->m_orig = server;
@@ -44,9 +43,22 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     return true;
 };
 
-ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, ServerListLayer * layer) {
+ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, ServerListLayer *layer) {
     auto ret = new ModifyServerPopup();
-    if (ret->initAnchored(240.f, 160.f, server, layer, "geode.loader/GE_square03.png")) {
+    ret->m_listLayer = layer;
+    if (ret->initAnchored(240.f, 160.f, server, "geode.loader/GE_square03.png")) {
+        ret->autorelease();
+        return ret;
+    }
+
+    delete ret;
+    return nullptr;
+}
+
+ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, EditServersPopup *popup) {
+    auto ret = new ModifyServerPopup();
+    ret->m_listPopup = popup;
+    if (ret->initAnchored(240.f, 160.f, server, "geode.loader/GE_square03.png")) {
         ret->autorelease();
         return ret;
     }
@@ -56,6 +68,7 @@ ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, ServerLis
 }
 
 void ModifyServerPopup::onClose(cocos2d::CCObject *sender) {
+    if (m_orig == m_server) return Popup::onClose(sender);
     if (m_isNew) {
         createQuickPopup("Are you sure?", "Are you sure you want to discard this server?", "No", "Yes", [this, sender](auto, bool btn2) {
             if (btn2) {
@@ -87,7 +100,8 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         s.name = m_nameInput->getString();
         s.url = m_urlInput->getString();
     }
-    m_listLayer->updateList();
+    if (m_listLayer) m_listLayer->updateList();
+    if (m_listPopup) m_listPopup->updateList();
     Mod::get()->setSavedValue<std::vector<GDPSTypes::Server>>("saved-servers", GDPSMain::get()->m_servers);
     Popup::onClose(sender);
 }
