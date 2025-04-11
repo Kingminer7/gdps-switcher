@@ -1,4 +1,5 @@
 #include "EditServersPopup.hpp"
+#include "ModifyServerPopup.hpp"
 #include "utils/GDPSMain.hpp"
 
 bool ServerEditNode::init(GDPSTypes::Server server, EditServersPopup *popup) {
@@ -66,7 +67,7 @@ ServerEditNode *ServerEditNode::create(GDPSTypes::Server server, EditServersPopu
 }
 
 void ServerEditNode::onEdit(CCObject *sender) {
-    
+    ModifyServerPopup::create(m_server, m_popup->m_listLayer)->show();
 }
 
 void ServerEditNode::onDelete(CCObject *sender) {

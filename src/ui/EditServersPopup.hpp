@@ -14,12 +14,13 @@ class EditServersPopup : public Popup<ServerListLayer *> {
         bool setup(ServerListLayer *layer) override;
 
         ScrollLayer *m_scroll = nullptr;        
-        ServerListLayer *m_listLayer = nullptr;
     public:
         void updateList();
         virtual void onExit() override;
 
         static EditServersPopup* create(ServerListLayer *layer);
+
+        ServerListLayer *m_listLayer = nullptr;
 };
 
 class ServerEditNode : public CCNode {

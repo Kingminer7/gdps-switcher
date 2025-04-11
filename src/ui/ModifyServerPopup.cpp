@@ -6,6 +6,7 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     this->m_listLayer = layer;
     this->m_isNew = server.empty();
     this->m_server = server;
+    this->m_orig = server;
     this->setTitle(this->m_isNew ? "Add Server" : "Edit Server");
     this->setID("ModifyServerPopup"_spr);
     m_buttonMenu->setID("button-menu");
@@ -79,7 +80,7 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         }
         gdpsMain->m_servers.push_back(m_server);
     } else {
-        GDPSTypes::Server& s = *std::find(gdpsMain->m_servers.begin(), gdpsMain->m_servers.end(), m_server);
+        GDPSTypes::Server& s = *std::find(gdpsMain->m_servers.begin(), gdpsMain->m_servers.end(), m_orig);
         if (s.empty()) {
             return;
         }

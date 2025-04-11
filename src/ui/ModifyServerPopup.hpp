@@ -18,13 +18,14 @@ class ModifyServerPopup : public Popup<GDPSTypes::Server, ServerListLayer *> {
         TextInput *m_urlInput = nullptr;
         ServerListLayer *m_listLayer = nullptr;
         GDPSTypes::Server m_server;
+        GDPSTypes::Server m_orig;
 
         bool m_isNew = true;
 
-        bool setup(GDPSTypes::Server servers, ServerListLayer * layer) override;
+        bool setup(GDPSTypes::Server server, ServerListLayer * layer) override;
     public:
         virtual void onClose(CCObject *sender) override;
         void onSave(CCObject *sender);
         
-        static ModifyServerPopup* create(GDPSTypes::Server servers, ServerListLayer * layer);
+        static ModifyServerPopup* create(GDPSTypes::Server server, ServerListLayer * layer);
 };
