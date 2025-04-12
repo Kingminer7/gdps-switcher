@@ -191,8 +191,8 @@ void ServerListLayer::onAdd(CCObject *sender) {
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {
-  // EditServersPopup::create(this)->show();
-  updateList(false, true);
+  EditServersPopup::create(this)->show();
+  // updateList(false, true);
 }
 
 void ServerListLayer::keyDown(enumKeyCodes code) {
