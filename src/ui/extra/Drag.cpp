@@ -118,7 +118,8 @@ void DragLayer::reorder(DragNode *node, CCPoint pos) {
 
 
 bool DragNode::init(DragLayer *layer, int place) {
-    if (!CCMenu::init()) return false;
+    if (!CCNode::init()) return false;
+    CCTouchDispatcher::get()->addTargetedDelegate(this, -9, true);
     m_layer = layer;
     m_bIgnoreAnchorPointForPosition = false;
     if (place == -1) m_layer->addNode(this);
@@ -144,10 +145,6 @@ DragNode *DragNode::create(DragLayer *layer, int place) {
     }
     delete ret;
     return nullptr;
-}
-
-void DragNode::registerWithTouchDispatcher() {
-    cocos2d::CCTouchDispatcher::get()->addTargetedDelegate(this, 0, true);
 }
 
 bool DragNode::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {

@@ -3,31 +3,32 @@
 #include "utils/ServerInfoManager.hpp"
 
 bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool editMode) {
-    if (!CCNode::init()) return false;
+  if (!DragNode::init(static_cast<DragLayer*>(list->m_scroll->m_contentLayer))) return false;
     m_editing = editMode;
     this->m_listLayer = list;
     this->m_server = server;
     this->setID("server-node");
     this->m_obContentSize = size;
-    this->setAnchorPoint({.5f, .5f});
+    ignoreAnchorPointForPosition(false);
+    setAnchorPoint({.5f, .5f});
 
     auto bg = CCScale9Sprite::create("GJ_square07.png", {0, 0, 80, 80});
     bg->setContentSize(size);
     bg->setID("background");
-    this->addChildAtPosition(bg, Anchor::Center);
+    this->addChildAtPosition(bg, Anchor::Center, {}, false);
 
     auto nameLab = CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
     nameLab->limitLabelWidth(size.width - 50, .7f, 0.f);
     nameLab->setAnchorPoint({0.f, 0.5f});
-    this->addChildAtPosition(nameLab, Anchor::TopLeft, {8, -1 - nameLab->getContentHeight() / 2});
+    this->addChildAtPosition(nameLab, Anchor::TopLeft, {8, -1 - nameLab->getContentHeight() / 2}, false);
 
     m_menu = CCMenu::create();
     m_menu->setID("button-menu");
     m_menu->setContentSize({size.width / 2 - 4, size.height});
     m_menu->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::End)->setAxisReverse(true));
     m_menu->setAnchorPoint({1.f, 0.5f});
-    this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0});
+    this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0}, false);
 
     if (!editMode) {
       // TODO: maybe use prevter's label
@@ -36,7 +37,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
       motdArea->getScrollLayer()->setTouchEnabled(false);
       motdArea->getScrollLayer()->setMouseEnabled(false);
       motdArea->setAnchorPoint({0.f, 1.f});
-      this->addChildAtPosition(motdArea, Anchor::Left, {8.f, 9.f});
+      this->addChildAtPosition(motdArea, Anchor::Left, {8.f, 9.f}, false);
       ServerInfoManager::get()->getInfoForServer(server, motdArea);
 
       auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server ? "GJ_button_02.png" : "GJ_button_01.png");

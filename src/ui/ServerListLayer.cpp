@@ -84,6 +84,24 @@ bool ServerListLayer::init() {
   m_scroll = geode::ScrollLayer::create({363, 235});
   m_scroll->setID("server-scroll");
   m_scroll->ignoreAnchorPointForPosition(false);
+  m_scroll->m_contentLayer->removeFromParent();
+  auto dragLayer = DragLayer::create(290, 200);
+  dragLayer->onReorder([this](std::vector<DragNode *> nodes) {
+    std::vector<GDPSTypes::Server> newOrder;
+    for (auto node : nodes) {
+      if (auto serverNode = dynamic_cast<ServerNode *>(node)) {
+        newOrder.push_back(serverNode->getServer());
+      }
+    }
+    GDPSMain::get()->m_servers = newOrder;
+  });
+  dragLayer->m_gap = 5;
+  // dragLayer->setEnabled(false);
+  dragLayer->setID("content-layer");
+  dragLayer->setAnchorPoint({0, 0});
+  m_scroll->m_contentLayer = dragLayer;
+  m_scroll->addChild(dragLayer);
+
   m_scrollbar = geode::Scrollbar::create(m_scroll);
   m_scrollbar->setID("scrollbar");
   m_scrollbar->setScaleY(.95f);
@@ -106,13 +124,14 @@ bool ServerListLayer::init() {
 
   updateList();
 
-  // i initially impled this as a joke but thought it'd be funny to include in secret settings
+  // i initially impled this as a joke but thought it'd be funny to include in
+  // secret settings
   if (Mod::get()->getSavedValue<bool>("geodify-break-haha") == true) {
     queueInMainThread([this, bg]() {
-        if (auto g = getChildByID("omgrod.geodify/swelvy-background")) {
-            g->removeFromParent();
-            bg->setVisible(true);
-        }
+      if (auto g = getChildByID("omgrod.geodify/swelvy-background")) {
+        g->removeFromParent();
+        bg->setVisible(true);
+      }
     });
   }
 
@@ -122,20 +141,31 @@ bool ServerListLayer::init() {
 }
 
 void ServerListLayer::updateList(bool scroll, bool editMode) {
+  if (auto dragLayer = static_cast<DragLayer *>(m_scroll->m_contentLayer)) {
+    dragLayer->removeAllNodes();
+    dragLayer->removeAllChildren();
+  }
+
   m_servers = GDPSMain::get()->m_servers;
-  m_servers.insert(m_servers.begin(),
-                   {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
-  m_scroll->m_contentLayer->removeAllChildren();
+  m_servers.insert(m_servers.begin(), {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
   m_scroll->m_contentLayer->setContentSize(
-      {363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
-  if (scroll) m_scroll->scrollToTop();
+    {363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
+  if (scroll)
+    m_scroll->scrollToTop();
+  // m_scroll->m_contentLayer->setContentHeight(std::max(m_scroll->getContentHeight(), servers.size() * 33.f - 3));
   float y = -5.f;
   for (auto server : m_servers) {
-    auto node = ServerNode::create(server, {363, 75}, this, editMode);
-    y += 80.f;
-    m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top,
-                                                 {0, 37.5f - y}, false);
+      y += 80.f;
+      auto node = ServerNode::create(server, {363, 75}, this, editMode);
+      node->setID(server.name);
+      m_scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top, {0, 37.5f - y});
   }
+  // for (auto server : m_servers) {
+  //   auto node = ServerNode::create(server, {363, 75}, this, editMode);
+  //   y += 80.f;
+  //   m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top,
+  //                                                {0, 37.5f - y}, false);
+  // }
 }
 
 void ServerListLayer::keyBackClicked() { this->onBack(nullptr); }
@@ -198,65 +228,71 @@ void ServerListLayer::onEdit(CCObject *sender) {
 void ServerListLayer::keyDown(enumKeyCodes code) {
   // Defined sequence of inputs for both KEY_* and CONTROLLER_*
   static const std::vector<std::vector<enumKeyCodes>> sequence = {
-      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up, enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
-      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up, enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
-      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down, enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
-      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down, enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
-      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left, enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
-      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right, enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT, CONTROLLER_RTHUMBSTICK_RIGHT},
-      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left, enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
-      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right, enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT, CONTROLLER_RTHUMBSTICK_RIGHT},
+      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
+      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
+      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
+      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
+      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
+      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT,
+       CONTROLLER_RTHUMBSTICK_RIGHT},
+      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
+      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right,
+       enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT,
+       CONTROLLER_RTHUMBSTICK_RIGHT},
       {enumKeyCodes::KEY_B, enumKeyCodes::CONTROLLER_B},
       {enumKeyCodes::KEY_A, enumKeyCodes::CONTROLLER_A},
-      {enumKeyCodes::KEY_Enter, enumKeyCodes::CONTROLLER_Start}
-  };
+      {enumKeyCodes::KEY_Enter, enumKeyCodes::CONTROLLER_Start}};
 
   if (m_eePos >= sequence.size())
-      return;
+    return CCLayer::keyDown(code);
 
   if (m_eePos < 3) {
-      CCLayer::keyDown(code);
+    CCLayer::keyDown(code);
   }
 
-  const auto& validCodes = sequence[m_eePos];
-  if (std::find(validCodes.begin(), validCodes.end(), code) != validCodes.end()) {
-      m_eePos++;
+  const auto &validCodes = sequence[m_eePos];
+  if (std::find(validCodes.begin(), validCodes.end(), code) !=
+      validCodes.end()) {
+    m_eePos++;
   } else {
-      m_eePos = 0;
-      log::info("Reset");
-      return;
+    m_eePos = 0;
+    log::info("Reset");
+    return;
   }
 
   if (m_eePos == sequence.size()) {
-      onKonami();
+    onKonami();
   }
 }
 
 // mobile support lmao
 
 void ServerListLayer::registerWithTouchDispatcher() {
-    cocos2d::CCTouchDispatcher::get()->addTargetedDelegate(this, 10, false);
+  cocos2d::CCTouchDispatcher::get()->addTargetedDelegate(this, 10, false);
 }
 
-bool ServerListLayer::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
-    return true;
+bool ServerListLayer::ccTouchBegan(cocos2d::CCTouch *touch,
+                                   cocos2d::CCEvent *evt) {
+  return true;
 }
 
-enum class Input {
-  None,
-  Up,
-  Down,
-  Left,
-  Right,
-  B,
-  A,
-  Start
-};
+enum class Input { None, Up, Down, Left, Right, B, A, Start };
 
-void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
-  static const std::vector<Input> sequence = {Input::Up, Input::Up, Input::Down, Input::Down, Input::Left, Input::Right, Input::Left, Input::Right, Input::B, Input::A, Input::Start};
+void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch,
+                                   cocos2d::CCEvent *evt) {
+  static const std::vector<Input> sequence = {
+      Input::Up,   Input::Up,    Input::Down, Input::Down,
+      Input::Left, Input::Right, Input::Left, Input::Right,
+      Input::B,    Input::A,     Input::Start};
   if (m_eePos >= sequence.size())
-      return;
+    return;
 
   auto diff = touch->getLocation() - touch->getStartLocation();
   auto axis = diff.normalize();
@@ -282,15 +318,15 @@ void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *ev
   }
 
   if (sequence[m_eePos] == inp) {
-      m_eePos++;
+    m_eePos++;
   } else {
-      m_eePos = 0;
-      log::info("Reset");
-      return;
+    m_eePos = 0;
+    log::info("Reset");
+    return;
   }
 
   if (m_eePos == sequence.size()) {
-      onKonami();
+    onKonami();
   }
 }
 

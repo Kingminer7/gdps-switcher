@@ -122,7 +122,7 @@ void EditServersPopup::updateList() {
             bg->setOpacity(i % 2 == 0 ? 0 : 60);
         }
         node->setID(server.name);
-        m_scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top, {0, -i * 30.f + 15.f});
+        m_scroll->m_contentLayer->addChild(node); //, Anchor::Top, {0, -i * 30.f + 15.f});
     }
 
     m_scroll->scrollToTop();

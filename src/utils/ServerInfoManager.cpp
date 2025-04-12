@@ -11,6 +11,10 @@ ServerInfoManager *ServerInfoManager::get() {
 void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, MDTextArea *area) {
     if (server.empty()) return;
     auto& sdata = m_listeners[server];
+    area->retain();
+    if (sdata.second != nullptr) {
+        sdata.second->release();
+    }
     sdata.second = area;
 
     server.motd = "test";
@@ -36,7 +40,10 @@ void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, MDTextArea *a
                     if (serverIt != GDPSMain::get()->m_servers.end()) {
                         serverIt->motd = motd;
                     }
-                    if (sdata.second) sdata.second->setString(motd.c_str());
+                    if (sdata.second) {
+                        sdata.second->setString(motd.c_str());
+                        sdata.second->release();
+                    }
                 }
             }
         });

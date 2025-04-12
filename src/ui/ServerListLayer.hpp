@@ -16,10 +16,6 @@ class ServerListLayer : public CCLayer {
         int m_eePos = 0;
         CCPoint m_start;
 
-        CCMenu *m_backMenu = nullptr;
-        ScrollLayer *m_scroll = nullptr;
-        Scrollbar *m_scrollbar = nullptr;
-
         int page = 1;
         int showing = 10;
 
@@ -42,9 +38,12 @@ class ServerListLayer : public CCLayer {
         void onAdd(CCObject *sender);
         void onEdit(CCObject *sender);
         void onSelect(GDPSTypes::Server server);
+        void onKonami();
 
         static GDPSTypes::Server m_selectedServer;
         std::vector<GDPSTypes::Server> m_servers;
 
-        void onKonami();
+        CCMenu *m_backMenu = nullptr;
+        ScrollLayer *m_scroll = nullptr;
+        Scrollbar *m_scrollbar = nullptr;
 };

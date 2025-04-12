@@ -2,12 +2,13 @@
 
 #include "ServerListLayer.hpp"
 #include "Types.hpp"
+#include "extra/Drag.hpp"
 
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
-class ServerNode : public CCNode {
+class ServerNode : public DragNode {
     protected:
         GDPSTypes::Server m_server;
         CCMenu *m_menu = nullptr;

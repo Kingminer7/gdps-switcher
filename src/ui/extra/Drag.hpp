@@ -40,7 +40,7 @@ class DragLayer : public GenericContentLayer {
         static DragLayer *create(float width, float height);
 };
 
-class DragNode : public CCMenu {
+class DragNode : public CCNode, CCTouchDelegate {
     protected:
         bool init(DragLayer *layer, int place = -1);
 
@@ -50,7 +50,6 @@ class DragNode : public CCMenu {
         void ccTouchCancelled(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override {
             ccTouchEnded(touch, event);
         }
-        void registerWithTouchDispatcher() override;
 
         CCPoint m_diff;
         DragLayer *m_layer;
