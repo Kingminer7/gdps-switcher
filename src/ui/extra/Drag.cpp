@@ -101,14 +101,9 @@ void DragLayer::reorder(DragNode *node, CCPoint pos) {
 
         for (size_t i = 0; i < m_nodes.size(); ++i) {
             if (i != currentPlace) {
-                log::info("{}", i);
-                log::info("{}", m_nodes[i] == nullptr);
-                log::info("{}", m_nodes[i]->getID());
-                log::info("{}", m_nodes[i]->getParent() == nullptr);
-                if (pos.y > convertToWorldSpace(m_nodes[i]->getPosition()).y) {
+                if (!m_nodes[i]->m_locked && pos.y > convertToWorldSpace(m_nodes[i]->getPosition()).y) {
                     break;
                 }
-                log::info("Fish 2");
                 newPlace = i + 1;
             }
         }
@@ -119,7 +114,7 @@ void DragLayer::reorder(DragNode *node, CCPoint pos) {
 
 bool DragNode::init(DragLayer *layer, int place) {
     if (!CCNode::init()) return false;
-    CCTouchDispatcher::get()->addTargetedDelegate(this, -9, true);
+    CCTouchDispatcher::get()->addTargetedDelegate(this, 0, true);
     m_layer = layer;
     m_bIgnoreAnchorPointForPosition = false;
     if (place == -1) m_layer->addNode(this);
@@ -148,7 +143,7 @@ DragNode *DragNode::create(DragLayer *layer, int place) {
 }
 
 bool DragNode::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
-    if (!m_layer->isEnabled()) return false;
+    if (!m_layer->isEnabled() || m_locked) return false;
     auto space = convertTouchToNodeSpace(touch);
     if (space.x < 0 || space.y < 0 || space.x > m_obContentSize.width || space.y > m_obContentSize.height)
         return false;
@@ -165,8 +160,8 @@ bool DragNode::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
 }
 
 void DragNode::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
-    if (auto cb = m_layer->getDragEndCallback()) cb(this);
     this->stopAllActions();
+    if (auto cb = m_layer->getDragEndCallback()) cb(this);
     m_layer->reorder(this, touch->getLocation());
     this->setZOrder(this->getZOrder() - 1);
     this->runAction(cocos2d::CCEaseSineOut::create(
@@ -177,4 +172,9 @@ void DragNode::ccTouchMoved(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
     auto pos = touch->getLocation() + m_diff;
     if (m_layer->m_isX) this->setPositionX(pos.x);
     else this->setPositionY(pos.y);
+}
+
+void DragNode::onExit() {
+    CCTouchDispatcher::get()->removeDelegate(this);
+    CCNode::onExit();
 }

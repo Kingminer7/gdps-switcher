@@ -33,7 +33,6 @@ class ServerListLayer : public CCLayer {
         }
         void registerWithTouchDispatcher() override;
 
-        
         void onBack(CCObject *sender);
         void onAdd(CCObject *sender);
         void onEdit(CCObject *sender);

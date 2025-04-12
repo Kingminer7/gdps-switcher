@@ -88,9 +88,15 @@ bool ServerListLayer::init() {
   auto dragLayer = DragLayer::create(290, 200);
   dragLayer->onReorder([this](std::vector<DragNode *> nodes) {
     std::vector<GDPSTypes::Server> newOrder;
+    auto real = GDPSMain::get()->m_servers;
+    bool skipped = false;
     for (auto node : nodes) {
+      if (!skipped) {
+        skipped = true;
+        continue;
+      }
       if (auto serverNode = dynamic_cast<ServerNode *>(node)) {
-        newOrder.push_back(serverNode->getServer());
+        newOrder.push_back(*std::find(real.begin(), real.end(), serverNode->getServer()));
       }
     }
     GDPSMain::get()->m_servers = newOrder;
@@ -147,13 +153,16 @@ void ServerListLayer::updateList(bool scroll, bool editMode) {
   }
 
   m_servers = GDPSMain::get()->m_servers;
-  m_servers.insert(m_servers.begin(), {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
+  auto bl = GDPSTypes::Server("Built-in Servers", ServerAPIEvents::getBaseUrl());
   m_scroll->m_contentLayer->setContentSize(
-    {363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
+    {363, std::max(m_servers.size() * 80.f + 75.f, 235.f)});
   if (scroll)
     m_scroll->scrollToTop();
-  // m_scroll->m_contentLayer->setContentHeight(std::max(m_scroll->getContentHeight(), servers.size() * 33.f - 3));
-  float y = -5.f;
+  auto node = ServerNode::create(bl, {363, 75}, this, editMode);
+  node->setID(bl.name);
+  node->m_locked = true;
+  m_scroll->m_contentLayer->addChildAtPosition(node, Anchor::Top, {0, 37.5f-75});
+  float y = 75.f;
   for (auto server : m_servers) {
       y += 80.f;
       auto node = ServerNode::create(server, {363, 75}, this, editMode);
@@ -222,6 +231,7 @@ void ServerListLayer::onAdd(CCObject *sender) {
 
 void ServerListLayer::onEdit(CCObject *sender) {
   EditServersPopup::create(this)->show();
+  // onAdd(sender);
   // updateList(false, true);
 }
 

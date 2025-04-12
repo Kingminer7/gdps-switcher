@@ -11,6 +11,9 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     this->m_obContentSize = size;
     ignoreAnchorPointForPosition(false);
     setAnchorPoint({.5f, .5f});
+    queueInMainThread([this](){
+      CCTouchDispatcher::get()->setPriority(-129, this);
+    });
 
     auto bg = CCScale9Sprite::create("GJ_square07.png", {0, 0, 80, 80});
     bg->setContentSize(size);

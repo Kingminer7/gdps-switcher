@@ -40,7 +40,7 @@ class DragLayer : public GenericContentLayer {
         static DragLayer *create(float width, float height);
 };
 
-class DragNode : public CCNode, CCTouchDelegate {
+class DragNode : public CCNode, public CCTouchDelegate {
     protected:
         bool init(DragLayer *layer, int place = -1);
 
@@ -51,6 +51,8 @@ class DragNode : public CCNode, CCTouchDelegate {
             ccTouchEnded(touch, event);
         }
 
+        void onExit() override;
+
         CCPoint m_diff;
         DragLayer *m_layer;
     public:
@@ -58,4 +60,5 @@ class DragNode : public CCNode, CCTouchDelegate {
         static DragNode *create(DragLayer *layer, int place);
 
         float m_baseScale = 1.f;
+        bool m_locked = false;
 };
