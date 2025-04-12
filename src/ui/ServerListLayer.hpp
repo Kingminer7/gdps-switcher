@@ -14,6 +14,7 @@ class ServerListLayer : public CCLayer {
         void keyBackClicked() override;
 
         int m_eePos = 0;
+        CCPoint m_start;
 
         CCMenu *m_backMenu = nullptr;
         ScrollLayer *m_scroll = nullptr;
@@ -27,7 +28,15 @@ class ServerListLayer : public CCLayer {
         static ServerListLayer *create();
         static CCScene *scene();
 
-        void updateList();
+        void updateList(bool scroll = true, bool editMode = false);
+
+        bool ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override;
+        void ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override;
+        void ccTouchCancelled(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override {
+            ccTouchEnded(touch, event);
+        }
+        void registerWithTouchDispatcher() override;
+
         
         void onBack(CCObject *sender);
         void onAdd(CCObject *sender);
@@ -36,4 +45,6 @@ class ServerListLayer : public CCLayer {
 
         static GDPSTypes::Server m_selectedServer;
         std::vector<GDPSTypes::Server> m_servers;
+
+        void onKonami();
 };

@@ -1,5 +1,4 @@
 #include "ServerListLayer.hpp"
-#include "EditServersPopup.hpp"
 #include "ModifyServerPopup.hpp"
 #include "ServerNode.hpp"
 #include "Types.hpp"
@@ -116,20 +115,23 @@ bool ServerListLayer::init() {
         }
     });
   }
+
+  registerWithTouchDispatcher();
+
   return true;
 }
 
-void ServerListLayer::updateList() {
+void ServerListLayer::updateList(bool scroll, bool editMode) {
   m_servers = GDPSMain::get()->m_servers;
   m_servers.insert(m_servers.begin(),
                    {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
   m_scroll->m_contentLayer->removeAllChildren();
   m_scroll->m_contentLayer->setContentSize(
       {363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
-  m_scroll->scrollToTop();
+  if (scroll) m_scroll->scrollToTop();
   float y = -5.f;
   for (auto server : m_servers) {
-    auto node = ServerNode::create(server, {363, 75}, this);
+    auto node = ServerNode::create(server, {363, 75}, this, editMode);
     y += 80.f;
     m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top,
                                                  {0, 37.5f - y}, false);
@@ -189,28 +191,109 @@ void ServerListLayer::onAdd(CCObject *sender) {
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {
-  EditServersPopup::create(this)->show();
+  // EditServersPopup::create(this)->show();
+  updateList(false, true);
 }
 
 void ServerListLayer::keyDown(enumKeyCodes code) {
-  CCLayer::keyDown(code);
-  static const std::vector<enumKeyCodes> sequence = {
-      enumKeyCodes::KEY_Up,   enumKeyCodes::KEY_Up,    enumKeyCodes::KEY_Down,
-      enumKeyCodes::KEY_Down, enumKeyCodes::KEY_Left,  enumKeyCodes::KEY_Right,
-      enumKeyCodes::KEY_Left, enumKeyCodes::KEY_Right, enumKeyCodes::KEY_B,
-      enumKeyCodes::KEY_A,    enumKeyCodes::KEY_Space, enumKeyCodes::KEY_Enter};
+  // Defined sequence of inputs for both KEY_* and CONTROLLER_*
+  static const std::vector<std::vector<enumKeyCodes>> sequence = {
+      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up, enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
+      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up, enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
+      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down, enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
+      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down, enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
+      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left, enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
+      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right, enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT, CONTROLLER_RTHUMBSTICK_RIGHT},
+      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left, enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
+      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right, enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT, CONTROLLER_RTHUMBSTICK_RIGHT},
+      {enumKeyCodes::KEY_B, enumKeyCodes::CONTROLLER_B},
+      {enumKeyCodes::KEY_A, enumKeyCodes::CONTROLLER_A},
+      {enumKeyCodes::KEY_Enter, enumKeyCodes::CONTROLLER_Start}
+  };
 
   if (m_eePos >= sequence.size())
-    return;
+      return;
 
-  if (code == sequence[m_eePos]) {
-    m_eePos++;
+  if (m_eePos < 3) {
+      CCLayer::keyDown(code);
+  }
+
+  const auto& validCodes = sequence[m_eePos];
+  if (std::find(validCodes.begin(), validCodes.end(), code) != validCodes.end()) {
+      m_eePos++;
   } else {
-    m_eePos = 0;
-    return;
+      m_eePos = 0;
+      log::info("Reset");
+      return;
   }
 
   if (m_eePos == sequence.size()) {
-    // TODO: impl this
+      onKonami();
   }
+}
+
+// mobile support lmao
+
+void ServerListLayer::registerWithTouchDispatcher() {
+    cocos2d::CCTouchDispatcher::get()->addTargetedDelegate(this, 10, false);
+}
+
+bool ServerListLayer::ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
+    return true;
+}
+
+enum class Input {
+  None,
+  Up,
+  Down,
+  Left,
+  Right,
+  B,
+  A,
+  Start
+};
+
+void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
+  static const std::vector<Input> sequence = {Input::Up, Input::Up, Input::Down, Input::Down, Input::Left, Input::Right, Input::Left, Input::Right, Input::B, Input::A, Input::Start};
+  if (m_eePos >= sequence.size())
+      return;
+
+  auto diff = touch->getLocation() - touch->getStartLocation();
+  auto axis = diff.normalize();
+  Input inp = Input::None;
+  if (sqrtf(diff.x * diff.x + diff.y * diff.y) < 50.f) {
+    auto screenWidth = CCDirector::get()->getWinSize().width;
+    auto tapLoc = touch->getLocation();
+    if (tapLoc.x < screenWidth / 3) {
+      inp = Input::A;
+    } else if (tapLoc.x > screenWidth * 2 / 3) {
+      inp = Input::B;
+    } else {
+      inp = Input::Start;
+    }
+  } else if (axis.y < -.75) {
+    inp = Input::Down;
+  } else if (axis.y > .75) {
+    inp = Input::Up;
+  } else if (axis.x < -.75) {
+    inp = Input::Left;
+  } else if (axis.x > .75) {
+    inp = Input::Right;
+  }
+
+  if (sequence[m_eePos] == inp) {
+      m_eePos++;
+  } else {
+      m_eePos = 0;
+      log::info("Reset");
+      return;
+  }
+
+  if (m_eePos == sequence.size()) {
+      onKonami();
+  }
+}
+
+void ServerListLayer::onKonami() {
+  FLAlertLayer::create("Konami Code", "NERD!", "ok bro")->show();
 }

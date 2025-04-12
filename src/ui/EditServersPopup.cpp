@@ -108,7 +108,10 @@ void EditServersPopup::onExit() {
 }
 
 void EditServersPopup::updateList() {
-    m_scroll->m_contentLayer->removeAllChildren();
+    if (auto dragLayer = static_cast<DragLayer*>(m_scroll->m_contentLayer)) {
+        dragLayer->removeAllNodes();
+        dragLayer->removeAllChildren();
+    }
     auto servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->setContentHeight(std::max(m_scroll->getContentHeight(), servers.size() * 33.f - 3));
     auto i = 0;
@@ -140,7 +143,8 @@ bool EditServersPopup::setup(ServerListLayer *layer) {
     m_scroll->setID("server-scroll");
     m_scroll->ignoreAnchorPointForPosition(false);
     m_scroll->m_contentLayer->removeFromParent();
-    auto dragLayer = DragLayer::create(290, 200, [this](std::vector<DragNode *> nodes) {
+    auto dragLayer = DragLayer::create(290, 200);
+    dragLayer->onReorder([this](std::vector<DragNode *> nodes) {
         std::vector<GDPSTypes::Server> newOrder;
         for (auto node : nodes) {
             if (auto serverNode = dynamic_cast<ServerEditNode *>(node)) {
@@ -148,7 +152,6 @@ bool EditServersPopup::setup(ServerListLayer *layer) {
             }
         }
         GDPSMain::get()->m_servers = newOrder;
-        updateList();
     });
     dragLayer->setID("content-layer");
     dragLayer->setAnchorPoint({ 0, 0 });

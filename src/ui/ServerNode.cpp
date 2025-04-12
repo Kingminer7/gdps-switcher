@@ -2,8 +2,9 @@
 #include "utils/GDPSMain.hpp"
 #include "utils/ServerInfoManager.hpp"
 
-bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list) {
+bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool editMode) {
     if (!CCNode::init()) return false;
+    m_editing = editMode;
     this->m_listLayer = list;
     this->m_server = server;
     this->setID("server-node");
@@ -21,25 +22,6 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     nameLab->setAnchorPoint({0.f, 0.5f});
     this->addChildAtPosition(nameLab, Anchor::TopLeft, {8, -1 - nameLab->getContentHeight() / 2});
 
-    // auto motdArea = TextArea::create(
-    //   server.motd, 
-    //   "chatFont.fnt", 
-    //   .7f, 
-    //   250.f, 
-    //   {0.f, 0.f}, 
-    //   13.f, 
-    //   false
-    // );
-    // TODO: maybe use prevter's label
-    auto motdArea = MDTextArea::create(server.motd, {250.f, 37.5f});
-    motdArea->setID("motd");
-    motdArea->getScrollLayer()->setTouchEnabled(false);
-    motdArea->getScrollLayer()->setMouseEnabled(false);
-    motdArea->setAnchorPoint({0.f, 1.f});
-    this->addChildAtPosition(motdArea, Anchor::Left, {8.f, 9.f});
-    
-    ServerInfoManager::get()->getInfoForServer(server, motdArea);
-
     m_menu = CCMenu::create();
     m_menu->setID("button-menu");
     m_menu->setContentSize({size.width / 2 - 4, size.height});
@@ -47,21 +29,32 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     m_menu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0});
 
-    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server ? "GJ_button_02.png" : "GJ_button_01.png");
-    useSpr->setScale(.6f);
-    auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
-    useBtn->setID("select-btn");
-    useSpr->setCascadeOpacityEnabled(true);
-    useBtn->setEnabled(list->m_selectedServer != server);
-    m_menu->addChild(useBtn);
+    if (!editMode) {
+      // TODO: maybe use prevter's label
+      auto motdArea = MDTextArea::create(server.motd, {250.f, 37.5f});
+      motdArea->setID("motd");
+      motdArea->getScrollLayer()->setTouchEnabled(false);
+      motdArea->getScrollLayer()->setMouseEnabled(false);
+      motdArea->setAnchorPoint({0.f, 1.f});
+      this->addChildAtPosition(motdArea, Anchor::Left, {8.f, 9.f});
+      ServerInfoManager::get()->getInfoForServer(server, motdArea);
+
+      auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server ? "GJ_button_02.png" : "GJ_button_01.png");
+      useSpr->setScale(.6f);
+      auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
+      useBtn->setID("select-btn");
+      useSpr->setCascadeOpacityEnabled(true);
+      useBtn->setEnabled(list->m_selectedServer != server);
+      m_menu->addChild(useBtn);
+    }
     m_menu->updateLayout();
 
     return true;
 };
 
-ServerNode *ServerNode::create(GDPSTypes::Server server, CCSize size, ServerListLayer *list) {
+ServerNode *ServerNode::create(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool editMode) {
     auto ret = new ServerNode;
-    if (ret && ret->init(server, size, list)) {
+    if (ret && ret->init(server, size, list, editMode)) {
       ret->autorelease();
       return ret;
     }
@@ -89,4 +82,8 @@ void ServerNode::updateVisual(GDPSTypes::Server server) {
 
 GDPSTypes::Server ServerNode::getServer() {
   return m_server;
+}
+
+bool ServerNode::isEditNode() {
+  return m_editing;
 }
