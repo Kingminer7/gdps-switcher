@@ -1,6 +1,7 @@
 #include "ServerNode.hpp"
 #include "utils/GDPSMain.hpp"
 #include "utils/ServerInfoManager.hpp"
+#include "ModifyServerPopup.hpp"
 
 bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list) {
     if (!CCNode::init()) return false;
@@ -43,17 +44,50 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     m_menu = CCMenu::create();
     m_menu->setID("button-menu");
     m_menu->setContentSize({size.width / 2 - 4, size.height});
-    m_menu->setLayout(RowLayout::create()->setAxisAlignment(AxisAlignment::End)->setAxisReverse(true));
+    // Whoever made ignoreInvisibleChildren return void, why.x
+    auto layout = RowLayout::create()
+        ->setAxisAlignment(AxisAlignment::End)
+        ->setAxisReverse(true)
+        ->setGap(2.f);
+    layout->ignoreInvisibleChildren(true);
+    m_menu->setLayout(layout);
     m_menu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0});
 
     auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server ? "GJ_button_02.png" : "GJ_button_01.png");
     useSpr->setScale(.6f);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
-    useBtn->setID("select-btn");
+    useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
     useBtn->setEnabled(list->m_selectedServer != server);
     m_menu->addChild(useBtn);
+
+    auto editSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("edit.png"_spr), EditorBaseColor::Green);
+    editSpr->setScale(.75f);
+    auto editBtn = CCMenuItemSpriteExtra::create(
+        editSpr,
+        this,
+        menu_selector(ServerNode::onEdit)
+    );
+    editBtn->setVisible(false);
+    editBtn->setID("edit-btn");
+
+    auto deleteSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"), EditorBaseColor::BrightGreen);
+    deleteSpr->setScale(.75f);
+    if (auto x = deleteSpr->getChildByType<CCSprite *>(0)) {
+        x->setScale(x->getScale() * .9);
+    }
+    auto deleteBtn = CCMenuItemSpriteExtra::create(
+        deleteSpr,
+        this,
+        menu_selector(ServerNode::onDelete)
+    );
+    deleteBtn->setID("delete-btn");
+    deleteBtn->setVisible(false);
+
+    m_menu->addChild(deleteBtn);
+    m_menu->addChild(editBtn);
+
     m_menu->updateLayout();
 
     return true;
@@ -73,7 +107,7 @@ void ServerNode::onSelect(CCObject *sender) {
     m_listLayer->onSelect(m_server);
 }
 
-void ServerNode::updateVisual(GDPSTypes::Server server) {
+void ServerNode::updateSelected(GDPSTypes::Server server) {
   auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("select-btn"));
   auto spr = btn->getChildByType<ButtonSprite *>(0);
   if (server == m_server) {
@@ -87,6 +121,47 @@ void ServerNode::updateVisual(GDPSTypes::Server server) {
   }
 }
 
+void ServerNode::updateInfo() {
+  log::info("{}", m_server.name);
+}
+
 GDPSTypes::Server ServerNode::getServer() {
   return m_server;
+}
+
+void ServerNode::onEdit(CCObject *sender) {
+  ModifyServerPopup::create(m_server, m_listLayer)->show();
+}
+
+void ServerNode::onDelete(CCObject *sender) {
+  createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}?", m_server.name), "No", "Yes", [this](auto, bool second) {
+      if (second) {
+          GDPSMain::get()->m_servers.erase(
+              std::remove_if(
+                  GDPSMain::get()->m_servers.begin(),
+                  GDPSMain::get()->m_servers.end(),
+                  [this](const GDPSTypes::Server& server) {
+                      return server.name == m_server.name;
+                  }
+              ),
+              GDPSMain::get()->m_servers.end()
+          );
+          m_listLayer->updateList();
+      }
+  });
+}
+
+void ServerNode::setEditing(bool editing) {
+  m_editing = editing;
+  auto editBtn = m_menu->getChildByID("edit-btn");
+  auto deleteBtn = m_menu->getChildByID("delete-btn");
+  auto useBtn = m_menu->getChildByID("use-btn");
+  if (editBtn) editBtn->setVisible(m_editing);
+  if (deleteBtn) deleteBtn->setVisible(m_editing);
+  if (useBtn) useBtn->setVisible(!m_editing);
+  m_menu->updateLayout();
+}
+
+bool ServerNode::isEditing() {
+  return m_editing;
 }

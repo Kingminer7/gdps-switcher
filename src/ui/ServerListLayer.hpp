@@ -14,6 +14,7 @@ class ServerListLayer : public CCLayer {
         void keyBackClicked() override;
 
         int m_eePos = 0;
+        bool m_isEditing = false;
 
         CCMenu *m_backMenu = nullptr;
         ScrollLayer *m_scroll = nullptr;

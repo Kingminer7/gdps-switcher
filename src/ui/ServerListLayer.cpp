@@ -1,6 +1,5 @@
 #include "ServerListLayer.hpp"
 #include "ModifyServerPopup.hpp"
-#include "EditServersPopup.hpp"
 #include "ServerNode.hpp"
 #include "Types.hpp"
 #include "utils/GDPSMain.hpp"
@@ -117,6 +116,7 @@ void ServerListLayer::updateList() {
     float y = -5.f;
     for (auto server : m_servers) {
         auto node = ServerNode::create(server, {363, 75}, this);
+        node->setEditing(m_isEditing);
         y += 80.f;
         m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top, {0, 37.5f - y}, false);
     }
@@ -160,7 +160,7 @@ void ServerListLayer::onSelect(GDPSTypes::Server server) {
     m_selectedServer = server;
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
-        node->updateVisual(server);
+        node->updateSelected(server);
         Mod::get()->setSavedValue("server", server.url);
     }
 }
@@ -170,7 +170,11 @@ void ServerListLayer::onAdd(CCObject *sender) {
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {
-    EditServersPopup::create(this)->show();
+    m_isEditing = !m_isEditing;
+    for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
+        if (!node) return;
+        node->setEditing(m_isEditing);
+    }
 }
 
 void ServerListLayer::keyDown(enumKeyCodes code) {

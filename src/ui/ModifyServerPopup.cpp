@@ -56,6 +56,7 @@ ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, ServerLis
 }
 
 void ModifyServerPopup::onClose(cocos2d::CCObject *sender) {
+    if (m_orig == m_server) return Popup::onClose(sender);
     if (m_isNew) {
         createQuickPopup("Are you sure?", "Are you sure you want to discard this server?", "No", "Yes", [this, sender](auto, bool btn2) {
             if (btn2) {
@@ -80,10 +81,11 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         }
         gdpsMain->m_servers.push_back(m_server);
     } else {
-        GDPSTypes::Server& s = *std::find(gdpsMain->m_servers.begin(), gdpsMain->m_servers.end(), m_orig);
-        if (s.empty()) {
+        auto res = std::find(gdpsMain->m_servers.begin(), gdpsMain->m_servers.end(), m_server);
+        if (res == gdpsMain->m_servers.end()) {
             return;
         }
+        GDPSTypes::Server& s = *res;
         s.name = m_nameInput->getString();
         s.url = m_urlInput->getString();
     }

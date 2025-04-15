@@ -44,7 +44,7 @@ namespace GDPSTypes {
 
         // idc that geode docs want me to use bool const instead, johnny cena
         bool empty() {
-            return name == "" && url == "";
+            return name.empty() && url.empty();
         }
     };
 }
