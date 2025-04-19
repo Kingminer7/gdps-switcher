@@ -30,10 +30,19 @@ class ServerListLayer : public CCLayer {
 
         void updateList();
         
+        bool ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override;
+        void ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override;
+        void ccTouchCancelled(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override {
+            ccTouchEnded(touch, event);
+        }
+        void registerWithTouchDispatcher() override;
+        void onExit() override;
+        
         void onBack(CCObject *sender);
         void onAdd(CCObject *sender);
         void onEdit(CCObject *sender);
         void onSelect(GDPSTypes::Server server);
+        void onKonami();
 
         static GDPSTypes::Server m_selectedServer;
         std::vector<GDPSTypes::Server> m_servers;
