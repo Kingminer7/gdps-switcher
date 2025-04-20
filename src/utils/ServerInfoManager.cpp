@@ -30,13 +30,8 @@ void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, MDTextArea *a
                         auto info = res->json().unwrapOrDefault();
                         motd = info["motd"].asString().unwrapOr("No MOTD found.");
                     }
-                    auto serverIt = std::find_if(
-                        GDPSMain::get()->m_servers.begin(),
-                        GDPSMain::get()->m_servers.end(),
-                        [&server](const auto& srv) { return srv.url == server.url; }
-                    );
-                    if (serverIt != GDPSMain::get()->m_servers.end()) {
-                        serverIt->motd = motd;
+                    if (GDPSMain::get()->m_servers.contains(server.id)) {
+                        GDPSMain::get()->m_servers[server.id].motd = motd;
                     }
                     if (sdata.second) {
                         sdata.second->setString(motd.c_str());

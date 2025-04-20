@@ -1,6 +1,7 @@
-#include "DataManager.hpp"
+#include "MigrationManager.hpp"
+#include "GDPSMain.hpp"
 
-Result<> DataManager::setup() {
+Result<> MigrationManager::setup() {
     auto savePath = dirs::getSaveDir() / "gdpses";
 
     if (!std::filesystem::exists(savePath)) {
@@ -19,7 +20,7 @@ Result<> DataManager::setup() {
     return Ok();
 }
 
-std::string DataManager::urlToFilenameSafe(const std::string url) {
+std::string MigrationManager::urlToFilenameSafe(const std::string url) {
     std::string ret = "";
     for (char c : url) {
         if (std::isalnum(c) || c == '.' || c == '-' || c == '_') {
@@ -31,9 +32,16 @@ std::string DataManager::urlToFilenameSafe(const std::string url) {
     return ret;
 }
 
-void DataManager::migrateData() {
+void MigrationManager::migrateData() {
     auto savePath = dirs::getSaveDir();
-    std::vector<std::string> servers;
+
+    std::vector<GDPSTypes::Server> servers;
+    for (auto old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
+        auto serv = fromOldServer(old);
+        servers.push_back(serv);
+    }
+
+    Mod::get()->setSavedValue<std::vector<GDPSTypes::Server>>("servers-v2", servers);
 
     auto gdpsPath = savePath / "gdpses";
 
@@ -71,7 +79,25 @@ void DataManager::migrateData() {
     Mod::get()->setSavedValue<std::string>("latest", "1.4.0");
 }
 
+GDPSTypes::Server MigrationManager::fromOldServer(GDPSTypes::OldServer server) {
+    GDPSTypes::Server ret = GDPSTypes::Server();
+    // Next free id in GDPSMain::get()->m_servers
+    // Don't just use the size. find the next free.
+    // (servers are structs and have id property)
+    int i = 0;
+    for (auto &[id, server] : GDPSMain::get()->m_servers) {
+        if (id == i) {
+            i++;
+        }
+    }
+    ret.id = i;
+    ret.name = server.name;
+    ret.url = server.url;
+    ret.saveDir = urlToFilenameSafe(server.url);
+    return ret;
+}
+
 $on_mod(Loaded) {
-    auto sm = std::make_unique<DataManager>();
+    auto sm = std::make_unique<MigrationManager>();
     auto a = sm->setup();
 }

@@ -54,12 +54,12 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     m_menu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0});
 
-    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server ? "GJ_button_02.png" : "GJ_button_01.png");
+    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server.id ? "GJ_button_02.png" : "GJ_button_01.png");
     useSpr->setScale(.6f);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
-    useBtn->setEnabled(list->m_selectedServer != server);
+    useBtn->setEnabled(list->m_selectedServer != server.id);
     m_menu->addChild(useBtn);
 
     auto editSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("edit.png"_spr), EditorBaseColor::Green);
@@ -136,16 +136,7 @@ void ServerNode::onEdit(CCObject *sender) {
 void ServerNode::onDelete(CCObject *sender) {
   createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}?", m_server.name), "No", "Yes", [this](auto, bool second) {
       if (second) {
-          GDPSMain::get()->m_servers.erase(
-              std::remove_if(
-                  GDPSMain::get()->m_servers.begin(),
-                  GDPSMain::get()->m_servers.end(),
-                  [this](const GDPSTypes::Server& server) {
-                      return server.name == m_server.name;
-                  }
-              ),
-              GDPSMain::get()->m_servers.end()
-          );
+          GDPSMain::get()->m_servers.erase(m_server.id);
           m_listLayer->updateList();
       }
   });

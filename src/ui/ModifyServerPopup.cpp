@@ -76,20 +76,19 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
     if (m_server.url == "" || m_server.name == "") return;
     auto gdpsMain = GDPSMain::get();
     if (m_isNew) {
-        if (std::find(gdpsMain->m_servers.begin(), gdpsMain->m_servers.end(), m_server) != gdpsMain->m_servers.end()) {
+        if (gdpsMain->m_servers.contains(m_server.id)) {
             return;
         }
-        gdpsMain->m_servers.push_back(m_server);
+        gdpsMain->m_servers[m_server.id] = m_server;
     } else {
-        auto res = std::find(gdpsMain->m_servers.begin(), gdpsMain->m_servers.end(), m_server);
-        if (res == gdpsMain->m_servers.end()) {
+        auto server = gdpsMain->m_servers[m_server.id];
+        if (!gdpsMain->m_servers.contains(server.id)) {
             return;
         }
-        GDPSTypes::Server& s = *res;
-        s.name = m_nameInput->getString();
-        s.url = m_urlInput->getString();
+        server.name = m_nameInput->getString();
+        server.url = m_urlInput->getString();
     }
     m_listLayer->updateList();
-    Mod::get()->setSavedValue<std::vector<GDPSTypes::Server>>("saved-servers", GDPSMain::get()->m_servers);
+    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2", GDPSMain::get()->m_servers);
     Popup::onClose(sender);
 }

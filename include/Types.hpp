@@ -15,14 +15,16 @@
 
 namespace GDPSTypes {
     struct Server {
+        int id = -1;
         std::string name = "";
         std::string url = "";
+        std::string saveDir = "";
 
-        // Doesn't save below
+        // Doesn't save below this comment
         std::string motd = "No MOTD found.";
         int serverApiId = -1;
 
-        Server(std::string name, std::string url) : url(url), name(name) {}
+        Server(int id, std::string name, std::string url) : id(id), url(url), name(name) {}
         Server() {}
 
         // Comparison operators
@@ -47,6 +49,10 @@ namespace GDPSTypes {
             return name.empty() && url.empty();
         }
     };
+    struct OldServer {
+        std::string name = "";
+        std::string url = "";
+    };
 }
 
 template <>
@@ -55,12 +61,31 @@ struct matjson::Serialize<GDPSTypes::Server>
     static geode::Result<GDPSTypes::Server> fromJson(matjson::Value const &value)
     {
         return geode::Ok(GDPSTypes::Server(
+            value["id"].asInt().unwrapOr(-1),
             value["name"].asString().unwrapOr("Failed to load name."),
             value["url"].asString().unwrapOr("Failed to load url.")
         ));
     }
 
     static matjson::Value toJson(GDPSTypes::Server const &value)
+    {
+        auto obj = matjson::makeObject({{"id", value.id}, {"name", value.name}, {"url", value.url}});
+        return obj;
+    }
+};
+
+template <>
+struct matjson::Serialize<GDPSTypes::OldServer>
+{
+    static geode::Result<GDPSTypes::OldServer> fromJson(matjson::Value const &value)
+    {
+        return geode::Ok(GDPSTypes::OldServer{
+            value["name"].asString().unwrapOr("Failed to load name."),
+            value["url"].asString().unwrapOr("Failed to load url.")
+        });
+    }
+
+    static matjson::Value toJson(GDPSTypes::OldServer const &value)
     {
         auto obj = matjson::makeObject({{"name", value.name}, {"url", value.url}});
         return obj;

@@ -6,14 +6,14 @@
 
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
-GDPSTypes::Server ServerListLayer::m_selectedServer = {"", ""};
+int ServerListLayer::m_selectedServer = -1;
 
 bool ServerListLayer::init() {
     if (!CCLayer::init()) return false;
 
     registerWithTouchDispatcher();
 
-    if (m_selectedServer.empty()) m_selectedServer = GDPSMain::get()->m_currentServer;
+    if (m_selectedServer == -1) m_selectedServer = GDPSMain::get()->m_currentServer;
 
     auto winSize = cocos2d::CCDirector::get()->getWinSize();
     this->setID("ServerListLayer"_spr);
@@ -111,12 +111,12 @@ bool ServerListLayer::init() {
 
 void ServerListLayer::updateList() {
     m_servers = GDPSMain::get()->m_servers;
-    m_servers.insert(m_servers.begin(), {"Built-in Servers", ServerAPIEvents::getBaseUrl()});
+    m_servers[-1] = {-1, "Built-in Servers", ServerAPIEvents::getBaseUrl()};
     m_scroll->m_contentLayer->removeAllChildren();
     m_scroll->m_contentLayer->setContentSize({363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
     m_scroll->scrollToTop();
     float y = -5.f;
-    for (auto server : m_servers) {
+    for (auto &[id, server] : m_servers) {
         auto node = ServerNode::create(server, {363, 75}, this);
         node->setEditing(m_isEditing);
         y += 80.f;
@@ -159,16 +159,16 @@ cocos2d::CCScene *ServerListLayer::scene() {
 }
 
 void ServerListLayer::onSelect(GDPSTypes::Server server) {
-    m_selectedServer = server;
+    m_selectedServer = server.id;
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
         node->updateSelected(server);
-        Mod::get()->setSavedValue("server", server.url);
+        Mod::get()->setSavedValue("server", server.id);
     }
 }
 
 void ServerListLayer::onAdd(CCObject *sender) {
-    ModifyServerPopup::create({"", ""}, this)->show();
+    ModifyServerPopup::create({-1, "", ""}, this)->show();
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {

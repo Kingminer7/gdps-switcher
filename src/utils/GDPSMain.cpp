@@ -23,26 +23,10 @@ GDPSMain *GDPSMain::m_instance = nullptr;
 
 void GDPSMain::init() {
     m_servers =
-        Mod::get()->getSavedValue<std::vector<GDPSTypes::Server>>("saved-servers");
-    auto targetUrl = Mod::get()->getSavedValue<std::string>("server", ServerAPIEvents::getBaseUrl());
-    bool found = false;
-    if (isBase(targetUrl)) {
-        m_currentServer = {
-            "Built-in Servers",
-            targetUrl
-        };
-    } else {
-        for (const auto &server : m_servers) {
-            if (server.url == targetUrl) {
-                m_currentServer = server;
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            m_currentServer = {"Unknown", targetUrl};
-        }
-        m_currentServer.serverApiId = ServerAPIEvents::registerServer(targetUrl, -40).id;
+        Mod::get()->getSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2");
+    if (m_currentServer >= 0) {
+        auto &server = m_servers[m_currentServer];
+        server.serverApiId = ServerAPIEvents::registerServer(server.url, -40).id;
     }
 }
 
@@ -56,8 +40,7 @@ GDPSMain *GDPSMain::get() {
 
 bool GDPSMain::isBase() {
     return
-        m_currentServer.url == ServerAPIEvents::getBaseUrl()
-    ||  fmt::format("{}/", m_currentServer.url) == ServerAPIEvents::getBaseUrl();
+        m_currentServer == -2;
 }
 
 bool GDPSMain::isBase(std::string url) {

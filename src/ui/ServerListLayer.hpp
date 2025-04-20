@@ -44,6 +44,6 @@ class ServerListLayer : public CCLayer {
         void onSelect(GDPSTypes::Server server);
         void onKonami();
 
-        static GDPSTypes::Server m_selectedServer;
-        std::vector<GDPSTypes::Server> m_servers;
+        static int m_selectedServer;
+        std::map<int, GDPSTypes::Server> m_servers;
 };

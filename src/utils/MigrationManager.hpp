@@ -2,13 +2,16 @@
 
 #pragma once
 
+#include "Types.hpp"
+
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
-class DataManager {
+class MigrationManager {
     protected:
         void migrateData();
+        GDPSTypes::Server fromOldServer(GDPSTypes::OldServer server);
     public:
         Result<> setup();
         static std::string urlToFilenameSafe(std::string url);

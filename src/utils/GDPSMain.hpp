@@ -17,6 +17,6 @@ class GDPSMain {
 
         static GDPSMain *get();
 
-        std::vector<GDPSTypes::Server> m_servers;
-        GDPSTypes::Server m_currentServer;
+        std::map<int, GDPSTypes::Server> m_servers;
+        int m_currentServer;
 };
