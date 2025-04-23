@@ -35,13 +35,13 @@ std::string MigrationManager::urlToFilenameSafe(const std::string url) {
 void MigrationManager::migrateData() {
     auto savePath = dirs::getSaveDir();
 
-    std::vector<GDPSTypes::Server> servers;
+    std::map<int, GDPSTypes::Server> servers;
     for (auto old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
         auto serv = fromOldServer(old);
-        servers.push_back(serv);
+        servers[serv.id] = serv;
     }
 
-    Mod::get()->setSavedValue<std::vector<GDPSTypes::Server>>("servers-v2", servers);
+    // Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2", servers);
 
     auto gdpsPath = savePath / "gdpses";
 
@@ -81,9 +81,6 @@ void MigrationManager::migrateData() {
 
 GDPSTypes::Server MigrationManager::fromOldServer(GDPSTypes::OldServer server) {
     GDPSTypes::Server ret = GDPSTypes::Server();
-    // Next free id in GDPSMain::get()->m_servers
-    // Don't just use the size. find the next free.
-    // (servers are structs and have id property)
     int i = 0;
     for (auto &[id, server] : GDPSMain::get()->m_servers) {
         if (id == i) {

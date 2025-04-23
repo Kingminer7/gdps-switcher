@@ -89,6 +89,6 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         server.url = m_urlInput->getString();
     }
     m_listLayer->updateList();
-    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2", GDPSMain::get()->m_servers);
+    // Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2", GDPSMain::get()->m_servers);
     Popup::onClose(sender);
 }

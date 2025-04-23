@@ -75,6 +75,33 @@ struct matjson::Serialize<GDPSTypes::Server>
 };
 
 template <>
+struct matjson::Serialize<std::map<int, GDPSTypes::Server>>
+{
+    static geode::Result<std::map<int, GDPSTypes::Server>> fromJson(matjson::Value const &value)
+    {
+        std::map<int, GDPSTypes::Server> ret = {};
+        for (auto server : value) {
+            int id = value["id"].asInt().unwrapOr(-1);
+            ret[id] = GDPSTypes::Server(
+                id,
+                value["name"].asString().unwrapOr("Failed to load name."),
+                value["url"].asString().unwrapOr("Failed to load url.")
+            );
+        }
+        return geode::Ok(ret);
+    }
+
+    static matjson::Value toJson(std::map<int, GDPSTypes::Server> const &value)
+    {
+        auto obj = matjson::makeObject({});
+        for (auto const& [id, server] : value) {
+            obj[id] = matjson::makeObject({{"name", server.name}, {"url", server.url}});
+        }
+        return obj;
+    }
+};
+
+template <>
 struct matjson::Serialize<GDPSTypes::OldServer>
 {
     static geode::Result<GDPSTypes::OldServer> fromJson(matjson::Value const &value)
