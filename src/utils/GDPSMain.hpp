@@ -18,5 +18,6 @@ class GDPSMain {
         static GDPSMain *get();
 
         std::map<int, GDPSTypes::Server> m_servers;
-        int m_currentServer;
+        int m_currentServer = -2;
+        int m_serverApiId = 0;
 };

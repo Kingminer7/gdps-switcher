@@ -1,6 +1,8 @@
 #include "MigrationManager.hpp"
 #include "GDPSMain.hpp"
 
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
+
 Result<> MigrationManager::setup() {
     auto savePath = dirs::getSaveDir() / "gdpses";
 
@@ -35,13 +37,24 @@ std::string MigrationManager::urlToFilenameSafe(const std::string url) {
 void MigrationManager::migrateData() {
     auto savePath = dirs::getSaveDir();
 
-    std::map<int, GDPSTypes::Server> servers;
+    auto main = GDPSMain::get();
+    auto oldSel = Mod::get()->getSavedValue<std::string>("server", "https://www.boomlings.com/database/");
+
     for (auto old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
         auto serv = fromOldServer(old);
-        servers[serv.id] = serv;
+        main->m_servers[serv.id] = serv;
+        log::info("{} {} {}", oldSel, serv.url, oldSel == serv.url);
+        if (oldSel == serv.url) {
+            main->m_currentServer = serv.id;
+            ServerAPIEvents::updateServer(main->m_serverApiId, serv.url);
+            Mod::get()->setSavedValue<int>("current", serv.id);
+        }
     }
 
-    // Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2", servers);
+    
+    auto servers = main->m_servers;
+    servers.erase(-2);
+    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
 
     auto gdpsPath = savePath / "gdpses";
 

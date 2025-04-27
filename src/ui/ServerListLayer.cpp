@@ -111,13 +111,15 @@ bool ServerListLayer::init() {
 
 void ServerListLayer::updateList() {
     m_servers = GDPSMain::get()->m_servers;
-    m_servers[-1] = {-1, "Built-in Servers", ServerAPIEvents::getBaseUrl()};
     m_scroll->m_contentLayer->removeAllChildren();
     m_scroll->m_contentLayer->setContentSize({363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
     m_scroll->scrollToTop();
     float y = -5.f;
     for (auto &[id, server] : m_servers) {
         auto node = ServerNode::create(server, {363, 75}, this);
+        if (server.id == -2) {
+            node->m_locked = true;
+        }
         node->setEditing(m_isEditing);
         y += 80.f;
         m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top, {0, 37.5f - y}, false);
@@ -163,12 +165,19 @@ void ServerListLayer::onSelect(GDPSTypes::Server server) {
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
         node->updateSelected(server);
-        Mod::get()->setSavedValue("server", server.id);
+        Mod::get()->setSavedValue("current", server.id);
     }
 }
 
 void ServerListLayer::onAdd(CCObject *sender) {
-    ModifyServerPopup::create({-1, "", ""}, this)->show();
+    int id = 0;
+    for (auto &[serverId, server] : m_servers) {
+      log::info("Server ID: {}, ID: {}", serverId, id);
+        if (serverId < 0) continue;
+        if (serverId == id) id++;
+        else break;
+    }
+    ModifyServerPopup::create({id, "", "", ""}, this)->show();
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {
@@ -179,8 +188,10 @@ void ServerListLayer::onEdit(CCObject *sender) {
     }
 }
 
+
+// Konami code easter egg
+
 void ServerListLayer::keyDown(enumKeyCodes code) {
-  // Defined sequence of inputs for both KEY_* and CONTROLLER_*
   static const std::vector<std::vector<enumKeyCodes>> sequence = {
       {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
        enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},

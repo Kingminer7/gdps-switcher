@@ -108,8 +108,10 @@ void ServerNode::onSelect(CCObject *sender) {
 }
 
 void ServerNode::updateSelected(GDPSTypes::Server server) {
-  auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("select-btn"));
+  auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("use-btn"));
+  if (!btn) return;
   auto spr = btn->getChildByType<ButtonSprite *>(0);
+  if (!spr) return;
   if (server == m_server) {
     spr->updateBGImage("GJ_button_02.png");
     btn->setEnabled(false);
@@ -130,10 +132,12 @@ GDPSTypes::Server ServerNode::getServer() {
 }
 
 void ServerNode::onEdit(CCObject *sender) {
+  if (m_locked) return;
   ModifyServerPopup::create(m_server, m_listLayer)->show();
 }
 
 void ServerNode::onDelete(CCObject *sender) {
+  if (m_locked) return;
   createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}?", m_server.name), "No", "Yes", [this](auto, bool second) {
       if (second) {
           GDPSMain::get()->m_servers.erase(m_server.id);
@@ -147,8 +151,8 @@ void ServerNode::setEditing(bool editing) {
   auto editBtn = m_menu->getChildByID("edit-btn");
   auto deleteBtn = m_menu->getChildByID("delete-btn");
   auto useBtn = m_menu->getChildByID("use-btn");
-  if (editBtn) editBtn->setVisible(m_editing);
-  if (deleteBtn) deleteBtn->setVisible(m_editing);
+  if (editBtn) editBtn->setVisible(m_editing && !m_locked);
+  if (deleteBtn) deleteBtn->setVisible(m_editing && !m_locked);
   if (useBtn) useBtn->setVisible(!m_editing);
   m_menu->updateLayout();
 }

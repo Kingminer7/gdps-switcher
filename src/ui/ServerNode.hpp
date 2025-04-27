@@ -28,5 +28,7 @@ class ServerNode : public CCNode {
 
         GDPSTypes::Server getServer();
 
+        bool m_locked = false;
+
         static ServerNode *create(GDPSTypes::Server server, CCSize size, ServerListLayer *list);
 };

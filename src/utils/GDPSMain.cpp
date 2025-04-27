@@ -23,10 +23,17 @@ GDPSMain *GDPSMain::m_instance = nullptr;
 
 void GDPSMain::init() {
     m_servers =
-        Mod::get()->getSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2");
+        Mod::get()->getSavedValue<std::map<int, GDPSTypes::Server>>("servers");
+    m_currentServer =
+        Mod::get()->getSavedValue<int>("current", -2);
+
+    m_servers[-2] = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ""};
     if (m_currentServer >= 0) {
-        auto &server = m_servers[m_currentServer];
-        server.serverApiId = ServerAPIEvents::registerServer(server.url, -40).id;
+        m_serverApiId = ServerAPIEvents::registerServer(m_servers[m_currentServer].url, -40).id;
+    }
+    
+    for (const auto& [id, server] : m_servers) {
+        log::info("Server: {} {} {} {}", id, server.name, server.url, server.saveDir);
     }
 }
 

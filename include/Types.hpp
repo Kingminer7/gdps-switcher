@@ -22,9 +22,8 @@ namespace GDPSTypes {
 
         // Doesn't save below this comment
         std::string motd = "No MOTD found.";
-        int serverApiId = -1;
 
-        Server(int id, std::string name, std::string url) : id(id), url(url), name(name) {}
+        Server(int id, std::string name, std::string url, std::string saveDir) : id(id), url(url), name(name), saveDir(saveDir) {}
         Server() {}
 
         // Comparison operators
@@ -63,13 +62,14 @@ struct matjson::Serialize<GDPSTypes::Server>
         return geode::Ok(GDPSTypes::Server(
             value["id"].asInt().unwrapOr(-1),
             value["name"].asString().unwrapOr("Failed to load name."),
-            value["url"].asString().unwrapOr("Failed to load url.")
+            value["url"].asString().unwrapOr("Failed to load url."),
+            value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory."))
         ));
     }
 
     static matjson::Value toJson(GDPSTypes::Server const &value)
     {
-        auto obj = matjson::makeObject({{"id", value.id}, {"name", value.name}, {"url", value.url}});
+        auto obj = matjson::makeObject({{"id", value.id}, {"name", value.name}, {"url", value.url}, {"saveDir", value.saveDir}});
         return obj;
     }
 };
@@ -81,23 +81,20 @@ struct matjson::Serialize<std::map<int, GDPSTypes::Server>>
     {
         std::map<int, GDPSTypes::Server> ret = {};
         for (auto server : value) {
-            int id = value["id"].asInt().unwrapOr(-1);
-            ret[id] = GDPSTypes::Server(
-                id,
-                value["name"].asString().unwrapOr("Failed to load name."),
-                value["url"].asString().unwrapOr("Failed to load url.")
-            );
+            auto serv = server.as<GDPSTypes::Server>().unwrapOr(GDPSTypes::Server());
+            int id = serv.id;
+            ret[id] = serv;
         }
         return geode::Ok(ret);
     }
 
     static matjson::Value toJson(std::map<int, GDPSTypes::Server> const &value)
     {
-        auto obj = matjson::makeObject({});
+        std::vector<matjson::Value> servers;
         for (auto const& [id, server] : value) {
-            obj[id] = matjson::makeObject({{"name", server.name}, {"url", server.url}});
+            servers.push_back(matjson::Value(server));
         }
-        return obj;
+        return matjson::Value(servers);
     }
 };
 

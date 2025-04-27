@@ -1,4 +1,5 @@
 #include "ModifyServerPopup.hpp"
+#include "utils/MigrationManager.hpp"
 #include "utils/GDPSMain.hpp"
 #include "Types.hpp"
 
@@ -81,14 +82,17 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         }
         gdpsMain->m_servers[m_server.id] = m_server;
     } else {
-        auto server = gdpsMain->m_servers[m_server.id];
+        auto &server = gdpsMain->m_servers[m_server.id];
         if (!gdpsMain->m_servers.contains(server.id)) {
             return;
         }
         server.name = m_nameInput->getString();
         server.url = m_urlInput->getString();
+        server.saveDir = MigrationManager::urlToFilenameSafe(server.url);
     }
     m_listLayer->updateList();
-    // Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers-v2", GDPSMain::get()->m_servers);
+    auto servers = GDPSMain::get()->m_servers;
+    servers.erase(-2);
+    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
     Popup::onClose(sender);
 }
