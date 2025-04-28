@@ -296,7 +296,14 @@ void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch,
 }
 
 void ServerListLayer::onKonami() {
-  FLAlertLayer::create("Konami Code", "NERD!", "ok bro")->show();
+  auto exp = CCParticleExplosion::create();
+  exp->setStartColor({255,127, 0, 255});
+  exp->setEndColorVar({255,127, 0, 255});
+  exp->setEndColor({ 255, 0, 0, 255 });
+  exp->setEndColorVar({ 255, 0, 0, 255 });
+  exp->setSpeed(120);
+  exp->setFadeOutTime(.3f);
+  addChildAtPosition(exp, geode::Anchor::Center, {0, 0}, false);
 }
 
 void ServerListLayer::onExit() {

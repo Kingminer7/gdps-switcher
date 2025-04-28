@@ -20,24 +20,15 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     nameLab->setID("name");
     nameLab->limitLabelWidth(size.width - 50, .7f, 0.f);
     nameLab->setAnchorPoint({0.f, 0.5f});
-    this->addChildAtPosition(nameLab, Anchor::TopLeft, {8, -1 - nameLab->getContentHeight() / 2});
+    this->addChildAtPosition(nameLab, Anchor::TopLeft, {8,  1- nameLab->getContentHeight() / 2});
 
-    // auto motdArea = TextArea::create(
-    //   server.motd, 
-    //   "chatFont.fnt", 
-    //   .7f, 
-    //   250.f, 
-    //   {0.f, 0.f}, 
-    //   13.f, 
-    //   false
-    // );
     // TODO: maybe use prevter's label
     auto motdArea = MDTextArea::create(server.motd, {250.f, 37.5f});
     motdArea->setID("motd");
     motdArea->getScrollLayer()->setTouchEnabled(false);
     motdArea->getScrollLayer()->setMouseEnabled(false);
     motdArea->setAnchorPoint({0.f, 1.f});
-    this->addChildAtPosition(motdArea, Anchor::Left, {8.f, 9.f});
+    this->addChildAtPosition(motdArea, Anchor::Left, {14.f, 9.f});
     
     ServerInfoManager::get()->getInfoForServer(server, motdArea);
 
