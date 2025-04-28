@@ -17,6 +17,7 @@ class ServerListLayer : public CCLayer {
         bool m_isEditing = false;
 
         CCMenu *m_backMenu = nullptr;
+        CCMenu *m_bottomMenu = nullptr;
         ScrollLayer *m_scroll = nullptr;
         Scrollbar *m_scrollbar = nullptr;
 
@@ -43,6 +44,7 @@ class ServerListLayer : public CCLayer {
         void onEdit(CCObject *sender);
         void onSelect(GDPSTypes::Server server);
         void onKonami();
+        void onSettings(CCObject *sender);
 
         static int m_selectedServer;
         std::map<int, GDPSTypes::Server> m_servers;

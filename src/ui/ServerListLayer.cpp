@@ -43,7 +43,7 @@ bool ServerListLayer::init() {
     );
     this->addChildAtPosition(m_backMenu, geode::Anchor::TopLeft, ccp(25.f, -25.f / 4.f), false);
 
-    auto m_bottomMenu = cocos2d::CCMenu::create();
+    m_bottomMenu = cocos2d::CCMenu::create();
     m_bottomMenu->setID("edit-menu");
     m_bottomMenu->setContentHeight(125.f);
     m_bottomMenu->setAnchorPoint({ .5f, 0.f });
@@ -286,7 +286,6 @@ void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch,
     m_eePos++;
   } else {
     m_eePos = 0;
-    log::info("Reset");
     return;
   }
 
@@ -296,16 +295,34 @@ void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch,
 }
 
 void ServerListLayer::onKonami() {
+  auto spr = CCSprite::createWithSpriteFrameName("edit.png"_spr);
+  auto circle = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::Big);
+  spr->setScale(1.4f);
+  circle->setScale(.7f);
+  auto btn = CCMenuItemSpriteExtra::create(
+      circle, this, menu_selector(ServerListLayer::onSettings)
+  );
+  btn->setID("settings-button");
+  m_bottomMenu->addChild(btn);
+  m_bottomMenu->updateLayout();
+
   auto exp = CCParticleExplosion::create();
   exp->setStartColor({255,127, 0, 255});
   exp->setEndColorVar({255,127, 0, 255});
   exp->setEndColor({ 255, 0, 0, 255 });
   exp->setEndColorVar({ 255, 0, 0, 255 });
   exp->setSpeed(120);
-  addChildAtPosition(exp, geode::Anchor::Center, {0, 0}, false);
+  exp->setEndSize(0.f);
+  exp->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(7.5f), CallFuncExt::create([this, exp](){exp->removeFromParent();})));
+  addChild(exp);
+  exp->setPosition(m_bottomMenu->convertToWorldSpace(btn->getPosition()));
 }
 
 void ServerListLayer::onExit() {
     CCLayer::onExit();
     CCTouchDispatcher::get()->removeDelegate(this);
+}
+
+void ServerListLayer::onSettings(CCObject *sender) {
+  FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
 }
