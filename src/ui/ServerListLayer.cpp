@@ -302,7 +302,6 @@ void ServerListLayer::onKonami() {
   exp->setEndColor({ 255, 0, 0, 255 });
   exp->setEndColorVar({ 255, 0, 0, 255 });
   exp->setSpeed(120);
-  exp->setFadeOutTime(.3f);
   addChildAtPosition(exp, geode::Anchor::Center, {0, 0}, false);
 }
 
