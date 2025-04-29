@@ -106,6 +106,20 @@ bool ServerListLayer::init() {
 
     updateList();
 
+    if (Mod::get()->getSavedValue("secret-settings", false)) {
+        m_eePos = 12;
+
+        auto spr = CCSprite::createWithSpriteFrameName("geode.loader/settings.png");
+        auto circle = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::Big);
+        circle->setScale(.7f);
+        auto btn = CCMenuItemSpriteExtra::create(
+            circle, this, menu_selector(ServerListLayer::onSettings)
+        );
+        btn->setID("settings-button");
+        m_bottomMenu->addChild(btn);
+        m_bottomMenu->updateLayout();
+    }
+
     return true;
 }
 
@@ -193,48 +207,48 @@ void ServerListLayer::onEdit(CCObject *sender) {
 
 void ServerListLayer::keyDown(enumKeyCodes code) {
   static const std::vector<std::vector<enumKeyCodes>> sequence = {
-      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
-      {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
-      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
-      {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
-      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
-      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT,
-       CONTROLLER_RTHUMBSTICK_RIGHT},
-      {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
-      {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right,
-       enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT,
-       CONTROLLER_RTHUMBSTICK_RIGHT},
-      {enumKeyCodes::KEY_B, enumKeyCodes::CONTROLLER_B},
-      {enumKeyCodes::KEY_A, enumKeyCodes::CONTROLLER_A},
-      {enumKeyCodes::KEY_Enter, enumKeyCodes::CONTROLLER_Start}};
+        {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
+        {enumKeyCodes::KEY_Up, enumKeyCodes::CONTROLLER_Up,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_UP, CONTROLLER_RTHUMBSTICK_UP},
+        {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
+        {enumKeyCodes::KEY_Down, enumKeyCodes::CONTROLLER_Down,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_DOWN, CONTROLLER_RTHUMBSTICK_DOWN},
+        {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
+        {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT,
+        CONTROLLER_RTHUMBSTICK_RIGHT},
+        {enumKeyCodes::KEY_Left, enumKeyCodes::CONTROLLER_Left,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_LEFT, CONTROLLER_RTHUMBSTICK_LEFT},
+        {enumKeyCodes::KEY_Right, enumKeyCodes::CONTROLLER_Right,
+        enumKeyCodes::CONTROLLER_LTHUMBSTICK_RIGHT,
+        CONTROLLER_RTHUMBSTICK_RIGHT},
+        {enumKeyCodes::KEY_B, enumKeyCodes::CONTROLLER_B},
+        {enumKeyCodes::KEY_A, enumKeyCodes::CONTROLLER_A},
+        {enumKeyCodes::KEY_Enter, enumKeyCodes::CONTROLLER_Start}};
 
-  if (m_eePos >= sequence.size())
-    return CCLayer::keyDown(code);
+    if (m_eePos >= sequence.size())
+        return CCLayer::keyDown(code);
 
-  if (m_eePos < 3) {
-    CCLayer::keyDown(code);
-  }
+    if (m_eePos < 3) {
+        CCLayer::keyDown(code);
+    }
 
-  const auto &validCodes = sequence[m_eePos];
-  if (std::find(validCodes.begin(), validCodes.end(), code) !=
-      validCodes.end()) {
-    m_eePos++;
-  } else {
-    m_eePos = 0;
-    log::info("Reset");
-    return;
-  }
+    const auto &validCodes = sequence[m_eePos];
+    if (std::find(validCodes.begin(), validCodes.end(), code) !=
+        validCodes.end()) {
+        m_eePos++;
+    } else {
+        m_eePos = 0;
+        log::info("Reset");
+        return;
+    }
 
-  if (m_eePos == sequence.size()) {
-    onKonami();
-  }
+    if (m_eePos == sequence.size()) {
+        onKonami();
+    }
 }
 
 // mobile support lmao
@@ -250,72 +264,72 @@ bool ServerListLayer::ccTouchBegan(cocos2d::CCTouch *touch,
 
 enum class Input { None, Up, Down, Left, Right, B, A, Start };
 
-void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch,
-                                   cocos2d::CCEvent *evt) {
-  static const std::vector<Input> sequence = {
-      Input::Up,   Input::Up,    Input::Down, Input::Down,
-      Input::Left, Input::Right, Input::Left, Input::Right,
-      Input::B,    Input::A,     Input::Start};
-  if (m_eePos >= sequence.size())
-    return;
+void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *evt) {
+    static const std::vector<Input> sequence = {
+        Input::Up,   Input::Up,    Input::Down, Input::Down,
+        Input::Left, Input::Right, Input::Left, Input::Right,
+        Input::B,    Input::A,     Input::Start};
+    if (m_eePos >= sequence.size())
+        return;
 
-  auto diff = touch->getLocation() - touch->getStartLocation();
-  auto axis = diff.normalize();
-  Input inp = Input::None;
-  if (sqrtf(diff.x * diff.x + diff.y * diff.y) < 50.f) {
-    auto screenWidth = CCDirector::get()->getWinSize().width;
-    auto tapLoc = touch->getLocation();
-    if (tapLoc.x < screenWidth / 3) {
-      inp = Input::A;
-    } else if (tapLoc.x > screenWidth * 2 / 3) {
-      inp = Input::B;
-    } else {
-      inp = Input::Start;
+    auto diff = touch->getLocation() - touch->getStartLocation();
+    auto axis = diff.normalize();
+    Input inp = Input::None;
+    if (sqrtf(diff.x * diff.x + diff.y * diff.y) < 50.f) {
+        auto screenWidth = CCDirector::get()->getWinSize().width;
+        auto tapLoc = touch->getLocation();
+        if (tapLoc.x < screenWidth / 3) {
+          inp = Input::A;
+        } else if (tapLoc.x > screenWidth * 2 / 3) {
+          inp = Input::B;
+        } else {
+          inp = Input::Start;
+        }
+    } else if (axis.y < -.75) {
+        inp = Input::Down;
+    } else if (axis.y > .75) {
+        inp = Input::Up;
+    } else if (axis.x < -.75) {
+        inp = Input::Left;
+    } else if (axis.x > .75) {
+        inp = Input::Right;
     }
-  } else if (axis.y < -.75) {
-    inp = Input::Down;
-  } else if (axis.y > .75) {
-    inp = Input::Up;
-  } else if (axis.x < -.75) {
-    inp = Input::Left;
-  } else if (axis.x > .75) {
-    inp = Input::Right;
-  }
 
-  if (sequence[m_eePos] == inp) {
-    m_eePos++;
-  } else {
-    m_eePos = 0;
-    return;
-  }
+    if (sequence[m_eePos] == inp) {
+        m_eePos++;
+    } else {
+        m_eePos = 0;
+        return;
+    }
 
-  if (m_eePos == sequence.size()) {
-    onKonami();
-  }
+    if (m_eePos == sequence.size()) {
+        onKonami();
+    }
 }
 
 void ServerListLayer::onKonami() {
-  auto spr = CCSprite::createWithSpriteFrameName("edit.png"_spr);
-  auto circle = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::Big);
-  spr->setScale(1.4f);
-  circle->setScale(.7f);
-  auto btn = CCMenuItemSpriteExtra::create(
-      circle, this, menu_selector(ServerListLayer::onSettings)
-  );
-  btn->setID("settings-button");
-  m_bottomMenu->addChild(btn);
-  m_bottomMenu->updateLayout();
+    auto spr = CCSprite::createWithSpriteFrameName("geode.loader/settings.png");
+    auto circle = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::Big);
+    circle->setScale(.7f);
+    auto btn = CCMenuItemSpriteExtra::create(
+        circle, this, menu_selector(ServerListLayer::onSettings)
+    );
+    btn->setID("settings-button");
+    m_bottomMenu->addChild(btn);
+    m_bottomMenu->updateLayout();
 
-  auto exp = CCParticleExplosion::create();
-  exp->setStartColor({255,127, 0, 255});
-  exp->setEndColorVar({255,127, 0, 255});
-  exp->setEndColor({ 255, 0, 0, 255 });
-  exp->setEndColorVar({ 255, 0, 0, 255 });
-  exp->setSpeed(120);
-  exp->setEndSize(0.f);
-  exp->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(7.5f), CallFuncExt::create([this, exp](){exp->removeFromParent();})));
-  addChild(exp);
-  exp->setPosition(m_bottomMenu->convertToWorldSpace(btn->getPosition()));
+    Mod::get()->setSavedValue("secret-settings", true);
+    auto exp = CCParticleExplosion::create();
+    exp->setStartColor({255,127, 0, 255});
+    exp->setEndColorVar({255,127, 0, 255});
+    exp->setEndColor({ 255, 0, 0, 255 });
+    exp->setEndColorVar({ 255, 0, 0, 255 });
+    exp->setSpeed(90);
+    exp->setLife(.01f);
+    exp->setEndSize(0.f);
+    exp->runAction(CCSequence::createWithTwoActions(CCDelayTime::create(7.5f), CallFuncExt::create([this, exp](){exp->removeFromParent();})));
+    exp->setPosition(m_bottomMenu->convertToWorldSpace(btn->getPosition()));
+    addChild(exp);
 }
 
 void ServerListLayer::onExit() {
@@ -324,5 +338,5 @@ void ServerListLayer::onExit() {
 }
 
 void ServerListLayer::onSettings(CCObject *sender) {
-  FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
+    FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
 }
