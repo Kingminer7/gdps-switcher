@@ -75,9 +75,8 @@ bool ServerListLayer::init() {
     this->addChildAtPosition(m_bottomMenu, geode::Anchor::BottomRight, ccp(-25.f, 25.f / 4.f), false);
 
     auto scrollBg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
-    // Terrible estimation
-    scrollBg->setColor({ 213, 151, 85 });
-    // scrollBg->setOpacity(90);
+    scrollBg->setColor({0, 0, 0});
+    scrollBg->setOpacity(90);
     scrollBg->setContentSize({380, 240});
     scrollBg->ignoreAnchorPointForPosition(false);
     scrollBg->setID("server-scroll-bg");
