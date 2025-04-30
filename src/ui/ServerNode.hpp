@@ -15,7 +15,7 @@ class ServerNode : public CCNode {
 
         bool m_editing = false;
 
-        bool init(GDPSTypes::Server server, CCSize size, ServerListLayer *list);
+        bool init(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd);
     public:
         void onSelect(CCObject *sender);
         void onEdit(CCObject *sender);
@@ -30,5 +30,5 @@ class ServerNode : public CCNode {
 
         bool m_locked = false;
 
-        static ServerNode *create(GDPSTypes::Server server, CCSize size, ServerListLayer *list);
+        static ServerNode *create(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd);
 };

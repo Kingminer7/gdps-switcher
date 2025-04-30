@@ -3,7 +3,7 @@
 #include "utils/ServerInfoManager.hpp"
 #include "ModifyServerPopup.hpp"
 
-bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list) {
+bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd) {
     if (!CCNode::init()) return false;
     this->m_listLayer = list;
     this->m_server = server;
@@ -11,9 +11,9 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
 
-    auto bg = CCScale9Sprite::create("GJ_square07.png", {0, 0, 80, 80});
-    bg->setContentSize(size);
+    auto bg = CCLayerColor::create(odd ? ccColor4B{0, 0, 0, 100} : ccColor4B{0, 0, 0, 0}, size.width, size.height);
     bg->setID("background");
+    bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
 
     auto nameLab = CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
@@ -39,7 +39,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     auto layout = RowLayout::create()
         ->setAxisAlignment(AxisAlignment::End)
         ->setAxisReverse(true)
-        ->setGap(2.f);
+        ->setGap(3.3f);
     layout->ignoreInvisibleChildren(true);
     m_menu->setLayout(layout);
     m_menu->setAnchorPoint({1.f, 0.5f});
@@ -53,8 +53,11 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     useBtn->setEnabled(list->m_selectedServer != server.id);
     m_menu->addChild(useBtn);
 
-    auto editSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("edit.png"_spr), EditorBaseColor::Green);
-    editSpr->setScale(.75f);
+    auto editSpr = CCSprite::create("GJ_button_04.png");
+    editSpr->setScale(.5475f);
+    auto pencilSpr = CCSprite::createWithSpriteFrameName("edit.png"_spr);
+    pencilSpr->setScale(1.3f);
+    editSpr->addChildAtPosition(pencilSpr, Anchor::Center);
     auto editBtn = CCMenuItemSpriteExtra::create(
         editSpr,
         this,
@@ -63,11 +66,11 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     editBtn->setVisible(false);
     editBtn->setID("edit-btn");
 
-    auto deleteSpr = EditorButtonSprite::create(CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"), EditorBaseColor::BrightGreen);
-    deleteSpr->setScale(.75f);
-    if (auto x = deleteSpr->getChildByType<CCSprite *>(0)) {
-        x->setScale(x->getScale() * .9);
-    }
+    auto deleteSpr = CCSprite::create("GJ_button_06.png");
+    deleteSpr->setScale(.5475f);
+    auto xSpr = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    xSpr->setScale(1.2);
+    deleteSpr->addChildAtPosition(xSpr, Anchor::Center);
     auto deleteBtn = CCMenuItemSpriteExtra::create(
         deleteSpr,
         this,
@@ -84,9 +87,9 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     return true;
 };
 
-ServerNode *ServerNode::create(GDPSTypes::Server server, CCSize size, ServerListLayer *list) {
+ServerNode *ServerNode::create(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd) {
     auto ret = new ServerNode;
-    if (ret && ret->init(server, size, list)) {
+    if (ret && ret->init(server, size, list, odd)) {
       ret->autorelease();
       return ret;
     }

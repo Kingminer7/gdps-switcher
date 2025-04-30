@@ -27,7 +27,7 @@
 	},
 	"resources": {
 		"spritesheets": {
-			"GS_serverSheet01": [
+			"GS_serverSheet02": [
 				"resources/*.png"
 			]
 		}
@@ -37,16 +37,6 @@
 		"camila314.geode-uri": {
 			"version": "1.0.0",
 			"importance": "suggested"
-		}
-	},
-	"settings": {
-		"open-recovery": {
-			"type": "custom:open-recovery",
-			"name": "Open Save Recovery"
-		},
-		"open-ignored-recovery": {
-			"type": "custom:open-ignored",
-			"name": "Open Ignored Save Recovery"
 		}
 	},
 	"api": {

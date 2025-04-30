@@ -75,8 +75,9 @@ bool ServerListLayer::init() {
     this->addChildAtPosition(m_bottomMenu, geode::Anchor::BottomRight, ccp(-25.f, 25.f / 4.f), false);
 
     auto scrollBg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
-    scrollBg->setColor({0, 0, 0});
-    scrollBg->setOpacity(90);
+    // Terrible estimation
+    scrollBg->setColor({ 213, 151, 85 });
+    // scrollBg->setOpacity(90);
     scrollBg->setContentSize({380, 240});
     scrollBg->ignoreAnchorPointForPosition(false);
     scrollBg->setID("server-scroll-bg");
@@ -129,8 +130,10 @@ void ServerListLayer::updateList() {
     m_scroll->m_contentLayer->setContentSize({363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
     m_scroll->scrollToTop();
     float y = -5.f;
+    bool odd = false;
     for (auto &[id, server] : m_servers) {
-        auto node = ServerNode::create(server, {363, 75}, this);
+        odd = !odd;
+        auto node = ServerNode::create(server, {363, 75}, this, odd);
         if (server.id == -2) {
             node->m_locked = true;
         }
