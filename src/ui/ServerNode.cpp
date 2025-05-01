@@ -11,7 +11,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
 
-    auto bg = CCLayerColor::create(odd ? ccColor4B{0, 0, 0, 100} : ccColor4B{0, 0, 0, 0}, size.width, size.height);
+    auto bg = CCLayerColor::create(odd ? ccColor4B{0, 0, 0, 80} : ccColor4B{0, 0, 0, 40}, size.width, size.height);
     bg->setID("background");
     bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
@@ -109,11 +109,15 @@ void ServerNode::updateSelected(GDPSTypes::Server server) {
   if (server == m_server) {
     spr->updateBGImage("GJ_button_02.png");
     btn->setEnabled(false);
-    // spr->setOpacity(127);
+    // For some reason the CCMenuItemSpriteExtra gets changed so i gotta fix it... we love robtop code
+    btn->setContentSize(spr->getScaledContentSize());
+    spr->setPosition(btn->getContentSize() / 2);
   } else {
     spr->updateBGImage("GJ_button_01.png");
     btn->setEnabled(true);
-    // spr->setOpacity(255);
+    // For some reason the CCMenuItemSpriteExtra gets changed so i gotta fix it... we love robtop code
+    btn->setContentSize(spr->getScaledContentSize());   
+    spr->setPosition(btn->getContentSize() / 2);
   }
 }
 

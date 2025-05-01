@@ -19,7 +19,6 @@ class ServerListLayer : public CCLayer {
         CCMenu *m_backMenu = nullptr;
         CCMenu *m_bottomMenu = nullptr;
         ScrollLayer *m_scroll = nullptr;
-        Scrollbar *m_scrollbar = nullptr;
 
         int page = 1;
         int showing = 10;

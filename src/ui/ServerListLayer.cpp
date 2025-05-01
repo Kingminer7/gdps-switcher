@@ -73,31 +73,38 @@ bool ServerListLayer::init() {
             ->setGap(3.f)
     );
     this->addChildAtPosition(m_bottomMenu, geode::Anchor::BottomRight, ccp(-25.f, 25.f / 4.f), false);
-
-    auto scrollBg = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
-    scrollBg->setColor({0, 0, 0});
-    scrollBg->setOpacity(90);
-    scrollBg->setContentSize({380, 240});
-    scrollBg->ignoreAnchorPointForPosition(false);
-    scrollBg->setID("server-scroll-bg");
-    this->addChildAtPosition(scrollBg, geode::Anchor::Center, {0, 0}, false);
     
-    m_scroll = geode::ScrollLayer::create({363, 235});
+    auto scrollFrame = CCLayerColor::create({191, 114, 62, 255}, 356, 220);
+    scrollFrame->setID("server-frame");
+    scrollFrame->ignoreAnchorPointForPosition(false);
+    addChildAtPosition(scrollFrame, geode::Anchor::Center, {0.f, 0.f}, false);
+
+    auto top = CCSprite::createWithSpriteFrameName("GJ_table_top_001.png");
+    scrollFrame->addChildAtPosition(top, geode::Anchor::Top, {0.f, 0});
+
+    auto right = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
+    right->setFlipX(true);
+    right->setScaleY(3.438f); 
+    scrollFrame->addChildAtPosition(right, geode::Anchor::Right, {0.f, 0.f});
+
+    auto left = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
+    left->setScaleY(3.438f);
+    scrollFrame->addChildAtPosition(left, geode::Anchor::Left, {0.f, 0.f});
+
+    auto bottom = CCSprite::createWithSpriteFrameName("GJ_table_bottom_001.png");
+    scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, 0.f});
+
+    m_scroll = geode::ScrollLayer::create({360, 230});
     m_scroll->setID("server-scroll");
     m_scroll->ignoreAnchorPointForPosition(false);
-    m_scrollbar = geode::Scrollbar::create(m_scroll);
-    m_scrollbar->setID("scrollbar");
-    m_scrollbar->setScaleY(.95f);
-
     auto clip = cocos2d::CCClippingNode::create();
     clip->setID("server-list");
     clip->setZOrder(1);
     clip->setContentSize({377, 235});
     clip->setAnchorPoint({0.5, 0.5});
     clip->setAlphaThreshold(0.05f);
-    clip->addChildAtPosition(m_scroll, geode::Anchor::Center, {-5.f, 0.f});
-    clip->addChildAtPosition(m_scrollbar, geode::Anchor::Right, {-6.f, 0.f});
-    addChildAtPosition(clip, geode::Anchor::Center, { 1.f, 0.f}, false);
+    clip->addChildAtPosition(m_scroll, geode::Anchor::Center, {0.f, 0.f});
+    addChildAtPosition(clip, geode::Anchor::Center, { 0.f, 0.f}, false);
 
     auto stencil = cocos2d::extension::CCScale9Sprite::create("square02b_001.png", {0, 0, 80, 80});
     stencil->setContentSize({377, 235});
@@ -126,9 +133,9 @@ bool ServerListLayer::init() {
 void ServerListLayer::updateList() {
     m_servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->removeAllChildren();
-    m_scroll->m_contentLayer->setContentSize({363, std::max(m_servers.size() * 80.f - 5.f, 235.f)});
+    m_scroll->m_contentLayer->setContentSize({363, std::max(m_servers.size() * 75.f, 235.f)});
     m_scroll->scrollToTop();
-    float y = -5.f;
+    float y = 0.f;
     bool odd = false;
     for (auto &[id, server] : m_servers) {
         odd = !odd;
@@ -137,7 +144,7 @@ void ServerListLayer::updateList() {
             node->m_locked = true;
         }
         node->setEditing(m_isEditing);
-        y += 80.f;
+        y += 75.f;
         m_scroll->m_contentLayer->addChildAtPosition(node, geode::Anchor::Top, {0, 37.5f - y}, false);
     }
 }
