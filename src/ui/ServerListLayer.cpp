@@ -80,27 +80,27 @@ bool ServerListLayer::init() {
     addChildAtPosition(scrollFrame, geode::Anchor::Center, {0.f, 0.f}, false);
 
     auto top = CCSprite::createWithSpriteFrameName("GJ_table_top_001.png");
-    scrollFrame->addChildAtPosition(top, geode::Anchor::Top, {0.f, 0});
+    scrollFrame->addChildAtPosition(top, geode::Anchor::Top, {0.f, 15.5});
 
     auto right = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     right->setFlipX(true);
     right->setScaleY(3.438f); 
-    scrollFrame->addChildAtPosition(right, geode::Anchor::Right, {0.f, 0.f});
+    scrollFrame->addChildAtPosition(right, geode::Anchor::Right, {6.f, 0.f});
 
     auto left = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     left->setScaleY(3.438f);
-    scrollFrame->addChildAtPosition(left, geode::Anchor::Left, {0.f, 0.f});
+    scrollFrame->addChildAtPosition(left, geode::Anchor::Left, {-6.f, 0.f});
 
     auto bottom = CCSprite::createWithSpriteFrameName("GJ_table_bottom_001.png");
-    scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, 0.f});
+    scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, -13.f});
 
-    m_scroll = geode::ScrollLayer::create({360, 230});
+    m_scroll = geode::ScrollLayer::create({356, 220});
     m_scroll->setID("server-scroll");
     m_scroll->ignoreAnchorPointForPosition(false);
     auto clip = cocos2d::CCClippingNode::create();
     clip->setID("server-list");
     clip->setZOrder(1);
-    clip->setContentSize({377, 235});
+    clip->setContentSize({356, 220});
     clip->setAnchorPoint({0.5, 0.5});
     clip->setAlphaThreshold(0.05f);
     clip->addChildAtPosition(m_scroll, geode::Anchor::Center, {0.f, 0.f});
@@ -139,7 +139,7 @@ void ServerListLayer::updateList() {
     bool odd = false;
     for (auto &[id, server] : m_servers) {
         odd = !odd;
-        auto node = ServerNode::create(server, {363, 75}, this, odd);
+        auto node = ServerNode::create(server, {356, 75}, this, odd);
         if (server.id == -2) {
             node->m_locked = true;
         }
