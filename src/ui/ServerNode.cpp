@@ -11,7 +11,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
 
-    auto bg = CCLayerColor::create(odd ? ccColor4B{0, 0, 0, 80} : ccColor4B{0, 0, 0, 40}, size.width, size.height);
+    auto bg = CCLayerColor::create(odd ? ccColor4B{0, 0, 0, 60} : ccColor4B{0, 0, 0, 30}, size.width, size.height);
     bg->setID("background");
     bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
