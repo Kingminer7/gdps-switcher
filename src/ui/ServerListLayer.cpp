@@ -81,18 +81,22 @@ bool ServerListLayer::init() {
 
     auto top = CCSprite::createWithSpriteFrameName("GJ_table_top_001.png");
     scrollFrame->addChildAtPosition(top, geode::Anchor::Top, {0.f, 15.5});
+    top->setZOrder(1);
 
     auto right = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     right->setFlipX(true);
     right->setScaleY(3.438f); 
     scrollFrame->addChildAtPosition(right, geode::Anchor::Right, {6.f, 0.f});
+    right->setZOrder(1);
 
     auto left = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     left->setScaleY(3.438f);
     scrollFrame->addChildAtPosition(left, geode::Anchor::Left, {-6.f, 0.f});
+    left->setZOrder(1);
 
     auto bottom = CCSprite::createWithSpriteFrameName("GJ_table_bottom_001.png");
     scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, -13.f});
+    bottom->setZOrder(1);
 
     m_scroll = geode::ScrollLayer::create({356, 220});
     m_scroll->setID("server-scroll");
@@ -103,7 +107,22 @@ bool ServerListLayer::init() {
             ->setMainAxisAlignment(MainAxisAlignment::Start)
             ->setMainAxisScaling(AxisScaling::Grow)
     );
-    addChildAtPosition(m_scroll, geode::Anchor::Center, { 0.f, 0.f}, false);
+    // addChildAtPosition(m_scroll, geode::Anchor::Center, { 0.f, 0.f}, false);
+
+    auto clip = cocos2d::CCClippingNode::create();
+    clip->setID("server-list");
+    clip->setZOrder(1);
+    clip->setContentSize({356, 220});
+    clip->setAnchorPoint({0.5, 0.5});
+    clip->setAlphaThreshold(0.05f);
+    clip->addChildAtPosition(m_scroll, geode::Anchor::Center);
+    scrollFrame->addChildAtPosition(clip, geode::Anchor::Center, {0.f, 0.f}, false);
+
+    auto stencil = CCSprite::create("square.png");
+    stencil->setScaleX(356 / stencil->getContentWidth());
+    stencil->setScaleY(220 / stencil->getContentHeight());
+    stencil->setPosition({178, 110});
+    clip->setStencil(stencil);
 
     updateList();
 
@@ -127,7 +146,6 @@ bool ServerListLayer::init() {
 void ServerListLayer::updateList() {
     m_servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->removeAllChildren();
-    m_scroll->scrollToTop();
     bool odd = false;
     for (auto &[id, server] : m_servers) {
         odd = !odd;
@@ -139,6 +157,7 @@ void ServerListLayer::updateList() {
         m_scroll->m_contentLayer->addChild(node);
     }
     m_scroll->m_contentLayer->updateLayout();
+    m_scroll->scrollToTop();
 }
 
 void ServerListLayer::keyBackClicked() {
