@@ -127,7 +127,6 @@ bool ServerListLayer::init() {
 void ServerListLayer::updateList() {
     m_servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->removeAllChildren();
-    m_scroll->m_contentLayer->setContentSize({356, std::max(m_servers.size() * 75.f, 220.f)});
     m_scroll->scrollToTop();
     bool odd = false;
     for (auto &[id, server] : m_servers) {
