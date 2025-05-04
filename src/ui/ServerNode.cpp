@@ -21,10 +21,9 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     log::info("{}, {}", size.height - 20, size.height - 20);
     auto icon = LazySprite::create({size.height - 20, size.height - 20}, true);
     icon->setID("icon");
-    icon->setAnchorPoint({0.f, 0.5f});
     // icon->setScale(1.f);
     icon->loadFromUrl("https://raw.githubusercontent.com/Kingminer7/kingminer7.github.io/refs/heads/master/src/assets/km7dev.png");
-    this->addChildAtPosition(icon, Anchor::Left, {7.5f, 0});
+    this->addChildAtPosition(icon, Anchor::Left, {7.5f + size.height / 2 - 10, 0});
 
     auto nameLab = CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
