@@ -57,9 +57,16 @@ bool ServerListLayer::init() {
     m_bottomMenu->addChild(addBtn);
 
     auto editSpr = CCSprite::createWithSpriteFrameName("edit.png"_spr);
+    editSpr->setZOrder(1);
+    editSpr->setID("edit-sprite");
     auto editCircle = CircleButtonSprite::create(editSpr, CircleBaseColor::Green, CircleBaseSize::Big);
     editSpr->setScale(1.4f);
+    editCircle->setID("edit-circle");
     editCircle->setScale(.7f);
+    auto blueCircle = CCSprite::createWithSpriteFrameName("geode.loader/baseCircle_Big_Blue.png");
+    blueCircle->setID("blue-circle");
+    blueCircle->setVisible(false);
+    editCircle->addChildAtPosition(blueCircle, geode::Anchor::Center, {0.f, 0.f}, false);
     auto editBtn = CCMenuItemSpriteExtra::create(
         editCircle, this, menu_selector(ServerListLayer::onEdit)
     );
@@ -111,7 +118,7 @@ bool ServerListLayer::init() {
 
     auto clip = cocos2d::CCClippingNode::create();
     clip->setID("server-list");
-    clip->setZOrder(1);
+    clip->setZOrder(0);
     clip->setContentSize({356, 220});
     clip->setAnchorPoint({0.5, 0.5});
     clip->setAlphaThreshold(0.05f);
@@ -216,6 +223,14 @@ void ServerListLayer::onAdd(CCObject *sender) {
 
 void ServerListLayer::onEdit(CCObject *sender) {
     m_isEditing = !m_isEditing;
+    if (auto editBtn = m_bottomMenu->getChildByID("edit-button")) {
+        if (auto editSpr = editBtn->getChildByID("edit-circle")) {
+            if (auto blueCircle = editSpr->getChildByID("blue-circle")) {
+                blueCircle->setVisible(m_isEditing);
+            }
+        }
+    }
+
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
         node->setEditing(m_isEditing);
