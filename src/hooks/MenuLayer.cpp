@@ -25,6 +25,6 @@ class GSMenuLayer : public Modify<GSMenuLayer, MenuLayer> {
 
         void onGDPS(CCObject *sender) {
             auto transition = CCTransitionFade::create(0.5f, ServerListLayer::scene());
-            CCDirector::get()->replaceScene(transition);
+            CCDirector::get()->pushScene(transition);
         }
 };

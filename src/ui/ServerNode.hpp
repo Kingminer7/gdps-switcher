@@ -21,7 +21,7 @@ class ServerNode : public CCNode {
         void onEdit(CCObject *sender);
         void onDelete(CCObject *sender);
         void updateSelected(GDPSTypes::Server server);
-        void updateInfo();
+        void updateInfo(GDPSTypes::Server server);
 
         void setEditing(bool editing);
         bool isEditing();

@@ -17,13 +17,23 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     bg->setID("background");
     bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
-
-    log::info("{}, {}", size.height - 20, size.height - 20);
-    auto icon = LazySprite::create({size.height - 20, size.height - 20}, true);
+    auto icon = LazySprite::create({size.height - 20, size.height - 20}, !server.icon.empty());
+    icon->setAutoResize(true);
+    icon->setScale(1.f);
+    icon->setLoadCallback([icon](Result<> status) {
+        if (status.isErr()) {
+            auto na = CCLabelBMFont::create("No\nIcon\nFound", "bigFont.fnt");
+            na->setID("na-label");
+            na->setScale(0.5f);
+            na->setAlignment(cocos2d::kCCTextAlignmentCenter);
+            na->setAnchorPoint({0.5f, 0.5f});
+            na->setOpacity(127);
+            icon->addChildAtPosition(na, Anchor::Center);
+        }
+    });
     icon->setID("icon");
-    // icon->setScale(1.f);
-    icon->loadFromUrl("https://raw.githubusercontent.com/Kingminer7/kingminer7.github.io/refs/heads/master/src/assets/km7dev.png");
     this->addChildAtPosition(icon, Anchor::Left, {7.5f + size.height / 2 - 10, 0});
+    updateInfo(server);
 
     auto nameLab = CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
@@ -39,7 +49,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     motdArea->setAnchorPoint({0.f, 1.f});
     this->addChildAtPosition(motdArea, Anchor::Left, {75.f, 9.f});
     
-    ServerInfoManager::get()->getInfoForServer(server, motdArea);
+    ServerInfoManager::get()->getInfoForServer(server, this);
 
     m_menu = CCMenu::create();
     m_menu->setID("button-menu");
@@ -130,8 +140,48 @@ void ServerNode::updateSelected(GDPSTypes::Server server) {
   }
 }
 
-void ServerNode::updateInfo() {
-  log::info("{}", m_server.name);
+void ServerNode::updateInfo(GDPSTypes::Server server) {
+    if (auto nameLab = static_cast<CCLabelBMFont *>(this->getChildByID("name"))) {
+        nameLab->setString(server.name.c_str());
+        nameLab->limitLabelWidth(this->m_obContentSize.width - 50, .7f, 0.f);
+    }
+
+    if (auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"))) {
+        motdArea->setString(server.motd.c_str());
+    }
+
+    if (auto icon = static_cast<LazySprite *>(this->getChildByID("icon"))) {
+        icon->removeAllChildren();
+        log::info("Icon: {}", server.icon);
+        log::info("Is sprite: {}", server.iconIsSprite);
+        if (server.iconIsSprite) {
+            auto frame = CCSpriteFrameCache::get()->spriteFrameByName(server.icon.c_str());
+            if (frame) {
+                icon->setDisplayFrame(frame);
+                icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+                icon->setAutoResize(true);
+            } else {
+                auto na = CCLabelBMFont::create("No\nIcon\nFound", "bigFont.fnt");
+                na->setID("na-label");
+                na->setScale(0.5f);
+                na->setAlignment(cocos2d::kCCTextAlignmentCenter);
+                na->setAnchorPoint({0.5f, 0.5f});
+                na->setOpacity(127);
+                icon->addChildAtPosition(na, Anchor::Center);
+            }
+        } else if (server.icon.empty()) {
+            auto na = CCLabelBMFont::create("No\nIcon\nFound", "bigFont.fnt");
+            na->setID("na-label");
+            na->setScale(0.5f);
+            na->setAlignment(cocos2d::kCCTextAlignmentCenter);
+            na->setAnchorPoint({0.5f, 0.5f});
+            na->setOpacity(127);
+            icon->addChildAtPosition(na, Anchor::Center);
+        } else {
+            icon->loadFromUrl(server.icon);
+        }
+    }
+
 }
 
 GDPSTypes::Server ServerNode::getServer() {

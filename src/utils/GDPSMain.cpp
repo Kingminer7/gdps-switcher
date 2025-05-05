@@ -27,7 +27,9 @@ void GDPSMain::init() {
     m_currentServer =
         Mod::get()->getSavedValue<int>("current", -2);
 
-    m_servers[-2] = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ""};
+    m_servers[-2] = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
+    m_servers[-2].iconIsSprite = true;
+    m_servers[-2].icon = "gdlogo.png"_spr;
     if (m_currentServer >= 0) {
         m_serverApiId = ServerAPIEvents::registerServer(m_servers[m_currentServer].url, -40).id;
     }

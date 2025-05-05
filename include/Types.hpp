@@ -20,8 +20,14 @@ namespace GDPSTypes {
         std::string url = "";
         std::string saveDir = "";
 
+        std::vector<std::string> dependencies = {};
+        std::string modPolicy = "blacklist";
+        std::map<std::string, std::string> modList = {};
+
         // Doesn't save below this comment
         std::string motd = "No MOTD found.";
+        bool iconIsSprite = false;
+        std::string icon = "";
 
         Server(int id, std::string name, std::string url, std::string saveDir) : id(id), url(url), name(name), saveDir(saveDir) {}
         Server() {}
@@ -43,9 +49,8 @@ namespace GDPSTypes {
             return other < *this;
         }
 
-        // idc that geode docs want me to use bool const instead, johnny cena
         bool empty() {
-            return name.empty() && url.empty();
+            return name.empty() && url.empty() && id == -1;
         }
     };
     struct OldServer {
@@ -59,17 +64,31 @@ struct matjson::Serialize<GDPSTypes::Server>
 {
     static geode::Result<GDPSTypes::Server> fromJson(matjson::Value const &value)
     {
-        return geode::Ok(GDPSTypes::Server(
+        GDPSTypes::Server server(
             value["id"].asInt().unwrapOr(-1),
             value["name"].asString().unwrapOr("Failed to load name."),
             value["url"].asString().unwrapOr("Failed to load url."),
             value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory."))
-        ));
+        );
+        server.dependencies = value["mods"]["dependencies"].as<std::vector<std::string>>().unwrapOr(std::vector<std::string>());
+        server.modPolicy = value["mods"]["policy"].asString().unwrapOr("whitelist");
+        server.modList = value["mods"]["modList"].as<std::map<std::string, std::string>>().unwrapOr(std::map<std::string, std::string>());
+        return geode::Ok(server);
     }
 
     static matjson::Value toJson(GDPSTypes::Server const &value)
     {
-        auto obj = matjson::makeObject({{"id", value.id}, {"name", value.name}, {"url", value.url}, {"saveDir", value.saveDir}});
+        auto obj = matjson::makeObject({
+            {"id", value.id},
+            {"name", value.name},
+            {"url", value.url},
+            {"saveDir", value.saveDir},
+            {"mods", matjson::makeObject({
+                {"dependencies", value.dependencies},
+                {"policy", value.modPolicy},
+                {"modList", value.modList}
+            })}
+        });
         return obj;
     }
 };

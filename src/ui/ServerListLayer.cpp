@@ -177,11 +177,11 @@ void ServerListLayer::onBack(cocos2d::CCObject *sender) {
             if (now) {
                 geode::utils::game::restart();
             } else {
-                cocos2d::CCDirector::get()->replaceScene(cocos2d::CCTransitionFade::create(.5f, MenuLayer::scene(false)));
+                cocos2d::CCDirector::get()->popSceneWithTransition(.5f, kPopTransitionFade);
             }
         });
     } else {
-        cocos2d::CCDirector::get()->replaceScene(cocos2d::CCTransitionFade::create(.5f, MenuLayer::scene(false)));
+        cocos2d::CCDirector::get()->popSceneWithTransition(.5f, kPopTransitionFade);
     }
 }
 

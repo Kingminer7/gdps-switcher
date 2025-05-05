@@ -26,7 +26,6 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     m_nameInput->setString(server.name);
     m_nameInput->setCallback([this](const std::string &text) {
         m_server.name = text;
-        checkValidity();
     });
     m_nameInput->setFilter("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=% ");
     m_mainLayer->addChildAtPosition(m_nameInput, Anchor::Center, {0.f, 48.f});
@@ -60,7 +59,7 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     });
     m_mainLayer->addChildAtPosition(m_saveInput, Anchor::Center, {0.f, -42.f});
 
-    auto saveSpr = ButtonSprite::create("`Save","bigFont.fnt","geode.loader/GE_button_05.png", .75f);
+    auto saveSpr = ButtonSprite::create("Save","bigFont.fnt","geode.loader/GE_button_05.png", .75f);
     saveSpr->setScale(.8f);
     m_saveBtn = CCMenuItemSpriteExtra::create(
         saveSpr,
