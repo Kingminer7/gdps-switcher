@@ -2,12 +2,12 @@
 ### Major changes
 - Added regex to urls
 - Redo the UI code (TODO)
-- Some minor server customization options. Currently only MOTDs nad logos are possible.
+- Some minor server customization options. Currently only MOTDs and logos are possible.
 - Finish documentation (TODO) (REMOVE THIS)
 - Check reimpled URI support (TODO) (REMOVE THIS)
 - Migrate to Prevter's label (TODO) (REMOVE THIS)
 - Bonus settings (TODO) (REMOVE THIS)
-- Figure out whats up with the input node (TODO) (REMOVE THIS)
+- Profanity filter for MOTD (TODO) (REMOVE THIS)
 # 1.3.0
 ### Add URI support
 - Added URI Handling if you have [Geode URI Scheme](mod:camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)

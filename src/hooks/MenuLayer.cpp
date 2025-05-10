@@ -22,7 +22,7 @@ class GSMenuLayer : public Modify<GSMenuLayer, MenuLayer> {
                 menu->updateLayout();
             }
 
-            if (!GDPSMain::get()->isActive()) {
+            if (!GDPSMain::get()->getIssues().empty()) {
                 queueInMainThread([this](){
                     std::string strungIssues = "";
                     for (auto issue : GDPSMain::get()->getIssues()) {
