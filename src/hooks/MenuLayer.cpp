@@ -3,6 +3,8 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
 
+#include "utils/GDPSMain.hpp"
+
 using namespace prelude;
 
 class GSMenuLayer : public Modify<GSMenuLayer, MenuLayer> {
@@ -18,6 +20,22 @@ class GSMenuLayer : public Modify<GSMenuLayer, MenuLayer> {
                 );
                 menu->addChild(button);
                 menu->updateLayout();
+            }
+
+            if (!GDPSMain::get()->isActive()) {
+                queueInMainThread([this](){
+                    std::string strungIssues = "";
+                    for (auto issue : GDPSMain::get()->getIssues()) {
+                        strungIssues += fmt::format("{}\n\n", issue);
+                    }
+                    auto alert = MDPopup::create(
+                        "GDPS Switcher",
+                        fmt::format("## Your GDPS is not enabled due to issues. Please fix the following:\n\n{}", strungIssues),
+                        "OK"
+                    );
+                    alert->show();
+                    alert->m_scene = getParent();
+                });
             }
 
             return true;

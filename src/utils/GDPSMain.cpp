@@ -19,6 +19,10 @@ void GDPSMain::registerIssue(std::string issue) {
     m_issues.push_back(issue);
 }
 
+std::vector<std::string> GDPSMain::getIssues() {
+    return m_issues;
+}
+
 GDPSMain *GDPSMain::m_instance = nullptr;
 
 void GDPSMain::init() {
@@ -30,12 +34,43 @@ void GDPSMain::init() {
     m_servers[-2] = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
     m_servers[-2].iconIsSprite = true;
     m_servers[-2].icon = "gdlogo.png"_spr;
-    if (m_currentServer >= 0) {
-        m_serverApiId = ServerAPIEvents::registerServer(m_servers[m_currentServer].url, -40).id;
-    }
-    
-    for (const auto& [id, server] : m_servers) {
-        log::info("Server: {} {} {} {}", id, server.name, server.url, server.saveDir);
+    auto &server = m_servers[m_currentServer];
+    // std::map<std::string, std::string> problems;
+    // for (auto [modid, version] : server.dependencies) {
+    //     log::info("{} is {}", modid, Loader::get()->getInstalledMod("geode.loader")->getSavedValue<bool>("should-load-geode.devtools"));
+    //     if (!Loader::get()->isModInstalled(modid)) {
+            
+    //         problems[modid] = "required for this server but not installed";
+    //     } else if (!Loader::get()->getInstalledMod("geode.loader")->getSavedValue<bool>("should-load-geode.devtools")) {
+    //         problems[modid] = "required for this server but not enabled";
+    //     } else {
+    //         auto loadedVer = Loader::get()->getInstalledMod(modid)->getVersion();
+    //         auto requiredVerRes = ComparableVersionInfo::parse(version);
+    //         if (requiredVerRes.isOk()) {
+    //             auto requiredVer = requiredVerRes.unwrap();
+    //             auto comp = requiredVer.compareWithReason(loadedVer);
+    //             if (comp == VersionCompareResult::TooOld) {
+    //                 problems[modid] = "too old for this server";
+    //             }
+    //         } else {
+    //             problems[modid] = "an invalid version";
+    //         }
+    //     }
+    // }
+    // for (auto mod : Loader::get()->getAllMods()) {
+    //     if (mod->isEnabled() && !server.dependencies.contains(mod->getID())) {
+    //         if (server.modPolicy == "blacklist" && std::find(server.modList.begin(), server.modList.end(), mod->getID()) != server.modList.end()) {
+    //             problems[mod->getID()] = "not allowed on this server";
+    //         } else if (server.modPolicy == "whitelist" && std::find(server.modList.begin(), server.modList.end(), mod->getID()) == server.modList.end()) {
+    //             problems[mod->getID()] = "not allowed on this server";
+    //         }
+    //     }
+    // }
+    // for (auto [modid, problem] : problems) {
+    //     registerIssue(fmt::format("Mod [{}](mod:{}) is {}.", modid, modid, problem));
+    // }
+    if (m_currentServer >= 0 && isActive()) {
+        m_serverApiId = ServerAPIEvents::registerServer(server.url, -40).id;
     }
 }
 

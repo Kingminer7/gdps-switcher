@@ -21,9 +21,9 @@ namespace GDPSTypes {
         std::string saveDir = "";
 
         // Many issues and stuff
-        // std::vector<std::string> dependencies = {};
         // std::string modPolicy = "blacklist";
-        // std::map<std::string, std::string> modList = {};
+        // std::map<std::string, std::string> dependencies = {};
+        // std::vector<std::string> modList = {};
 
         // Doesn't save below this comment
         std::string motd = "No MOTD found.";
@@ -71,9 +71,9 @@ struct matjson::Serialize<GDPSTypes::Server>
             value["url"].asString().unwrapOr("Failed to load url."),
             value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory."))
         );
-        // server.dependencies = value["mods"]["dependencies"].as<std::vector<std::string>>().unwrapOr(std::vector<std::string>());
+        // server.dependencies = value["mods"]["dependencies"].as<std::map<std::string, std::string>>().unwrapOr(std::map<std::string, std::string>());
         // server.modPolicy = value["mods"]["policy"].asString().unwrapOr("whitelist");
-        // server.modList = value["mods"]["modList"].as<std::map<std::string, std::string>>().unwrapOr(std::map<std::string, std::string>());
+        // server.modList = value["mods"]["modList"].as<std::vector<std::string>>().unwrapOr(std::vector<std::string>());
         return geode::Ok(server);
     }
 

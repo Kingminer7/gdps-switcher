@@ -34,8 +34,8 @@ void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, ServerNode *n
                             serverData.motd = info["motd"].asString().unwrapOr("No MOTD found.");
                             serverData.icon = info["icon"].asString().unwrapOr("");
                             // serverData.modPolicy = info["mods"]["policy"].asString().unwrapOr(serverData.modPolicy);
-                            // serverData.dependencies = info["mods"]["dependencies"].as<std::vector<std::string>>().unwrapOr(serverData.dependencies);
-                            // serverData.modList = info["mods"]["modList"].as<std::map<std::string, std::string>>().unwrapOr(serverData.modList);
+                            // serverData.dependencies = info["mods"]["dependencies"].as<std::map<std::string, std::string>>().unwrapOr(serverData.dependencies);
+                            // serverData.modList = info["mods"]["modList"].as<std::vector<std::string>>().unwrapOr(serverData.modList);
 
                             if (sdata.second) {
                                 sdata.second->updateInfo(serverData);

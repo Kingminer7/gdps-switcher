@@ -12,6 +12,7 @@ class GDPSMain {
     public:
         bool isActive();
         void registerIssue(std::string issue);
+        std::vector<std::string> getIssues();
         bool isBase();
         bool isBase(std::string url);
 

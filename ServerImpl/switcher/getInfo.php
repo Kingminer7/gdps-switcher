@@ -15,6 +15,5 @@ echo json_encode([
     "motd" => $motd,
     "version" => $version,
     "icon" => $icon
-    // "mods" => $mod
 ]);
 ?>

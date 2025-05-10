@@ -1,10 +1,10 @@
 # 1.4.0
 ### Major changes
-- Added regex to urls (TODO REIMPL)
+- Added regex to urls
 - Redo the UI code (TODO)
-- Server integration support (TODO)
-- Clean up includes (TODO) (REMOVE THIS)
-- Reimpl URI support (TODO) (REMOVE THIS)
+- Some minor server customization options. Currently only MOTDs nad logos are possible.
+- Finish documentation (TODO) (REMOVE THIS)
+- Check reimpled URI support (TODO) (REMOVE THIS)
 - Migrate to Prevter's label (TODO) (REMOVE THIS)
 - Bonus settings (TODO) (REMOVE THIS)
 - Figure out whats up with the input node (TODO) (REMOVE THIS)
