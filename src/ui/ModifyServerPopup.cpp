@@ -1,4 +1,5 @@
 #include "ModifyServerPopup.hpp"
+#include "Geode/ui/BasedButtonSprite.hpp"
 #include "utils/MigrationManager.hpp"
 #include "utils/GDPSMain.hpp"
 #include "Types.hpp"
@@ -11,6 +12,12 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     this->m_orig = server;
     this->setTitle(this->m_isNew ? "Add Server" : "Edit Server");
     this->setID("ModifyServerPopup"_spr);
+    m_closeBtn->removeFromParent();
+    m_closeBtn = CCMenuItemSpriteExtra::create(
+        CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .9f, CircleBaseColor::DarkPurple, CircleBaseSize::Small),
+        this, menu_selector(ModifyServerPopup::onClose)
+    );
+    m_buttonMenu->addChildAtPosition(m_closeBtn, Anchor::TopLeft, {3.f, -3.f});
     m_buttonMenu->setID("button-menu");
     m_closeBtn->setID("close-button");
     m_mainLayer->setID("main-layer");
@@ -26,6 +33,7 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     m_nameInput->setString(server.name);
     m_nameInput->setCallback([this](const std::string &text) {
         m_server.name = text;
+        checkValidity();
     });
     m_nameInput->setFilter("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=% ");
     m_mainLayer->addChildAtPosition(m_nameInput, Anchor::Center, {0.f, 48.f});
@@ -39,7 +47,7 @@ bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer)
     m_urlInput->setID("url-input");
     m_urlInput->setString(server.url);
     m_urlInput->setFilter("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%");
-    m_urlInput->setCallback([this](const std::string &text) {
+    m_urlInput->setCallback( [this](const std::string &text) {
         m_server.url = text;
         checkValidity();
     });
@@ -85,29 +93,34 @@ ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, ServerLis
 }
 
 void ModifyServerPopup::checkValidity() {
-    if (m_nameInput->getString() == "" || m_urlInput->getString() == "") {
-        m_saveBtn->setEnabled(false);
-    } else {
-        m_saveBtn->setEnabled(true);
+    static std::basic_regex urlRegex = std::regex("(http|https):\\/\\/([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:\\/~+#-]*[\\w@?^=%&\\/~+#-])");
+    bool valid = true;
+    
+    if (!m_server.url.empty()) {
+        if (!std::regex_match(m_server.url, urlRegex)){
+            m_urlInput->getInputNode()->setLabelNormalColor({255,100,100});
+            valid = false;
+        } else {
+            m_urlInput->getInputNode()->setLabelNormalColor({255,255,255});
+        }
     }
-    std::basic_regex urlRegex = std::regex("(http|https):\\/\\/([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:\\/~+#-]*[\\w@?^=%&\\/~+#-])");
-    if (!std::regex_match(m_urlInput->getString(), urlRegex)){
-        m_urlInput->getInputNode()->setLabelNormalColor({255,100,100});
-        m_saveBtn->setEnabled(false);
-        auto spr = static_cast<CCSprite*>(m_saveBtn->getNormalImage());
-        spr->setCascadeColorEnabled(true);
-        spr->setCascadeOpacityEnabled(true);
-        spr->setColor(ccGRAY);
-        spr->setOpacity(155);
+    if (m_server.name.empty() || m_server.url.empty()) {
+        valid = false;
     }
-    else{
-        m_urlInput->getInputNode()->setLabelNormalColor({255,255,255});
+    if (valid) {
         m_saveBtn->setEnabled(true);
         auto spr = static_cast<CCSprite*>(m_saveBtn->getNormalImage());
         spr->setCascadeColorEnabled(true);
         spr->setCascadeOpacityEnabled(true);
         spr->setColor({255,255,255});
         spr->setOpacity(255);
+    } else {
+        m_saveBtn->setEnabled(false);
+        auto spr = static_cast<CCSprite*>(m_saveBtn->getNormalImage());
+        spr->setCascadeColorEnabled(true);
+        spr->setCascadeOpacityEnabled(true);
+        spr->setColor(ccGRAY);
+        spr->setOpacity(155);
     }
 }
 
@@ -130,6 +143,7 @@ void ModifyServerPopup::onClose(cocos2d::CCObject *sender) {
 
 void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
     if (m_server.url == "" || m_server.name == "") return;
+    
     auto gdpsMain = GDPSMain::get();
     if (m_isNew) {
         if (gdpsMain->m_servers.contains(m_server.id)) {
@@ -147,7 +161,12 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
     }
     m_listLayer->updateList();
     auto servers = GDPSMain::get()->m_servers;
-    servers.erase(-2);
+    if (servers.contains(-1)) {
+        servers.erase(-1);
+    }
+    if (servers.contains(-2)) {
+        servers.erase(-2);
+    }
     Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
     Popup::onClose(sender);
 }

@@ -33,16 +33,21 @@ void ServerInfoManager::getInfoForServer(GDPSTypes::Server server, ServerNode *n
 
                             serverData.motd = info["motd"].asString().unwrapOr("No MOTD found.");
                             serverData.icon = info["icon"].asString().unwrapOr("");
-                            serverData.modPolicy = info["mods"]["policy"].asString().unwrapOr(serverData.modPolicy);
-                            serverData.dependencies = info["mods"]["dependencies"].as<std::vector<std::string>>().unwrapOr(serverData.dependencies);
-                            serverData.modList = info["mods"]["modList"].as<std::map<std::string, std::string>>().unwrapOr(serverData.modList);
+                            // serverData.modPolicy = info["mods"]["policy"].asString().unwrapOr(serverData.modPolicy);
+                            // serverData.dependencies = info["mods"]["dependencies"].as<std::vector<std::string>>().unwrapOr(serverData.dependencies);
+                            // serverData.modList = info["mods"]["modList"].as<std::map<std::string, std::string>>().unwrapOr(serverData.modList);
 
                             if (sdata.second) {
                                 sdata.second->updateInfo(serverData);
                                 sdata.second->release();
                             }
                             auto servers = GDPSMain::get()->m_servers;
-                            servers.erase(-2);
+                            if (servers.contains(-1)) {
+                                servers.erase(-1);
+                            }
+                            if (servers.contains(-2)) {
+                                servers.erase(-2);
+                            }
                             Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);                            
                         }
                     }

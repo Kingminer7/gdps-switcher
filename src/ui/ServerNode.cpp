@@ -22,13 +22,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     icon->setScale(1.f);
     icon->setLoadCallback([icon](Result<> status) {
         if (status.isErr()) {
-            auto na = CCLabelBMFont::create("No\nIcon\nFound", "bigFont.fnt");
-            na->setID("na-label");
-            na->setScale(0.5f);
-            na->setAlignment(cocos2d::kCCTextAlignmentCenter);
-            na->setAnchorPoint({0.5f, 0.5f});
-            na->setOpacity(127);
-            icon->addChildAtPosition(na, Anchor::Center);
+            icon->initWithSpriteFrameName("grayGdLogo.png"_spr);
         }
     });
     icon->setID("icon");
@@ -161,22 +155,20 @@ void ServerNode::updateInfo(GDPSTypes::Server server) {
                 icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
                 icon->setAutoResize(true);
             } else {
-                auto na = CCLabelBMFont::create("No\nIcon\nFound", "bigFont.fnt");
-                na->setID("na-label");
-                na->setScale(0.5f);
-                na->setAlignment(cocos2d::kCCTextAlignmentCenter);
-                na->setAnchorPoint({0.5f, 0.5f});
-                na->setOpacity(127);
-                icon->addChildAtPosition(na, Anchor::Center);
+                auto frame = CCSpriteFrameCache::get()->spriteFrameByName("grayGdLogo.png"_spr);
+                if (frame) {
+                    icon->setDisplayFrame(frame);
+                    icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+                    icon->setAutoResize(true);
+                }
             }
         } else if (server.icon.empty()) {
-            auto na = CCLabelBMFont::create("No\nIcon\nFound", "bigFont.fnt");
-            na->setID("na-label");
-            na->setScale(0.5f);
-            na->setAlignment(cocos2d::kCCTextAlignmentCenter);
-            na->setAnchorPoint({0.5f, 0.5f});
-            na->setOpacity(127);
-            icon->addChildAtPosition(na, Anchor::Center);
+            auto frame = CCSpriteFrameCache::get()->spriteFrameByName("grayGdLogo.png"_spr);
+            if (frame) {
+                icon->setDisplayFrame(frame);
+                icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+                icon->setAutoResize(true);
+            }
         } else {
             icon->loadFromUrl(server.icon);
         }
