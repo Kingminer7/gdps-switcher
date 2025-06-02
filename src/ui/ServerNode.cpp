@@ -94,23 +94,6 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
 
     m_menu->updateLayout();
 
-    if (m_server.status == GDPSTypes::ServerInfoStatus::NOTLOADED) {
-        retain();
-        m_server.status = GDPSTypes::ServerInfoStatus::LOADING;
-        m_listener.bind([this, server] (utils::web::WebTask::Event* e) {
-            if (auto v = e->getValue()) {
-                if (!v->ok()) {
-                    return log::warn("Request failed: {}", v->errorMessage());
-                }
-                log::info("{}", this->getID());
-                release();
-            }
-        });
-
-        auto req = web::WebRequest();
-        m_listener.setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
-    }
-
     return true;
 };
 
@@ -129,23 +112,20 @@ void ServerNode::onSelect(CCObject *sender) {
 }
 
 void ServerNode::updateSelected(GDPSTypes::Server server) {
-  auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("use-btn"));
-  if (!btn) return;
-  auto spr = btn->getChildByType<ButtonSprite *>(0);
-  if (!spr) return;
-  if (server == m_server) {
-    spr->updateBGImage("GJ_button_02.png");
-    btn->setEnabled(false);
-    // For some reason the CCMenuItemSpriteExtra gets changed so i gotta fix it... we love robtop code
-    btn->setContentSize(spr->getScaledContentSize());
-    spr->setPosition(btn->getContentSize() / 2);
-  } else {
-    spr->updateBGImage("GJ_button_01.png");
-    btn->setEnabled(true);
+    auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("use-btn"));
+    if (!btn) return;
+    auto spr = btn->getChildByType<ButtonSprite *>(0);
+    if (!spr) return;
+    if (server == m_server) {
+        spr->updateBGImage("GJ_button_02.png");
+        btn->setEnabled(false);
+    } else {
+        spr->updateBGImage("GJ_button_01.png");
+        btn->setEnabled(true);
+    }
     // For some reason the CCMenuItemSpriteExtra gets changed so i gotta fix it... we love robtop code
     btn->setContentSize(spr->getScaledContentSize());   
     spr->setPosition(btn->getContentSize() / 2);
-  }
 }
 
 void ServerNode::updateInfo(GDPSTypes::Server server) {
