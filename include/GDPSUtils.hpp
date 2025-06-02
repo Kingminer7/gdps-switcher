@@ -1,16 +1,6 @@
 #ifndef GDPSUTILS_HPP
 #define GDPSUTILS_HPP
 
-#ifdef GEODE_IS_WINDOWS
-    #ifdef GDPSSwitcher_EXPORTS
-        #define GDPSUTILS_API __declspec(dllexport)
-    #else
-        #define GDPSUTILS_API __declspec(dllimport)
-    #endif
-#else
-    #define GDPSUTILS_API
-#endif
-
 #include "Types.hpp"
 #include <string>
 #include <Geode/loader/Dispatch.hpp>

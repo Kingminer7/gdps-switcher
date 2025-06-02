@@ -2,34 +2,34 @@
 
 #include "Types.hpp"
 
-#include <Geode/Geode.hpp>
-
-using namespace geode::prelude;
+#include "Geode/cocos/layers_scenes_transitions_nodes/CCLayer.h"
+#include "Geode/cocos/menu_nodes/CCMenu.h"
+#include "Geode/ui/ScrollLayer.hpp"
 
 class ServerNode;
 
-class ServerListLayer : public CCLayer {
+class ServerListLayer : public cocos2d::CCLayer {
     protected:
         bool init() override;
         void keyBackClicked() override;
 
-        int m_eePos = 0;
+        int m_konamiPos = 0;
         bool m_isEditing = false;
 
-        CCMenu *m_backMenu = nullptr;
-        CCMenu *m_bottomMenu = nullptr;
-        ScrollLayer *m_scroll = nullptr;
+        cocos2d::CCMenu *m_backMenu = nullptr;
+        cocos2d::CCMenu *m_bottomMenu = nullptr;
+        geode::ScrollLayer *m_scroll = nullptr;
 
         int page = 1;
         int showing = 10;
 
-        virtual void keyDown(enumKeyCodes key) override;
+        void keyDown(cocos2d::enumKeyCodes key) override;
     public:
         static ServerListLayer *create();
-        static CCScene *scene();
+        static cocos2d::CCScene *scene();
 
         void updateList();
-        
+
         bool ccTouchBegan(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override;
         void ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override;
         void ccTouchCancelled(cocos2d::CCTouch *touch, cocos2d::CCEvent *event) override {
@@ -41,7 +41,7 @@ class ServerListLayer : public CCLayer {
         void onBack(CCObject *sender);
         void onAdd(CCObject *sender);
         void onEdit(CCObject *sender);
-        void onSelect(GDPSTypes::Server server);
+        void onSelect(const GDPSTypes::Server &server) const;
         void onKonami();
         void onSettings(CCObject *sender);
 

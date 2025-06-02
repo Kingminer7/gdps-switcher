@@ -160,13 +160,6 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         server.saveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
     }
     m_listLayer->updateList();
-    auto servers = GDPSMain::get()->m_servers;
-    if (servers.contains(-1)) {
-        servers.erase(-1);
-    }
-    if (servers.contains(-2)) {
-        servers.erase(-2);
-    }
-    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
+    GDPSMain::get()->save();
     Popup::onClose(sender);
 }

@@ -6,6 +6,8 @@
 
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
+using namespace geode::prelude;
+
 int ServerListLayer::m_selectedServer = -1;
 
 bool ServerListLayer::init() {
@@ -15,7 +17,6 @@ bool ServerListLayer::init() {
 
     if (m_selectedServer == -1) m_selectedServer = GDPSMain::get()->m_currentServer;
 
-    auto winSize = cocos2d::CCDirector::get()->getWinSize();
     this->setID("ServerListLayer"_spr);
     this->setKeyboardEnabled(true);
     this->setKeypadEnabled(true);
@@ -134,7 +135,7 @@ bool ServerListLayer::init() {
     updateList();
 
     if (Mod::get()->getSavedValue("secret-settings", false)) {
-        m_eePos = 12;
+        m_konamiPos = 12;
 
         auto spr = CCSprite::createWithSpriteFrameName("geode.loader/settings.png");
         auto circle = CircleButtonSprite::create(spr, CircleBaseColor::Green, CircleBaseSize::Big);
@@ -187,7 +188,7 @@ void ServerListLayer::onBack(cocos2d::CCObject *sender) {
 
 ServerListLayer *ServerListLayer::create() {
     auto ret = new ServerListLayer;
-    if (ret && ret->init()) {
+    if (ret->init()) {
       ret->autorelease();
       return ret;
     }
@@ -201,7 +202,7 @@ cocos2d::CCScene *ServerListLayer::scene() {
     return scene;
 }
 
-void ServerListLayer::onSelect(GDPSTypes::Server server) {
+void ServerListLayer::onSelect(const GDPSTypes::Server &server) const {
     m_selectedServer = server.id;
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
@@ -212,7 +213,7 @@ void ServerListLayer::onSelect(GDPSTypes::Server server) {
 
 void ServerListLayer::onAdd(CCObject *sender) {
     int id = 0;
-    for (auto &[serverId, server] : m_servers) {
+    for (const auto &serverId: m_servers | std::views::keys) {
       log::info("Server ID: {}, ID: {}", serverId, id);
         if (serverId < 0) continue;
         if (serverId == id) id++;
@@ -237,8 +238,12 @@ void ServerListLayer::onEdit(CCObject *sender) {
     }
 }
 
+void ServerListLayer::onSettings(CCObject *sender) {
+    FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
+}
 
-// Konami code easter egg
+
+//region Konami code easter egg
 
 void ServerListLayer::keyDown(enumKeyCodes code) {
   static const std::vector<std::vector<enumKeyCodes>> sequence = {
@@ -264,24 +269,24 @@ void ServerListLayer::keyDown(enumKeyCodes code) {
         {enumKeyCodes::KEY_A, enumKeyCodes::CONTROLLER_A},
         {enumKeyCodes::KEY_Enter, enumKeyCodes::CONTROLLER_Start}};
 
-    if (m_eePos >= sequence.size())
+    if (m_konamiPos >= sequence.size())
         return CCLayer::keyDown(code);
 
-    if (m_eePos < 3) {
+    if (m_konamiPos < 3) {
         CCLayer::keyDown(code);
     }
 
-    const auto &validCodes = sequence[m_eePos];
+    const auto &validCodes = sequence[m_konamiPos];
     if (std::find(validCodes.begin(), validCodes.end(), code) !=
         validCodes.end()) {
-        m_eePos++;
+        m_konamiPos++;
     } else {
-        m_eePos = 0;
+        m_konamiPos = 0;
         log::info("Reset");
         return;
     }
 
-    if (m_eePos == sequence.size()) {
+    if (m_konamiPos == sequence.size()) {
         onKonami();
     }
 }
@@ -304,7 +309,7 @@ void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *ev
         Input::Up,   Input::Up,    Input::Down, Input::Down,
         Input::Left, Input::Right, Input::Left, Input::Right,
         Input::B,    Input::A,     Input::Start};
-    if (m_eePos >= sequence.size())
+    if (m_konamiPos >= sequence.size())
         return;
 
     auto diff = touch->getLocation() - touch->getStartLocation();
@@ -330,14 +335,14 @@ void ServerListLayer::ccTouchEnded(cocos2d::CCTouch *touch, cocos2d::CCEvent *ev
         inp = Input::Right;
     }
 
-    if (sequence[m_eePos] == inp) {
-        m_eePos++;
+    if (sequence[m_konamiPos] == inp) {
+        m_konamiPos++;
     } else {
-        m_eePos = 0;
+        m_konamiPos = 0;
         return;
     }
 
-    if (m_eePos == sequence.size()) {
+    if (m_konamiPos == sequence.size()) {
         onKonami();
     }
 }
@@ -371,7 +376,4 @@ void ServerListLayer::onExit() {
     CCLayer::onExit();
     CCTouchDispatcher::get()->removeDelegate(this);
 }
-
-void ServerListLayer::onSettings(CCObject *sender) {
-    FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
-}
+//endregion

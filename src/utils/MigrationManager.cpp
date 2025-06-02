@@ -52,14 +52,7 @@ void MigrationManager::migrateData() {
     }
 
     
-    auto servers = main->m_servers;
-    if (servers.contains(-1)) {
-        servers.erase(-1);
-    }
-    if (servers.contains(-2)) {
-        servers.erase(-2);
-    }
-    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
+    GDPSMain::get()->save();
 
     auto gdpsPath = savePath / "gdpses";
 

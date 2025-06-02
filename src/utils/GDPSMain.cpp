@@ -7,20 +7,32 @@
 
 using namespace geode::prelude;
 
-bool GDPSMain::isActive() {
-    if (m_issues.size() > 0)
+bool GDPSMain::isActive() const {
+    if (!m_issues.empty())
         return false;
     if (isBase())
         return false;
     return true;
 }
 
-void GDPSMain::registerIssue(std::string issue) {
+void GDPSMain::registerIssue(const std::string& issue) {
     m_issues.push_back(issue);
 }
 
 std::vector<std::string> GDPSMain::getIssues() {
     return m_issues;
+}
+
+void GDPSMain::save() const {
+    auto servers = m_servers;
+    if (servers.contains(-1)) {
+        servers.erase(-1);
+    }
+    if (servers.contains(-2)) {
+        servers.erase(-2);
+    }
+    Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
+
 }
 
 GDPSMain *GDPSMain::m_instance = nullptr;
@@ -31,44 +43,12 @@ void GDPSMain::init() {
     m_currentServer =
         Mod::get()->getSavedValue<int>("current", -2);
 
-    m_servers[-2] = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
-    m_servers[-2].iconIsSprite = true;
-    m_servers[-2].icon = "gdlogo.png"_spr;
-    auto &server = m_servers[m_currentServer];
-    // std::map<std::string, std::string> problems;
-    // for (auto [modid, version] : server.dependencies) {
-    //     log::info("{} is {}", modid, Loader::get()->getInstalledMod("geode.loader")->getSavedValue<bool>("should-load-geode.devtools"));
-    //     if (!Loader::get()->isModInstalled(modid)) {
-            
-    //         problems[modid] = "required for this server but not installed";
-    //     } else if (!Loader::get()->getInstalledMod("geode.loader")->getSavedValue<bool>("should-load-geode.devtools")) {
-    //         problems[modid] = "required for this server but not enabled";
-    //     } else {
-    //         auto loadedVer = Loader::get()->getInstalledMod(modid)->getVersion();
-    //         auto requiredVerRes = ComparableVersionInfo::parse(version);
-    //         if (requiredVerRes.isOk()) {
-    //             auto requiredVer = requiredVerRes.unwrap();
-    //             auto comp = requiredVer.compareWithReason(loadedVer);
-    //             if (comp == VersionCompareResult::TooOld) {
-    //                 problems[modid] = "too old for this server";
-    //             }
-    //         } else {
-    //             problems[modid] = "an invalid version";
-    //         }
-    //     }
-    // }
-    // for (auto mod : Loader::get()->getAllMods()) {
-    //     if (mod->isEnabled() && !server.dependencies.contains(mod->getID())) {
-    //         if (server.modPolicy == "blacklist" && std::find(server.modList.begin(), server.modList.end(), mod->getID()) != server.modList.end()) {
-    //             problems[mod->getID()] = "not allowed on this server";
-    //         } else if (server.modPolicy == "whitelist" && std::find(server.modList.begin(), server.modList.end(), mod->getID()) == server.modList.end()) {
-    //             problems[mod->getID()] = "not allowed on this server";
-    //         }
-    //     }
-    // }
-    // for (auto [modid, problem] : problems) {
-    //     registerIssue(fmt::format("Mod [{}](mod:{}) is {}.", modid, modid, problem));
-    // }
+    auto base = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
+    base.iconIsSprite = true;
+    base.icon = "gdlogo.png"_spr;
+    // ReSharper disable once CppDFAArrayIndexOutOfBounds
+    m_servers[-2] = base;
+    const auto &server = m_servers[m_currentServer];
     if (m_currentServer >= 0 && isActive()) {
         m_serverApiId = ServerAPIEvents::registerServer(server.url, -40).id;
     }
@@ -82,7 +62,7 @@ GDPSMain *GDPSMain::get() {
     return m_instance;
 }
 
-bool GDPSMain::isBase() {
+bool GDPSMain::isBase() const {
     return
         m_currentServer == -2;
 }

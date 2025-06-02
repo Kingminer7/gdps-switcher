@@ -13,6 +13,8 @@ class ServerNode : public CCNode {
         CCMenu *m_menu = nullptr;
         ServerListLayer *m_listLayer = nullptr;
 
+        EventListener<web::WebTask> m_listener;
+
         bool m_editing = false;
 
         bool init(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd);

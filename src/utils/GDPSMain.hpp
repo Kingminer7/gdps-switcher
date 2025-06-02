@@ -1,8 +1,9 @@
+#pragma once
+
 #include "Types.hpp"
 
-#include <Geode/Geode.hpp>
-
-using namespace geode::prelude;
+#include <vector>
+#include <string>
 
 class GDPSMain {
     protected:
@@ -10,11 +11,13 @@ class GDPSMain {
         std::vector<std::string> m_issues = {};
         void init();
     public:
-        bool isActive();
-        void registerIssue(std::string issue);
+        bool isActive() const;
+        void registerIssue(const std::string& issue);
         std::vector<std::string> getIssues();
-        bool isBase();
-        bool isBase(std::string url);
+        bool isBase() const;
+        static bool isBase(std::string url);
+
+        void save() const;
 
         static GDPSMain *get();
 

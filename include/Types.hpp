@@ -3,22 +3,16 @@
 #ifndef GDPSTYPES_HPP
 #define GDPSTYPES_HPP
 
-#ifdef GEODE_IS_WINDOWS
-    #ifdef GDPSSwitcher_EXPORTS
-        #define GDPSTYPES __declspec(dllexport)
-    #else
-        #define GDPSTYPES __declspec(dllimport)
-    #endif
-#else
-    #define GDPSTYPES
-#endif
+#include <ranges>
+#include <utility>
 
 namespace GDPSTypes {
+
     struct Server {
         int id = -1;
-        std::string name = "";
-        std::string url = "";
-        std::string saveDir = "";
+        std::string name;
+        std::string url;
+        std::string saveDir;
 
         // Many issues and stuff
         // std::string modPolicy = "blacklist";
@@ -26,12 +20,13 @@ namespace GDPSTypes {
         // std::vector<std::string> modList = {};
 
         // Doesn't save below this comment
+        bool infoLoaded = false;
         std::string motd = "No MOTD found.";
         bool iconIsSprite = false;
-        std::string icon = "";
+        std::string icon;
 
-        Server(int id, std::string name, std::string url, std::string saveDir) : id(id), url(url), name(name), saveDir(saveDir) {}
-        Server() {}
+        Server(const int id, std::string name, std::string url, std::string saveDir) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)) {}
+        Server() = default;
 
         // Comparison operators
         bool operator==(const Server& other) const {
@@ -50,13 +45,13 @@ namespace GDPSTypes {
             return other < *this;
         }
 
-        bool empty() {
+        [[nodiscard]] bool empty() const {
             return (name.empty() && url.empty()) || id == -1;
         }
     };
     struct OldServer {
-        std::string name = "";
-        std::string url = "";
+        std::string name;
+        std::string url;
     };
 }
 
@@ -100,7 +95,7 @@ struct matjson::Serialize<std::map<int, GDPSTypes::Server>>
     static geode::Result<std::map<int, GDPSTypes::Server>> fromJson(matjson::Value const &value)
     {
         std::map<int, GDPSTypes::Server> ret = {};
-        for (auto server : value) {
+        for (const auto& server : value) {
             auto serv = server.as<GDPSTypes::Server>().unwrapOr(GDPSTypes::Server());
             int id = serv.id;
             ret[id] = serv;
@@ -111,10 +106,10 @@ struct matjson::Serialize<std::map<int, GDPSTypes::Server>>
     static matjson::Value toJson(std::map<int, GDPSTypes::Server> const &value)
     {
         std::vector<matjson::Value> servers;
-        for (auto const& [id, server] : value) {
-            servers.push_back(matjson::Value(server));
+        for (const auto &server: value | std::views::values) {
+            servers.emplace_back(server);
         }
-        return matjson::Value(servers);
+        return {servers};
     }
 };
 

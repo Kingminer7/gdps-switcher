@@ -1,6 +1,5 @@
 #include "ServerNode.hpp"
 #include "utils/GDPSMain.hpp"
-#include "utils/ServerInfoManager.hpp"
 #include "ModifyServerPopup.hpp"
 
 #include <Geode/ui/LazySprite.hpp>
@@ -42,8 +41,6 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     motdArea->getScrollLayer()->setMouseEnabled(false);
     motdArea->setAnchorPoint({0.f, 1.f});
     this->addChildAtPosition(motdArea, Anchor::Left, {75.f, 9.f});
-    
-    ServerInfoManager::get()->getInfoForServer(server, this);
 
     m_menu = CCMenu::create();
     m_menu->setID("button-menu");
@@ -96,6 +93,23 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     m_menu->addChild(editBtn);
 
     m_menu->updateLayout();
+
+    if (m_server.status == GDPSTypes::ServerInfoStatus::NOTLOADED) {
+        retain();
+        m_server.status = GDPSTypes::ServerInfoStatus::LOADING;
+        m_listener.bind([this, server] (utils::web::WebTask::Event* e) {
+            if (auto v = e->getValue()) {
+                if (!v->ok()) {
+                    return log::warn("Request failed: {}", v->errorMessage());
+                }
+                log::info("{}", this->getID());
+                release();
+            }
+        });
+
+        auto req = web::WebRequest();
+        m_listener.setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
+    }
 
     return true;
 };
@@ -190,6 +204,7 @@ void ServerNode::onDelete(CCObject *sender) {
   createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}?", m_server.name), "No", "Yes", [this](auto, bool second) {
       if (second) {
           GDPSMain::get()->m_servers.erase(m_server.id);
+          GDPSMain::get()->save();
           m_listLayer->updateList();
       }
   });

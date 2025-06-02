@@ -5,23 +5,19 @@
 
 using namespace geode::prelude;
 
-class GSGManager : public geode::Modify<GSGManager, GManager> {
-    public:
-        void setup() {
-            auto gdpsm = GDPSMain::get();
-            auto server = gdpsm->m_servers[gdpsm->m_currentServer];
-            if (gdpsm->isActive()) {
+class $modify(GSGManager, GManager) {
+        void setup() override {
+            const auto main = GDPSMain::get();
+            auto server = main->m_servers[main->m_currentServer];
+            const auto dir = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
+            std::error_code error;
+            if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, error)) {
+                main->registerIssue(fmt::format("Failed to setup save file: {}", error.message()));
+                return log::error("Failed to create directory '{}', data will not save: {}", dir.string(), error.message());
+            }
+            if (main->isActive()) {
                 m_fileName = fmt::format("gdpses/{}/{}", server.saveDir, m_fileName);
             }
-            auto dir = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
-            std::error_code ec;
-            if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, ec)) {
-                geode::log::error("Failed to create directory '{}', data will not save: {}", dir.string(), ec.message());
-            }
             GManager::setup();
-        }
-
-        void save() {
-            GManager::save();
         }
 };
