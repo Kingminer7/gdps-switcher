@@ -13,11 +13,12 @@ class ServerNode : public CCNode {
         GDPSTypes::Server& m_server;
         CCMenu* m_menu = nullptr;
         ServerListLayer* m_listLayer = nullptr;
-	geode::EventListener<EventFilter<LoadDataEvent>> *m_listener = nullptr;
-
+	    geode::EventListener<EventFilter<LoadDataEvent>> *m_listener = nullptr;
         bool m_editing = false;
 
-        bool init(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, bool odd);
+        ServerNode(GDPSTypes::Server& server) : m_server(server) {};
+
+        bool init(CCSize size, ServerListLayer *list, bool odd);
     public:
         void onSelect(CCObject* sender);
         void onEdit(CCObject* sender);

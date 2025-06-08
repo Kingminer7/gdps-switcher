@@ -4,10 +4,9 @@
 
 #include <Geode/ui/LazySprite.hpp>
 
-bool ServerNode::init(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, bool odd) {
+bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     if (!CCNode::init()) return false;
     this->m_listLayer = list;
-    this->m_server = server;
     this->setID("server-node");
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
@@ -16,7 +15,7 @@ bool ServerNode::init(GDPSTypes::Server& server, CCSize size, ServerListLayer *l
     bg->setID("background");
     bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
-    auto icon = LazySprite::create({size.height - 20, size.height - 20}, !server.icon.empty());
+    auto icon = LazySprite::create({size.height - 20, size.height - 20}, !m_server.icon.empty());
     icon->setAutoResize(true);
     icon->setScale(1.f);
     icon->setLoadCallback([icon](Result<> status) {
@@ -26,16 +25,16 @@ bool ServerNode::init(GDPSTypes::Server& server, CCSize size, ServerListLayer *l
     });
     icon->setID("icon");
     this->addChildAtPosition(icon, Anchor::Left, {7.5f + size.height / 2 - 10, 0});
-    updateInfo(server);
+    // updateInfo(m_server);
 
-    auto nameLab = CCLabelBMFont::create(server.name.c_str(), "bigFont.fnt");
+    auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
     nameLab->limitLabelWidth(size.width - 50, .7f, 0.f);
     nameLab->setAnchorPoint({0.f, 0.5f});
     this->addChildAtPosition(nameLab, Anchor::TopLeft, {69,  1- nameLab->getContentHeight() / 2});
 
     // TODO: maybe use prevter's label
-    auto motdArea = MDTextArea::create(server.motd, {230.f, 37.5f});
+    auto motdArea = MDTextArea::create(m_server.motd, {230.f, 37.5f});
     motdArea->setID("motd");
     motdArea->getScrollLayer()->setTouchEnabled(false);
     motdArea->getScrollLayer()->setMouseEnabled(false);
@@ -55,12 +54,12 @@ bool ServerNode::init(GDPSTypes::Server& server, CCSize size, ServerListLayer *l
     m_menu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0});
 
-    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == server.id ? "GJ_button_02.png" : "GJ_button_01.png");
+    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png");
     useSpr->setScale(.6f);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
-    useBtn->setEnabled(list->m_selectedServer != server.id);
+    useBtn->setEnabled(list->m_selectedServer != m_server.id);
     m_menu->addChild(useBtn);
 
     auto editSpr = CCSprite::create("GJ_button_04.png");
@@ -98,8 +97,8 @@ bool ServerNode::init(GDPSTypes::Server& server, CCSize size, ServerListLayer *l
 };
 
 ServerNode *ServerNode::create(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, bool odd) {
-    auto ret = new ServerNode;
-    if (ret && ret->init(server, size, list, odd)) {
+    auto ret = new ServerNode(server);
+    if (ret && ret->init(size, list, odd)) {
       ret->autorelease();
       return ret;
     }
@@ -142,7 +141,7 @@ void ServerNode::updateInfo(LoadDataEvent event) {
         icon->removeAllChildren();
         log::info("Icon: {}", m_server.icon);
         log::info("Is sprite: {}", m_server.iconIsSprite);
-        if (server.iconIsSprite) {
+        if (m_server.iconIsSprite) {
             auto frame = CCSpriteFrameCache::get()->spriteFrameByName(m_server.icon.c_str());
             if (frame) {
                 icon->setDisplayFrame(frame);
@@ -156,7 +155,7 @@ void ServerNode::updateInfo(LoadDataEvent event) {
                     icon->setAutoResize(true);
                 }
             }
-        } else if (server.icon.empty()) {
+        } else if (m_server.icon.empty()) {
             auto frame = CCSpriteFrameCache::get()->spriteFrameByName("grayGdLogo.png"_spr);
             if (frame) {
                 icon->setDisplayFrame(frame);
@@ -164,13 +163,13 @@ void ServerNode::updateInfo(LoadDataEvent event) {
                 icon->setAutoResize(true);
             }
         } else {
-            icon->loadFromUrl(server.icon);
+            icon->loadFromUrl(m_server.icon);
         }
     }
 
 }
 
-GDPSTypes::Server ServerNode::getServer() {
+GDPSTypes::Server& ServerNode::getServer() {
   return m_server;
 }
 
