@@ -4,7 +4,7 @@
 
 #include <Geode/ui/LazySprite.hpp>
 
-bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd) {
+bool ServerNode::init(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, bool odd) {
     if (!CCNode::init()) return false;
     this->m_listLayer = list;
     this->m_server = server;
@@ -97,7 +97,7 @@ bool ServerNode::init(GDPSTypes::Server server, CCSize size, ServerListLayer *li
     return true;
 };
 
-ServerNode *ServerNode::create(GDPSTypes::Server server, CCSize size, ServerListLayer *list, bool odd) {
+ServerNode *ServerNode::create(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, bool odd) {
     auto ret = new ServerNode;
     if (ret && ret->init(server, size, list, odd)) {
       ret->autorelease();
@@ -128,22 +128,22 @@ void ServerNode::updateSelected(GDPSTypes::Server server) {
     spr->setPosition(btn->getContentSize() / 2);
 }
 
-void ServerNode::updateInfo(GDPSTypes::Server server) {
-    if (auto nameLab = static_cast<CCLabelBMFont *>(this->getChildByID("name"))) {
-        nameLab->setString(server.name.c_str());
+void ServerNode::updateInfo(LoadDataEvent event) {
+    if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
+        nameLab->setString(m_server.name.c_str());
         nameLab->limitLabelWidth(this->m_obContentSize.width - 50, .7f, 0.f);
     }
 
     if (auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"))) {
-        motdArea->setString(server.motd.c_str());
+        motdArea->setString(m_server.motd.c_str());
     }
 
     if (auto icon = static_cast<LazySprite *>(this->getChildByID("icon"))) {
         icon->removeAllChildren();
-        log::info("Icon: {}", server.icon);
-        log::info("Is sprite: {}", server.iconIsSprite);
+        log::info("Icon: {}", m_server.icon);
+        log::info("Is sprite: {}", m_server.iconIsSprite);
         if (server.iconIsSprite) {
-            auto frame = CCSpriteFrameCache::get()->spriteFrameByName(server.icon.c_str());
+            auto frame = CCSpriteFrameCache::get()->spriteFrameByName(m_server.icon.c_str());
             if (frame) {
                 icon->setDisplayFrame(frame);
                 icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
