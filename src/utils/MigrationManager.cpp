@@ -43,7 +43,6 @@ void MigrationManager::migrateData() {
     for (auto old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
         auto serv = fromOldServer(old);
         main->m_servers[serv.id] = serv;
-        log::info("{} {} {}", oldSel, serv.url, oldSel == serv.url);
         if (oldSel == serv.url) {
             main->m_currentServer = serv.id;
             ServerAPIEvents::updateServer(main->m_serverApiId, serv.url);

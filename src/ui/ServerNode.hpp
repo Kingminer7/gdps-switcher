@@ -10,7 +10,7 @@ using namespace geode::prelude;
 
 class ServerNode : public CCNode {
     protected:
-        GDPSTypes::Server& m_server;
+        GDPSTypes::Server m_server;
         CCMenu* m_menu = nullptr;
         ServerListLayer* m_listLayer = nullptr;
 	    geode::EventListener<EventFilter<LoadDataEvent>> m_listener;
@@ -23,6 +23,7 @@ class ServerNode : public CCNode {
         void onSelect(CCObject* sender);
         void onEdit(CCObject* sender);
         void onDelete(CCObject* sender);
+        void onMove(CCObject* sender);
         void updateSelected(GDPSTypes::Server server);
         void updateInfo();
 

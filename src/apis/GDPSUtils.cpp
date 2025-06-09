@@ -8,7 +8,6 @@ using namespace geode::prelude;
 Result<int> GDPSUtils::createServer(std::string name, std::string url, std::string saveDir) {
     int id = 0;
     for (auto &[serverId, server] : GDPSMain::get()->m_servers) {
-      log::info("Server ID: {}, ID: {}", serverId, id);
         if (serverId < 0) continue;
         if (serverId == id) id++;
         else break;

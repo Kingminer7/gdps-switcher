@@ -1,19 +1,38 @@
 #include "ServerInfoManager.hpp"
+#include "utils/GDPSMain.hpp"
 
 using namespace geode::prelude;
 
 ServerInfoManager *ServerInfoManager::m_instance = nullptr;
 
 void ServerInfoManager::fetch(GDPSTypes::Server& server) {
-	LoadDataEvent(server, "Motd", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBgNT8zJosfwEyrPM2N4F8pRGfBG80hXwvbuN7cqo9zxb600Jblfujv4E&usqp=CAE&s").post();
-}
+    if (server.infoLoaded == false) {
+        server.infoLoaded = true;
+        if (server.id < 0) return;
+        // idk weird shit
+        int id = server.id;
+        std::string url = server.url;
+        m_listeners[server.id].bind([this, id, url] (utils::web::WebTask::Event* e) {
+            if (auto res = e->getValue()) {
+                if (res->json().isErr()) {
+                    log::warn("Failed to parse info for {}: {}", url, res->json().err());
+                } else {
+                    auto info = res->json().unwrapOrDefault();
+                    GDPSTypes::Server& server = GDPSMain::get()->m_servers[id];
+                    server.motd = info["motd"].asString().unwrapOr("No MOTD found.");
+                    server.icon = info["icon"].asString().unwrapOr("");
+                    // serverData.modPolicy = info["mods"]["policy"].asString().unwrapOr(serverData.modPolicy);
+                    // serverData.dependencies = info["mods"]["dependencies"].as<std::map<std::string, std::string>>().unwrapOr(serverData.dependencies);
+                    // serverData.modList = info["mods"]["modList"].as<std::vector<std::string>>().unwrapOr(serverData.modList);
+                    GDPSMain::get()->save();
+                    LoadDataEvent(server).post();
+                }
+            }
+        });
 
-std::string LoadDataEvent::getMotd() const {
-    return m_motd;
-}
-
-std::string LoadDataEvent::getLogo() const {
-    return m_logo;
+        auto req = web::WebRequest();
+        m_listeners[server.id].setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
+    }
 }
 
 GDPSTypes::Server& LoadDataEvent::getServer() const {

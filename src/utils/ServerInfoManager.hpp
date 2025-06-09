@@ -3,26 +3,20 @@
 #include "Types.hpp"
 
 #include <Geode/loader/Event.hpp>
- 
-#include <string>
+#include <functional>
 
 class LoadDataEvent : public geode::Event {
-protected:
-	std::string m_motd;
-	std::string m_logo;
 	GDPSTypes::Server& m_server;
 
 public:
-    LoadDataEvent(GDPSTypes::Server& server, std::string const& motd, std::string const& logo) : m_server(server), m_motd(motd), m_logo(logo) {}
-
-    std::string getMotd() const;
-    std::string getLogo() const;
+    LoadDataEvent(GDPSTypes::Server& server) : m_server(server) {}
     GDPSTypes::Server& getServer() const;
 };
 
 class ServerInfoManager {
 	protected:
 		static ServerInfoManager *m_instance;
+		std::map<int, geode::EventListener<geode::utils::web::WebTask>> m_listeners;
 	public:
 		void fetch(GDPSTypes::Server& server);
 

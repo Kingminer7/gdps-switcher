@@ -156,15 +156,35 @@ bool ServerListLayer::init() {
         m_bottomMenu->updateLayout();
     }
 
+    static bool fetched = false;
+    if (!fetched) {
+        fetched = true;
+        for (auto [id, server] : GDPSMain::get()->m_servers) {
+            ServerInfoManager::get()->fetch(server);
+        }
+    }
+
     return true;
 }
 
 void ServerListLayer::updateList() {
+    auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
+    for (auto server : std::ranges::views::values(GDPSMain::get()->m_servers)) {
+        if (server.id < 0 && server.id != -2) continue;
+        if (std::find(order.begin(), order.end(), server.id) == order.end()) {
+            order.push_back(server.id);
+        }
+    }
+    Mod::get()->setSavedValue("server-order", order);
+
     m_servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->removeAllChildren();
     bool odd = false;
-    for (auto &[id, server] : m_servers) {
+    for (int id : order) {
+        auto it = m_servers.find(id);
+        if (it == m_servers.end()) continue;
         odd = !odd;
+        auto& server = it->second;
         auto node = ServerNode::create(server, {356, 75}, this, odd);
         if (server.id == -2) {
             node->m_locked = true;
@@ -184,7 +204,7 @@ void ServerListLayer::onBack(cocos2d::CCObject *sender) {
     if (m_selectedServer != GDPSMain::get()->m_currentServer) {
         geode::createQuickPopup("GDPS Switcher", "Switching servers requires a restart.", "Restart later", "Restart now", [this](auto, bool now) {
             if (now) {
-                geode::utils::game::restart();
+                geode::utils::game::restart(true);
             } else {
                 cocos2d::CCDirector::get()->popSceneWithTransition(.5f, kPopTransitionFade);
             }
@@ -222,7 +242,6 @@ void ServerListLayer::onSelect(const GDPSTypes::Server &server) const {
 void ServerListLayer::onAdd(CCObject *sender) {
     int id = 0;
     for (const auto &serverId: m_servers | std::views::keys) {
-      log::info("Server ID: {}, ID: {}", serverId, id);
         if (serverId < 0) continue;
         if (serverId == id) id++;
         else break;
@@ -290,7 +309,6 @@ void ServerListLayer::keyDown(enumKeyCodes code) {
         m_konamiPos++;
     } else {
         m_konamiPos = 0;
-        log::info("Reset");
         return;
     }
 
