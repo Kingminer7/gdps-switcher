@@ -3,6 +3,7 @@
 #include "ServerNode.hpp"
 #include "Types.hpp"
 #include "utils/GDPSMain.hpp"
+#include "utils/ServerInfoManager.hpp"
 
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
@@ -73,6 +74,13 @@ bool ServerListLayer::init() {
     );
     editBtn->setID("edit-button");
     m_bottomMenu->addChild(editBtn);
+
+    auto gplusSignInBtn = CCMenuItemExt::createSpriteExtraWithFrameName("gplusSignIn_001.png", 1.f, [this](auto) {
+        for (auto server : std::ranges::views::values(m_servers)) {
+            ServerInfoManager::get()->fetch(server);
+        }
+    });
+    m_bottomMenu->addChild(gplusSignInBtn);
 
     m_bottomMenu->setLayout(
         geode::ColumnLayout::create()

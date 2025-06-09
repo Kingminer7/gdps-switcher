@@ -21,6 +21,10 @@ public:
 };
 
 class ServerInfoManager {
+	protected:
+		static ServerInfoManager *m_instance;
 	public:
 		void fetch(GDPSTypes::Server& server);
+
+		static ServerInfoManager *get();
 };

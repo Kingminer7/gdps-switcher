@@ -6,6 +6,11 @@
 
 bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     if (!CCNode::init()) return false;
+
+    m_listener.bind([this](LoadDataEvent *event) {
+        return ListenerResult::Propagate;
+    });
+
     this->m_listLayer = list;
     this->setID("server-node");
     this->m_obContentSize = size;
@@ -25,7 +30,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     });
     icon->setID("icon");
     this->addChildAtPosition(icon, Anchor::Left, {7.5f + size.height / 2 - 10, 0});
-    // updateInfo(m_server);
+    updateInfo();
 
     auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
@@ -127,7 +132,7 @@ void ServerNode::updateSelected(GDPSTypes::Server server) {
     spr->setPosition(btn->getContentSize() / 2);
 }
 
-void ServerNode::updateInfo(LoadDataEvent event) {
+void ServerNode::updateInfo() {
     if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
         nameLab->setString(m_server.name.c_str());
         nameLab->limitLabelWidth(this->m_obContentSize.width - 50, .7f, 0.f);
