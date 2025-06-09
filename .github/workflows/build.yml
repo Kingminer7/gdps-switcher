@@ -58,7 +58,7 @@ jobs:
       #     curl -L -o ${{ github.workspace }}/cli-profile/Contents/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/nightly/km7dev.server_api.geode
 
       - name: Build the mod
-        uses: hiimjasmine00/build-geode-mod@main
+        uses: hiimjasmine00/build-geode-mod@xwin
         with:
           bindings: geode-sdk/bindings
           bindings-ref: main
