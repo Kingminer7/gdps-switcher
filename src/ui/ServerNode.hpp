@@ -11,7 +11,8 @@ using namespace geode::prelude;
 class ServerNode : public CCNode {
     protected:
         GDPSTypes::Server m_server;
-        CCMenu* m_menu = nullptr;
+        CCMenu* m_editMenu = nullptr;
+        CCMenu* m_useMenu = nullptr;
         ServerListLayer* m_listLayer = nullptr;
 	    geode::EventListener<EventFilter<LoadDataEvent>> m_listener;
         bool m_editing = false;

@@ -25,14 +25,14 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
     nameLab->limitLabelWidth(size.width - 120, .6f, 0.f);
-    nameLab->setAnchorPoint({0.f, 1.f});
-    this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -2});
+    nameLab->setAnchorPoint({0.f, 0.f});
+    this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -nameLab->getContentHeight()/2 - 8});
 
     updateInfo();
 
-    m_menu = CCMenu::create();
-    m_menu->setID("button-menu");
-    m_menu->setContentSize({size.width - 306, size.height});
+    m_editMenu = CCMenu::create();
+    m_editMenu->setID("edit-menu");
+    m_editMenu->setContentSize({55, size.height});
     auto layout = RowLayout::create()
         ->setAxisAlignment(AxisAlignment::End)
         ->setAxisReverse(true)
@@ -41,17 +41,33 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
         ->setGrowCrossAxis(true)
         ->setCrossAxisAlignment(AxisAlignment::Center);
     layout->ignoreInvisibleChildren(true);
-    m_menu->setLayout(layout);
-    m_menu->setAnchorPoint({1.f, 0.5f});
-    this->addChildAtPosition(m_menu, Anchor::Right, {-8, 0});
+    m_editMenu->setLayout(layout);
+    m_editMenu->setAnchorPoint({1.f, 0.5f});
+    this->addChildAtPosition(m_editMenu, Anchor::Right, {-8, 0});
 
-    auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png");
-    useSpr->setScale(.6f);
+    m_useMenu = CCMenu::create();
+    m_useMenu->setID("use-menu");
+    m_useMenu->setContentSize({90, size.height});
+    layout = RowLayout::create()
+        ->setAxisAlignment(AxisAlignment::End)
+        ->setAxisReverse(true)
+        ->setGap(3.3f)
+        ->setCrossAxisOverflow(true)
+        ->setGrowCrossAxis(true)
+        ->setCrossAxisAlignment(AxisAlignment::Center);
+    layout->ignoreInvisibleChildren(true);
+    m_useMenu->setLayout(layout);
+    m_useMenu->setAnchorPoint({1.f, 0.5f});
+    this->addChildAtPosition(m_useMenu, Anchor::Right, {-8, 0});
+
+    auto useSpr = ButtonSprite::create(list->m_selectedServer == m_server.id ? "In Use" : "Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png");
+    useSpr->setScale(.7f);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
     useBtn->setEnabled(list->m_selectedServer != m_server.id);
-    m_menu->addChild(useBtn);
+    m_useMenu->addChild(useBtn);
+    m_useMenu->updateLayout();
 
     auto editSpr = CCSprite::create("GJ_button_04.png");
     editSpr->setScale(.5475f);
@@ -107,12 +123,12 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     downBtn->setID("down-btn");
     downBtn->setVisible(false);
 
-    m_menu->addChild(editBtn);
-    m_menu->addChild(upBtn);
-    m_menu->addChild(deleteBtn);
-    m_menu->addChild(downBtn);
+    m_editMenu->addChild(editBtn);
+    m_editMenu->addChild(upBtn);
+    m_editMenu->addChild(deleteBtn);
+    m_editMenu->addChild(downBtn);
 
-    m_menu->updateLayout();
+    m_editMenu->updateLayout();
 
     return true;
 };
@@ -132,17 +148,20 @@ void ServerNode::onSelect(CCObject *sender) {
 }
 
 void ServerNode::updateSelected(GDPSTypes::Server server) {
-    auto btn = static_cast<CCMenuItemSpriteExtra *>(m_menu->getChildByID("use-btn"));
+    auto btn = static_cast<CCMenuItemSpriteExtra *>(m_useMenu->getChildByID("use-btn"));
     if (!btn) return;
     auto spr = btn->getChildByType<ButtonSprite *>(0);
     if (!spr) return;
     if (server == m_server) {
         spr->updateBGImage("GJ_button_02.png");
+        spr->setString("In Use");
         btn->setEnabled(false);
     } else {
         spr->updateBGImage("GJ_button_01.png");
+        spr->setString("Use");
         btn->setEnabled(true);
     }
+    m_useMenu->updateLayout();
     // For some reason the CCMenuItemSpriteExtra gets changed so i gotta fix it... we love robtop code
     btn->setContentSize(spr->getScaledContentSize());   
     spr->setPosition(btn->getContentSize() / 2);
@@ -152,12 +171,12 @@ void ServerNode::updateInfo() {
     m_server = GDPSMain::get()->m_servers[m_server.id];
     if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
         nameLab->setString(m_server.name.c_str());
-        nameLab->limitLabelWidth(this->m_obContentSize.width - 120, .7f, 0.f);
+        nameLab->limitLabelWidth(this->m_obContentSize.width - 80, .7f, 0.f);
     }
 
     auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"));
     if (!motdArea) {
-        motdArea = MDTextArea::create(m_server.motd, {246.f, getContentHeight() - 27.f});
+        motdArea = MDTextArea::create(m_server.motd, {205.f, getContentHeight() - 27.f});
         motdArea->setID("motd");
 	motdArea->getChildByType<CCScale9Sprite>(0)->setVisible(false);
         motdArea->getScrollLayer()->setTouchEnabled(false);
@@ -176,37 +195,25 @@ void ServerNode::updateInfo() {
     if (m_server.iconIsSprite) {
         icon = CCSprite::createWithSpriteFrameName(m_server.icon.c_str());
         if (icon && !icon->getUserObject("geode.texture-loader/fallback")) {
-            icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
+            icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
         } else {
             icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
-            if (icon) {
-                icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
-            }
+            icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
         }
     } else if (m_server.icon.empty()) {
         icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
-        if (icon) {
-            icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
-        } else {
-            icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
-            if (icon) {
-                icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
-            }
-        }
+        icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
     } else {
-        auto ls = LazySprite::create({m_obContentSize.height - 10, m_obContentSize.height - 10}, !m_server.icon.empty());
+        auto ls = LazySprite::create({m_obContentSize.height - 12.5f, m_obContentSize.height - 12.5f}, true);
         ls->setAutoResize(true);
         ls->setScale(1.f);
         ls->setLoadCallback([this, &icon, ls](Result<> status) {
             if (status.isErr()) {
-               ls->removeFromParent();
-	       icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr
-  );
-              if (icon) {
-                  icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
-icon->setID("icon");
-this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
-              }
+                ls->removeFromParent();
+                icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
+                icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
+                icon->setID("icon");
+                this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
             }
         });
         ls->loadFromUrl(m_server.icon);
@@ -214,8 +221,8 @@ this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f,
     }
 
     if (icon) {
-    icon->setID("icon");
-    this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
+        icon->setID("icon");
+        this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
     }
 }
 
@@ -242,13 +249,13 @@ void ServerNode::onDelete(CCObject *sender) {
 void ServerNode::setEditing(bool editing) {
     m_editing = editing;
     bool show = m_editing && !m_locked;
-    if (auto btn = m_menu->getChildByID("edit-btn")) btn->setVisible(show);
-    if (auto btn = m_menu->getChildByID("delete-btn")) btn->setVisible(show);
+    if (auto btn = m_editMenu->getChildByID("edit-btn")) btn->setVisible(show);
+    if (auto btn = m_editMenu->getChildByID("delete-btn")) btn->setVisible(show);
     auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
     log::info("{}", order);
     log::info("{}", m_server.id);
     auto it = std::find(order.begin(), order.end(), m_server.id);
-    if (auto btn = m_menu->getChildByID("up-btn")) {
+    if (auto btn = m_editMenu->getChildByID("up-btn")) {
         btn->setVisible(show);
         auto spr = btn->getChildByType<CCSprite*>(0);
         if (spr) {
@@ -256,7 +263,7 @@ void ServerNode::setEditing(bool editing) {
             spr->setVisible(!isSecond);
         }
     }
-    if (auto btn = m_menu->getChildByID("down-btn")) {
+    if (auto btn = m_editMenu->getChildByID("down-btn")) {
         btn->setVisible(show);
         auto spr = btn->getChildByType<CCSprite*>(0);
         if (spr) {
@@ -264,8 +271,8 @@ void ServerNode::setEditing(bool editing) {
             spr->setVisible(!isLast);
         }
     }
-    if (auto btn = m_menu->getChildByID("use-btn")) btn->setVisible(!m_editing);
-    m_menu->updateLayout();
+    if (auto btn = m_editMenu->getChildByID("use-btn")) btn->setVisible(!m_editing);
+    m_editMenu->updateLayout();
 }
 
 bool ServerNode::isEditing() {

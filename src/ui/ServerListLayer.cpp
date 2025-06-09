@@ -118,7 +118,8 @@ bool ServerListLayer::init() {
     scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, -13.f});
     bottom->setZOrder(1);
 
-    auto title = CCLabelBMFont::create("Private Servers", "goldFont.fnt");
+    auto title = CCLabelBMFont::create("Private Servers", "bigFont.fnt");
+    title->setScale(.8f);
     title->setID("title");
     title->setZOrder(2);
     scrollFrame->addChildAtPosition(title, geode::Anchor::Top, {0.f, 19.5f});
