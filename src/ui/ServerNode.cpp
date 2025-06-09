@@ -24,9 +24,9 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
 
     auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
-    nameLab->limitLabelWidth(size.width - 50, .7f, 0.f);
-    nameLab->setAnchorPoint({0.f, 0.5f});
-    this->addChildAtPosition(nameLab, Anchor::TopLeft, {69,  1- nameLab->getContentHeight() / 2});
+    nameLab->limitLabelWidth(size.width - 120, .6f, 0.f);
+    nameLab->setAnchorPoint({0.f, 1.f});
+    this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -2});
 
     updateInfo();
 
@@ -43,7 +43,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     layout->ignoreInvisibleChildren(true);
     m_menu->setLayout(layout);
     m_menu->setAnchorPoint({1.f, 0.5f});
-    this->addChildAtPosition(m_menu, Anchor::Right, {-6, 0});
+    this->addChildAtPosition(m_menu, Anchor::Right, {-8, 0});
 
     auto useSpr = ButtonSprite::create("Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png");
     useSpr->setScale(.6f);
@@ -152,17 +152,18 @@ void ServerNode::updateInfo() {
     m_server = GDPSMain::get()->m_servers[m_server.id];
     if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
         nameLab->setString(m_server.name.c_str());
-        nameLab->limitLabelWidth(this->m_obContentSize.width - 50, .7f, 0.f);
+        nameLab->limitLabelWidth(this->m_obContentSize.width - 120, .7f, 0.f);
     }
 
     auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"));
     if (!motdArea) {
-        motdArea = MDTextArea::create(m_server.motd, {230.f, 37.5f});
+        motdArea = MDTextArea::create(m_server.motd, {246.f, getContentHeight() - 27.f});
         motdArea->setID("motd");
+	motdArea->getChildByType<CCScale9Sprite>(0)->setVisible(false);
         motdArea->getScrollLayer()->setTouchEnabled(false);
         motdArea->getScrollLayer()->setMouseEnabled(false);
-        motdArea->setAnchorPoint({0.f, 1.f});
-        this->addChildAtPosition(motdArea, Anchor::Left, {75.f, 9.f});
+        motdArea->setAnchorPoint({0.f, 0.f});
+        this->addChildAtPosition(motdArea, Anchor::BottomLeft, {61.f, 4.5f});
     }
     motdArea->setString(m_server.motd.c_str());
 
@@ -174,39 +175,48 @@ void ServerNode::updateInfo() {
 
     if (m_server.iconIsSprite) {
         icon = CCSprite::createWithSpriteFrameName(m_server.icon.c_str());
-        if (icon) {
-            icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+        if (icon && !icon->getUserObject("geode.texture-loader/fallback")) {
+            icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
         } else {
-            icon = CCSprite::createWithSpriteFrameName("grayGdLogo.png"_spr);
+            icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
             if (icon) {
-                icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+                icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
             }
         }
     } else if (m_server.icon.empty()) {
-        icon = CCSprite::createWithSpriteFrameName(m_server.icon.c_str());
+        icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
         if (icon) {
-            icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+            icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
         } else {
-            icon = CCSprite::createWithSpriteFrameName("grayGdLogo.png"_spr);
+            icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
             if (icon) {
-                icon->setScale((this->getContentHeight() - 20) / icon->getContentHeight());
+                icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
             }
         }
     } else {
-        auto ls = LazySprite::create({m_obContentSize.height - 20, m_obContentSize.height - 20}, !m_server.icon.empty());
+        auto ls = LazySprite::create({m_obContentSize.height - 10, m_obContentSize.height - 10}, !m_server.icon.empty());
         ls->setAutoResize(true);
         ls->setScale(1.f);
-        ls->setLoadCallback([icon](Result<> status) {
+        ls->setLoadCallback([this, &icon, ls](Result<> status) {
             if (status.isErr()) {
-                icon->initWithSpriteFrameName("grayGdLogo.png"_spr);
+               ls->removeFromParent();
+	       icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr
+  );
+              if (icon) {
+                  icon->setScale((this->getContentHeight() - 10) / icon->getContentHeight());
+icon->setID("icon");
+this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
+              }
             }
         });
         ls->loadFromUrl(m_server.icon);
         icon = ls;
     }
 
+    if (icon) {
     icon->setID("icon");
-    this->addChildAtPosition(icon, Anchor::Left, {7.5f + m_obContentSize.height / 2 - 10, 0});
+    this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
+    }
 }
 
 GDPSTypes::Server& ServerNode::getServer() {

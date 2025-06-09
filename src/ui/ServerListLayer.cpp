@@ -75,12 +75,12 @@ bool ServerListLayer::init() {
     editBtn->setID("edit-button");
     m_bottomMenu->addChild(editBtn);
 
-    auto gplusSignInBtn = CCMenuItemExt::createSpriteExtraWithFrameName("gplusSignIn_001.png", 1.f, [this](auto) {
-        for (auto server : std::ranges::views::values(m_servers)) {
-            ServerInfoManager::get()->fetch(server);
-        }
-    });
-    m_bottomMenu->addChild(gplusSignInBtn);
+    //auto gplusSignInBtn = CCMenuItemExt::createSpriteExtraWithFrameName("gplusSignIn_001.png", 1.f, [this](auto) {
+    //    for (auto server : std::ranges::views::values(m_servers)) {
+    //        ServerInfoManager::get()->fetch(server);
+    //    }
+    //});
+    //m_bottomMenu->addChild(gplusSignInBtn);
 
     m_bottomMenu->setLayout(
         geode::ColumnLayout::create()
@@ -98,21 +98,30 @@ bool ServerListLayer::init() {
     auto top = CCSprite::createWithSpriteFrameName("GJ_table_top_001.png");
     scrollFrame->addChildAtPosition(top, geode::Anchor::Top, {0.f, 15.5});
     top->setZOrder(1);
+    top->setID("top");
 
     auto right = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     right->setFlipX(true);
     right->setScaleY(3.438f); 
     scrollFrame->addChildAtPosition(right, geode::Anchor::Right, {6.f, 0.f});
     right->setZOrder(1);
+    right->setID("right");
 
     auto left = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     left->setScaleY(3.438f);
     scrollFrame->addChildAtPosition(left, geode::Anchor::Left, {-6.f, 0.f});
     left->setZOrder(1);
+    left->setID("left");
 
     auto bottom = CCSprite::createWithSpriteFrameName("GJ_table_bottom_001.png");
+    bottom->setID("bottom");
     scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, -13.f});
     bottom->setZOrder(1);
+
+    auto title = CCLabelBMFont::create("Private Servers", "goldFont.fnt");
+    title->setID("title");
+    title->setZOrder(2);
+    scrollFrame->addChildAtPosition(title, geode::Anchor::Top, {0.f, 19.5f});
 
     m_scroll = geode::ScrollLayer::create({356, 220});
     m_scroll->setID("server-scroll");
@@ -187,7 +196,7 @@ void ServerListLayer::updateList() {
         if (it == m_servers.end()) continue;
         odd = !odd;
         auto& server = it->second;
-        auto node = ServerNode::create(server, {356, 75}, this, odd);
+        auto node = ServerNode::create(server, {356, 55}, this, odd);
         if (server.id == -2) {
             node->m_locked = true;
         }
