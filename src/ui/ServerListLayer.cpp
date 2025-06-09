@@ -142,6 +142,8 @@ bool ServerListLayer::init() {
 
     updateList();
 
+    m_scroll->scrollToTop();
+
     if (Mod::get()->getSavedValue("secret-settings", false)) {
         m_konamiPos = 12;
 
@@ -193,7 +195,7 @@ void ServerListLayer::updateList() {
         m_scroll->m_contentLayer->addChild(node);
     }
     m_scroll->m_contentLayer->updateLayout();
-    m_scroll->scrollToTop();
+    // m_scroll->scrollToTop();
 }
 
 void ServerListLayer::keyBackClicked() {

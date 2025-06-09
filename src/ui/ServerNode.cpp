@@ -235,21 +235,23 @@ void ServerNode::setEditing(bool editing) {
     if (auto btn = m_menu->getChildByID("edit-btn")) btn->setVisible(show);
     if (auto btn = m_menu->getChildByID("delete-btn")) btn->setVisible(show);
     auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
+    log::info("{}", order);
+    log::info("{}", m_server.id);
     auto it = std::find(order.begin(), order.end(), m_server.id);
     if (auto btn = m_menu->getChildByID("up-btn")) {
         btn->setVisible(show);
-        auto spr = btn->getChildByType<CCSprite *>(0);
+        auto spr = btn->getChildByType<CCSprite*>(0);
         if (spr) {
-            bool isSecondToLast = (it != order.end() && std::distance(it, order.end()) == 2);
-            spr->setVisible(!isSecondToLast);
+            bool isSecond = it != order.end() && std::next(order.begin()) == it;
+            spr->setVisible(!isSecond);
         }
     }
     if (auto btn = m_menu->getChildByID("down-btn")) {
         btn->setVisible(show);
-        auto spr = btn->getChildByType<CCSprite *>(0);
+        auto spr = btn->getChildByType<CCSprite*>(0);
         if (spr) {
-            bool isFirst = (it != order.end() && it == order.begin());
-            spr->setVisible(!isFirst);
+            bool isLast = (it != order.end() && std::prev(order.end()) == it);
+            spr->setVisible(!isLast);
         }
     }
     if (auto btn = m_menu->getChildByID("use-btn")) btn->setVisible(!m_editing);

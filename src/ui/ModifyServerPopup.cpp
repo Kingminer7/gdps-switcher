@@ -1,4 +1,5 @@
 #include "ModifyServerPopup.hpp"
+#include "utils/ServerInfoManager.hpp"
 #include "Geode/ui/BasedButtonSprite.hpp"
 #include "utils/MigrationManager.hpp"
 #include "utils/GDPSMain.hpp"
@@ -158,6 +159,7 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         server.name = m_nameInput->getString();
         server.url = m_urlInput->getString();
         server.saveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
+	ServerInfoManager::get()->fetch(server);
     }
     m_listLayer->updateList();
     GDPSMain::get()->save();
