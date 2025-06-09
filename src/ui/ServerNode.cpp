@@ -24,7 +24,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
 
     auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
-    nameLab->limitLabelWidth(size.width - 120, .6f, 0.f);
+    nameLab->limitLabelWidth(size.width - 160, .6f, 0.f);
     nameLab->setAnchorPoint({0.f, 0.f});
     this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -nameLab->getContentHeight()/2 - 8});
 
@@ -33,6 +33,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     m_editMenu = CCMenu::create();
     m_editMenu->setID("edit-menu");
     m_editMenu->setContentSize({55, size.height});
+    m_editMenu->setVisible(false);
     auto layout = RowLayout::create()
         ->setAxisAlignment(AxisAlignment::End)
         ->setAxisReverse(true)
@@ -48,15 +49,6 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     m_useMenu = CCMenu::create();
     m_useMenu->setID("use-menu");
     m_useMenu->setContentSize({90, size.height});
-    layout = RowLayout::create()
-        ->setAxisAlignment(AxisAlignment::End)
-        ->setAxisReverse(true)
-        ->setGap(3.3f)
-        ->setCrossAxisOverflow(true)
-        ->setGrowCrossAxis(true)
-        ->setCrossAxisAlignment(AxisAlignment::Center);
-    layout->ignoreInvisibleChildren(true);
-    m_useMenu->setLayout(layout);
     m_useMenu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_useMenu, Anchor::Right, {-8, 0});
 
@@ -66,8 +58,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
     useBtn->setEnabled(list->m_selectedServer != m_server.id);
-    m_useMenu->addChild(useBtn);
-    m_useMenu->updateLayout();
+    m_useMenu->addChildAtPosition(useBtn, Anchor::Right, {-useBtn->getContentWidth() / 2, 0});
 
     auto editSpr = CCSprite::create("GJ_button_04.png");
     editSpr->setScale(.5475f);
@@ -79,7 +70,6 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
         this,
         menu_selector(ServerNode::onEdit)
     );
-    editBtn->setVisible(false);
     editBtn->setID("edit-btn");
 
     auto deleteSpr = CCSprite::create("GJ_button_06.png");
@@ -93,7 +83,6 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
         menu_selector(ServerNode::onDelete)
     );
     deleteBtn->setID("delete-btn");
-    deleteBtn->setVisible(false);
 
     auto upSpr = CCSprite::create("GJ_button_05.png");
     upSpr->setScale(0.5475f);
@@ -107,7 +96,6 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
         menu_selector(ServerNode::onMove)
     );
     upBtn->setID("up-btn");
-    upBtn->setVisible(false);
 
     auto downSpr = CCSprite::create("GJ_button_05.png");
     downSpr->setScale(0.5475f);
@@ -121,7 +109,6 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
         menu_selector(ServerNode::onMove)
     );
     downBtn->setID("down-btn");
-    downBtn->setVisible(false);
 
     m_editMenu->addChild(editBtn);
     m_editMenu->addChild(upBtn);
@@ -161,17 +148,20 @@ void ServerNode::updateSelected(GDPSTypes::Server server) {
         spr->setString("Use");
         btn->setEnabled(true);
     }
-    m_useMenu->updateLayout();
+    auto alo = static_cast<AnchorLayoutOptions*>(btn->getLayoutOptions());
     // For some reason the CCMenuItemSpriteExtra gets changed so i gotta fix it... we love robtop code
     btn->setContentSize(spr->getScaledContentSize());   
     spr->setPosition(btn->getContentSize() / 2);
+    alo->setOffset({-btn->getContentWidth() / 2, 0});
+    btn->updateLayout();
+    m_useMenu->updateLayout();
 }
 
 void ServerNode::updateInfo() {
     m_server = GDPSMain::get()->m_servers[m_server.id];
     if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
         nameLab->setString(m_server.name.c_str());
-        nameLab->limitLabelWidth(this->m_obContentSize.width - 80, .7f, 0.f);
+        nameLab->limitLabelWidth(this->m_obContentSize.width - 160, .7f, 0.f);
     }
 
     auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"));
@@ -248,31 +238,18 @@ void ServerNode::onDelete(CCObject *sender) {
 
 void ServerNode::setEditing(bool editing) {
     m_editing = editing;
-    bool show = m_editing && !m_locked;
-    if (auto btn = m_editMenu->getChildByID("edit-btn")) btn->setVisible(show);
-    if (auto btn = m_editMenu->getChildByID("delete-btn")) btn->setVisible(show);
+    m_useMenu->setVisible(!m_editing);
+    m_editMenu->setVisible(m_editing && !m_locked);
     auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
-    log::info("{}", order);
-    log::info("{}", m_server.id);
     auto it = std::find(order.begin(), order.end(), m_server.id);
     if (auto btn = m_editMenu->getChildByID("up-btn")) {
-        btn->setVisible(show);
-        auto spr = btn->getChildByType<CCSprite*>(0);
-        if (spr) {
-            bool isSecond = it != order.end() && std::next(order.begin()) == it;
-            spr->setVisible(!isSecond);
-        }
+        bool isSecond = it != order.end() && std::next(order.begin()) == it;
+        btn->setVisible(!isSecond);
     }
     if (auto btn = m_editMenu->getChildByID("down-btn")) {
-        btn->setVisible(show);
-        auto spr = btn->getChildByType<CCSprite*>(0);
-        if (spr) {
-            bool isLast = (it != order.end() && std::prev(order.end()) == it);
-            spr->setVisible(!isLast);
-        }
+        bool isLast = (it != order.end() && std::prev(order.end()) == it);
+        btn->setVisible(!isLast);
     }
-    if (auto btn = m_editMenu->getChildByID("use-btn")) btn->setVisible(!m_editing);
-    m_editMenu->updateLayout();
 }
 
 bool ServerNode::isEditing() {
