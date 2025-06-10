@@ -52,8 +52,9 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     m_useMenu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_useMenu, Anchor::Right, {-8, 0});
 
-    auto useSpr = ButtonSprite::create(list->m_selectedServer == m_server.id ? "In Use" : "Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png");
-    useSpr->setScale(.7f);
+    auto useSpr = ButtonSprite::create("Use", 66, 0, 0.7f, false, "bigFont.fnt", "GJ_button_01.png", 30);
+    // auto useSpr = ButtonSprite::create(list->m_selectedServer == m_server.id ? "In Use" : "Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png", .2f);
+    // useSpr->setScale(.7f);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
@@ -116,6 +117,8 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     m_editMenu->addChild(downBtn);
 
     m_editMenu->updateLayout();
+
+    updateSelected(m_listLayer->m_servers[m_listLayer->m_selectedServer]);
 
     return true;
 };
