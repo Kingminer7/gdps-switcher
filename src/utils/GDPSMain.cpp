@@ -46,6 +46,7 @@ void GDPSMain::init() {
     auto base = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
     base.iconIsSprite = true;
     base.icon = "gdlogo.png"_spr;
+    base.motd = "Vanilla Geometry Dash servers.";
     // ReSharper disable once CppDFAArrayIndexOutOfBounds
     m_servers[-2] = base;
     const auto &server = m_servers[m_currentServer];
