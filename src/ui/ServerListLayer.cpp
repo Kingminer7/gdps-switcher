@@ -199,13 +199,12 @@ void ServerListLayer::updateList() {
 
     m_servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->removeAllChildren();
-    bool odd = false;
+    int index = 0;
     for (int id : order) {
         auto it = m_servers.find(id);
         if (it == m_servers.end()) continue;
-        odd = !odd;
         auto& server = it->second;
-        auto node = ServerNode::create(server, {356, 55}, this, odd);
+        auto node = ServerNode::create(server, {356, 55}, this, index++);
         if (server.id == -2) {
             node->m_locked = true;
         }

@@ -5,8 +5,9 @@
 
 #include <Geode/ui/LazySprite.hpp>
 
-bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
+bool ServerNode::init(CCSize size, ServerListLayer *list, int index) {
     if (!CCNode::init()) return false;
+    m_index = index;
 
     m_listener.bind([this](LoadDataEvent *event) {
         updateInfo();
@@ -18,7 +19,21 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     this->m_obContentSize = size;
     this->setAnchorPoint({.5f, .5f});
 
-    auto bg = CCLayerColor::create(odd ? ccColor4B{0, 0, 0, 60} : ccColor4B{0, 0, 0, 30}, size.width, size.height);
+    ccColor4B color;
+    if (Mod::get()->getSavedValue("ss-rainbow", false)) {
+	switch(index % 6) {
+	    case 0: color = ccc4(228, 3, 3, 150); break;
+	    case 1: color = ccc4(255, 140, 0, 150); break;
+	    case 2: color = ccc4(255, 237, 0, 150); break;
+	    case 3: color = ccc4(0, 128, 38, 150); break;
+	    case 4: color = ccc4(0, 77, 255, 150); break;
+	    case 5: color = ccc4(117, 7, 135, 150); break;
+	}
+    } else {
+        color = index % 2 == 0 ? ccColor4B{0, 0, 0, 60} : ccColor4B{0, 0, 0, 30};
+    }
+
+    auto bg = CCLayerColor::create(color, size.width, size.height);
     bg->setID("background");
     bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
@@ -122,9 +137,9 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     return true;
 };
 
-ServerNode *ServerNode::create(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, bool odd) {
+ServerNode *ServerNode::create(GDPSTypes::Server& server, CCSize size, ServerListLayer *list, int index) {
     auto ret = new ServerNode(server);
-    if (ret && ret->init(size, list, odd)) {
+    if (ret && ret->init(size, list, index)) {
         ret->autorelease();
         return ret;
     }

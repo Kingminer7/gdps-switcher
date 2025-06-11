@@ -74,6 +74,10 @@ bool BonusSettingsPopup::setup() {
         Mod::get()->setSavedValue("ss-nintendo-switcher", !toggler->m_toggled);
         m_reloadLayer = true;
     })
+    makeToggle(rainbow, "Rainbow Nodes", "rainbow-toggle", "ss-rainbow", false, [this](CCMenuItemToggler *toggler){
+	Mod::get()->setSavedValue("ss-rainbow", !toggler->m_toggled);
+        m_reloadLayer = true;
+    })
     makeButton(hideBtn, "hide-button", "Deactivate Menu", "GJ_button_01.png", [this](auto){ 
         geode::createQuickPopup("Are you sure?", "Are you sure you want to disable the secret settings?", "Cancel", "Yes", [this](FLAlertLayer* popup, bool second){
             if (second) {
