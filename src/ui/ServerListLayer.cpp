@@ -1,6 +1,7 @@
 #include "ServerListLayer.hpp"
 #include "ModifyServerPopup.hpp"
 #include "ServerNode.hpp"
+#include "BonusSettingsPopup.hpp"
 #include "Types.hpp"
 #include "utils/GDPSMain.hpp"
 #include "utils/ServerInfoManager.hpp"
@@ -14,6 +15,8 @@ int ServerListLayer::m_selectedServer = -1;
 bool ServerListLayer::init() {
     if (!CCLayer::init()) return false;
 
+    bool switcherTheme = Mod::get()->getSavedValue<bool>("ss-nintendo-switcher");
+
     registerWithTouchDispatcher();
 
     if (m_selectedServer == -1) m_selectedServer = GDPSMain::get()->m_currentServer;
@@ -23,6 +26,7 @@ bool ServerListLayer::init() {
     this->setKeypadEnabled(true);
 
     auto bg = geode::createLayerBG();
+    if (switcherTheme) bg->setColor({0, 228, 255});
     bg->setID("background");
     this->addChild(bg);
 
@@ -90,7 +94,7 @@ bool ServerListLayer::init() {
     );
     this->addChildAtPosition(m_bottomMenu, geode::Anchor::BottomRight, ccp(-25.f, 25.f / 4.f), false);
     
-    auto scrollFrame = CCLayerColor::create({191, 114, 62, 255}, 356, 220);
+    auto scrollFrame = CCLayerColor::create(switcherTheme ? ccColor4B{255, 0, 0, 255} : ccColor4B{191, 114, 62, 255}, 356, 220);
     scrollFrame->setID("server-frame");
     scrollFrame->ignoreAnchorPointForPosition(false);
     addChildAtPosition(scrollFrame, geode::Anchor::Center, {0.f, 0.f}, false);
@@ -99,6 +103,7 @@ bool ServerListLayer::init() {
     scrollFrame->addChildAtPosition(top, geode::Anchor::Top, {0.f, 15.5});
     top->setZOrder(1);
     top->setID("top");
+    if (switcherTheme) top->setColor({255, 0, 0});
 
     auto right = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     right->setFlipX(true);
@@ -106,19 +111,22 @@ bool ServerListLayer::init() {
     scrollFrame->addChildAtPosition(right, geode::Anchor::Right, {6.f, 0.f});
     right->setZOrder(1);
     right->setID("right");
+    if (switcherTheme) right->setColor({255, 0, 0});
 
     auto left = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
     left->setScaleY(3.438f);
     scrollFrame->addChildAtPosition(left, geode::Anchor::Left, {-6.f, 0.f});
     left->setZOrder(1);
     left->setID("left");
+    if (switcherTheme) left->setColor({255, 0, 0});
 
     auto bottom = CCSprite::createWithSpriteFrameName("GJ_table_bottom_001.png");
     bottom->setID("bottom");
     scrollFrame->addChildAtPosition(bottom, geode::Anchor::Bottom, {0.f, -13.f});
     bottom->setZOrder(1);
+    if (switcherTheme) bottom->setColor({255, 0, 0});
 
-    auto title = CCLabelBMFont::create("Private Servers", "bigFont.fnt");
+    auto title = CCLabelBMFont::create(switcherTheme ? "Nintendo Switcher" : "Private Servers", "bigFont.fnt");
     title->setScale(.8f);
     title->setID("title");
     title->setZOrder(2);
@@ -278,7 +286,8 @@ void ServerListLayer::onEdit(CCObject *sender) {
 }
 
 void ServerListLayer::onSettings(CCObject *sender) {
-    FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
+    BonusSettingsPopup::create()->show();
+    // FLAlertLayer::create("Sorry!", "The bonus settings aren't implemented yet. Check back later!", "Ok")->show();
 }
 
 

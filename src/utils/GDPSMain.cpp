@@ -32,7 +32,6 @@ void GDPSMain::save() const {
         servers.erase(-2);
     }
     Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
-
 }
 
 GDPSMain *GDPSMain::m_instance = nullptr;

@@ -21,7 +21,7 @@ namespace GDPSTypes {
 
         // Doesn't save below this comment
         bool infoLoaded = false;
-        std::string motd = "A Geometry Dash Private Server.";
+        std::string motd = "<h>A <cr>G<co>e<cy>o<cg>m<cb>e<ca>t</c>ry <c-00AEFF>Da<cad>s<c-hg954k>h P</c>rivate Server. dkl;fdlsakjdfkjldfsklaj;fsdkl;ajsdfklja;fklj;sdaksflj;dasfklj;da";
         bool iconIsSprite = false;
         std::string icon;
 

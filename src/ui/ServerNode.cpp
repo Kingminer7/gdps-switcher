@@ -1,6 +1,7 @@
 #include "ServerNode.hpp"
 #include "utils/GDPSMain.hpp"
 #include "ModifyServerPopup.hpp"
+#include "ColorLabel.hpp"
 
 #include <Geode/ui/LazySprite.hpp>
 
@@ -24,7 +25,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
 
     auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
-    nameLab->limitLabelWidth(size.width - 160, .6f, 0.f);
+    nameLab->limitLabelWidth(size.width - 150, .6f, 0.f);
     nameLab->setAnchorPoint({0.f, 0.f});
     this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -nameLab->getContentHeight()/2 - 8});
 
@@ -52,9 +53,8 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     m_useMenu->setAnchorPoint({1.f, 0.5f});
     this->addChildAtPosition(m_useMenu, Anchor::Right, {-8, 0});
 
-    auto useSpr = ButtonSprite::create("Use", 66, 0, 0.7f, false, "bigFont.fnt", "GJ_button_01.png", 30);
-    // auto useSpr = ButtonSprite::create(list->m_selectedServer == m_server.id ? "In Use" : "Use", "bigFont.fnt", list->m_selectedServer == m_server.id ? "GJ_button_02.png" : "GJ_button_01.png", .2f);
-    // useSpr->setScale(.7f);
+    auto useSpr = ButtonSprite::create("Use", 66, 0, 0.6f, false, "bigFont.fnt", "GJ_button_01.png", 30);
+    useSpr->setScale(.95);
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
@@ -103,7 +103,6 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, bool odd) {
     auto downArrowSpr = CCSprite::createWithSpriteFrameName("d_arrow_03_001.png");
     downArrowSpr->setScale(0.6f);
     downArrowSpr->setRotation(90.f);
-    downSpr->addChildAtPosition(downArrowSpr, Anchor::Center);
     auto downBtn = CCMenuItemSpriteExtra::create(
         downSpr,
         this,
@@ -164,21 +163,22 @@ void ServerNode::updateInfo() {
     m_server = GDPSMain::get()->m_servers[m_server.id];
     if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
         nameLab->setString(m_server.name.c_str());
-        nameLab->limitLabelWidth(this->m_obContentSize.width - 160, .7f, 0.f);
+        nameLab->limitLabelWidth(this->m_obContentSize.width - 150, .6f, 0.f);
     }
 
-    auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"));
+    // auto motdArea = static_cast<MDTextArea *>(this->getChildByID("motd"));
+    auto motdArea = static_cast<ColorLabel *>(this->getChildByID("motd"));
     if (!motdArea) {
-        motdArea = MDTextArea::create(m_server.motd, {205.f, getContentHeight() - 27.f});
+        // motdArea = MDTextArea::create(m_server.motd, {205.f, getContentHeight() - 27.f});
+        motdArea = ColorLabel::create(m_server.motd, {205.f, getContentHeight() - 30.f}, .75f, 60);
         motdArea->setID("motd");
-	motdArea->getChildByType<CCScale9Sprite>(0)->setVisible(false);
-        motdArea->getScrollLayer()->setTouchEnabled(false);
-        motdArea->getScrollLayer()->setMouseEnabled(false);
+	    // motdArea->getChildByType<CCScale9Sprite>(0)->setVisible(false);
+        // motdArea->getScrollLayer()->setTouchEnabled(false);
+        // motdArea->getScrollLayer()->setMouseEnabled(false);
         motdArea->setAnchorPoint({0.f, 0.f});
         this->addChildAtPosition(motdArea, Anchor::BottomLeft, {61.f, 4.5f});
     }
-    motdArea->setString(m_server.motd.c_str());
-
+    motdArea->setText(m_server.motd.c_str());
     if (auto icon = this->getChildByID("icon")) {
         icon->removeFromParent();
     }

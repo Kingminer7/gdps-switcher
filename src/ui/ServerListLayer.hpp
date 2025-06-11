@@ -13,7 +13,6 @@ class ServerListLayer : public cocos2d::CCLayer {
         bool init() override;
         void keyBackClicked() override;
 
-        int m_konamiPos = 0;
         bool m_isEditing = false;
 
         cocos2d::CCMenu *m_backMenu = nullptr;
@@ -47,4 +46,6 @@ class ServerListLayer : public cocos2d::CCLayer {
 
         static int m_selectedServer;
         std::map<int, GDPSTypes::Server> m_servers;
+
+        int m_konamiPos = 0;
 };
