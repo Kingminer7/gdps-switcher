@@ -8,5 +8,5 @@ $motd = "A Geometry Dash Private Server.";
 
 # The link to the icon for the server.
 # This should be a link to a png.
-$icon = "https://raw.githubusercontent.com/Kingminer7/pixel-art/refs/heads/main/pfp/pfp.png";
+$icon = "https://github.com/Kingminer7/gdps-switcher/blob/main/resources/gdlogo.png";
 ?>
