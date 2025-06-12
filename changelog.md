@@ -5,7 +5,6 @@
 - Some minor server customization options. Currently only MOTDs and logos are possible.
 - Finish documentation (TODO) (REMOVE THIS)
 - Check reimpled URI support (TODO) (REMOVE THIS)
-- Fix servers in logo (TODO) (REMOVE THIS)
 - Secrets
 # 1.3.0
 ### Add URI support
