@@ -9,7 +9,7 @@ void ServerInfoManager::fetch(GDPSTypes::Server& server) {
     if (server.infoLoaded == false) {
         server.infoLoaded = true;
         if (server.id < 0) return;
-        // idk weird shit
+        // idk weird stuff
         int id = server.id;
         std::string url = server.url;
         m_listeners[server.id].bind([this, id, url] (utils::web::WebTask::Event* e) {
