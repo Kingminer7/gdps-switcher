@@ -8,7 +8,7 @@ Simple mod that lets you change your game servers.
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
-- MOTD and logo support (server owners see [here](https://github.com/Kingminer7/gdps-switcher/wiki/))
+- MOTD and logo support (server owners see [here](https://github.com/Kingminer7/gdps-switcher/wiki/Server-Integration))
 ## Credits
 - [Brift](https://x.com/BriftXD) - Pencil icon
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
