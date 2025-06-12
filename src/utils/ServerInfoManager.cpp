@@ -31,7 +31,11 @@ void ServerInfoManager::fetch(GDPSTypes::Server& server) {
         });
 
         auto req = web::WebRequest();
-        m_listeners[server.id].setFilter(req.get(fmt::format("{}/switcher/getInfo.php", server.url)));
+        std::string endpoint = server.url;
+        if (!endpoint.empty() && endpoint.back() != '/')
+            endpoint += "/";
+        endpoint += "switcher/getInfo.php";
+        m_listeners[server.id].setFilter(req.get(endpoint));
     }
 }
 

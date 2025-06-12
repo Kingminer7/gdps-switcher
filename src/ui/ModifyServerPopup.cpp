@@ -5,6 +5,7 @@
 #include "utils/GDPSMain.hpp"
 #include "Types.hpp"
 #include <regex>
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer) {
     this->m_listLayer = layer;
@@ -159,6 +160,9 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         server.name = m_nameInput->getString();
         server.url = m_urlInput->getString();
         server.saveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
+        if (gdpsMain->m_currentServer == server.id) {
+            ServerAPIEvents::updateServer(server.id, server.url);
+        }
 	ServerInfoManager::get()->fetch(server);
     }
     m_listLayer->updateList();

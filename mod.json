@@ -33,10 +33,20 @@
 		}
 	},
 	"dependencies": {
-		"km7dev.server_api": "2.0.0",
-		"camila314.geode-uri": {
+		"km7dev.server_api": "2.0.2"
+	},
+	"incompatibilities": {
+		"capeling.geometry-dash-lunar": {
 			"version": "1.0.0",
-			"importance": "suggested"
+			"importance": "breaking"
+		},
+		"teamtcm.geometry-dash-odyssey": {
+			"version": "1.0.0",
+			"importance": "breaking"
+		},
+		"chumiiu.geometry_dash_time_reborn": {
+			"version": "1.0.0",
+			"importance": "breaking"
 		}
 	},
 	"api": {

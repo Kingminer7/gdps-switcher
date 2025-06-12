@@ -8,12 +8,12 @@ Simple mod that lets you change your game servers.
 ## Features
 - Separate saves for servers
 - Importing/exporting server lists
-- URI Handling if you have [Geode URI Scheme](https://geode-sdk.org/mods/camila314.geode-uri) by Camila314 (usage: `geode://gdps/add/[url];[name]`)
+- MOTD and logo support (server owners see [here](https://github.com/Kingminer7/gdps-switcher/wiki/))
 ## Credits
 - [Brift](https://x.com/BriftXD) - Pencil icon
 - [Geode Discord](https://discord.com/geode) - answering and helping with my stupid questions and issues
-- [Uproxide](https://x.com/uproxide) - Event levels (Both the idea and some of the functionality)
-- [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac
+- [Uproxide](https://x.com/uproxide) - Event levels in 2.206 (Both the idea and some of the functionality)
+- [TheSillyDoggo](https://github.com/TheSillyDoggo) - Finding some bindings for the event levels to work on mac in 2.206
 - [OmgRod](https://github.com/OmgRod) - Suggesting and initial implementation of the API
 - [RighteousRyan](https://github.com/RighteousRyan1) - Finding another save file bug and helping me test
 - [cdc](https://github.com/cdc-sys) - Regex for server URLs
