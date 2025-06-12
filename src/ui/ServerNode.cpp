@@ -118,6 +118,7 @@ bool ServerNode::init(CCSize size, ServerListLayer *list, int index) {
     auto downArrowSpr = CCSprite::createWithSpriteFrameName("d_arrow_03_001.png");
     downArrowSpr->setScale(0.6f);
     downArrowSpr->setRotation(90.f);
+    downSpr->addChildAtPosition(downArrowSpr, Anchor::Center);
     auto downBtn = CCMenuItemSpriteExtra::create(
         downSpr,
         this,
