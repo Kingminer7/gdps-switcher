@@ -49,13 +49,6 @@ jobs:
 
       - name: Set Release Build
         run: echo "RELEASE_BUILD=${{ github.event.inputs.build_type == 'release' }}" >> $GITHUB_ENV
-      
-      # - name: Download Server API
-      #   run: |
-      #     mkdir -p ${{ github.workspace }}/cli-profile/geode/mods
-      #     curl -L -o ${{ github.workspace }}/cli-profile/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/nightly/km7dev.server_api.geode
-      #     mkdir -p ${{ github.workspace }}/cli-profile/Contents/geode/mods
-      #     curl -L -o ${{ github.workspace }}/cli-profile/Contents/geode/mods/km7dev.server_api.geode https://github.com/Kingminer7/server-api/releases/download/nightly/km7dev.server_api.geode
 
       - name: Build the mod
         uses: hiimjasmine00/build-geode-mod@xwin
@@ -63,7 +56,7 @@ jobs:
           bindings: geode-sdk/bindings
           bindings-ref: main
           combine: true
-          build-config: ${{ github.event.inputs.build_type != 'release' && 'RelWithDebInfo' || 'Release' }}
+          build-config: ${{ (matrix.config.target == 'Android64' || matrix.config.target == 'Android32') && 'Release' || (github.event.inputs.build_type != 'release' && 'RelWithDebInfo' || 'Release') }}
           export-pdb: true
           export-symbols: true
           target: ${{ matrix.config.target }}
