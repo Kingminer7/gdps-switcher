@@ -186,7 +186,7 @@ void ServerNode::updateInfo() {
     auto motdArea = static_cast<ColorLabel *>(this->getChildByID("motd"));
     if (!motdArea) {
         // motdArea = MDTextArea::create(m_server.motd, {205.f, getContentHeight() - 27.f});
-        motdArea = ColorLabel::create(m_server.motd, {205.f, getContentHeight() - 30.f}, .75f, 60);
+        motdArea = ColorLabel::create(m_server.motd, {205.f, getContentHeight() - 30.f}, .75f, 70);
         motdArea->setID("motd");
 	    // motdArea->getChildByType<CCScale9Sprite>(0)->setVisible(false);
         // motdArea->getScrollLayer()->setTouchEnabled(false);

@@ -15,7 +15,7 @@ Result<> MigrationManager::setup() {
         return Err(fmt::format("'{}' exists but is not a directory.", savePath.string()));
     }
 
-    if (Mod::get()->getSavedValue<std::string>("latest") != "1.4.0") {
+    if (Mod::get()->getSavedValue<bool>("1.4.0-migration") != true) {
         migrateData();
     }
 
@@ -86,7 +86,7 @@ void MigrationManager::migrateData() {
             }
         }
     }
-    Mod::get()->setSavedValue<std::string>("latest", "1.4.0");
+    Mod::get()->setSavedValue<bool>("1.4.0-migration", true);
 }
 
 GDPSTypes::Server MigrationManager::fromOldServer(GDPSTypes::OldServer server) {
