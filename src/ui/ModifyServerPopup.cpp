@@ -163,8 +163,8 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         if (gdpsMain->m_currentServer == server.id) {
             ServerAPIEvents::updateServer(server.id, server.url);
         }
-	ServerInfoManager::get()->fetch(server);
     }
+	ServerInfoManager::get()->fetch(server);
     m_listLayer->updateList();
     GDPSMain::get()->save();
     Popup::onClose(sender);
