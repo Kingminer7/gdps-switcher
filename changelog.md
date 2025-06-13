@@ -1,3 +1,6 @@
+# 1.4.1
+### API Fix
+- <cy>Fix API for mods like GDPS Hub</c>
 # 1.4.0
 ### Major changes
 - <cg>Added regex to urls</c>

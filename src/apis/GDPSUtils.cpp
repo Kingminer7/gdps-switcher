@@ -9,6 +9,9 @@ Result<int> GDPSUtils::createServer(std::string name, std::string url, std::stri
     int id = 0;
     for (auto &[serverId, server] : GDPSMain::get()->m_servers) {
         if (serverId < 0) continue;
+        if (server.url == url) {
+            return Err("Server already saved as {}", name);
+        }
         if (serverId == id) id++;
         else break;
     }

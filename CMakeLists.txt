@@ -8,12 +8,10 @@ else()
 	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
 
-project(GDPSSwitcher VERSION 1.4.0)
+project(GDPSSwitcher VERSION 1.4.1)
 
-file(GLOB SOURCES CONFIGURE_DEPENDS
-    src/utils/*.cpp
-    src/hooks/*.cpp
-    src/ui/*.cpp
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
+    src/*.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
