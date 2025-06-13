@@ -25,7 +25,6 @@ void ColorLabel::updateLabel() {
     m_renderer->pushHorizontalAlign(geode::TextAlignment::Begin);
     auto colored = getColoredText(m_text, m_charLimit);
     for (auto [color, text] : colored) {
-        geode::log::info("{}: {}", text, color);
         m_renderer->pushColor(color);
         m_renderer->renderString(text);
     }
