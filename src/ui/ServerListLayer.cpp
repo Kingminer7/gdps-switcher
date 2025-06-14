@@ -251,6 +251,7 @@ cocos2d::CCScene *ServerListLayer::scene() {
 
 void ServerListLayer::onSelect(const GDPSTypes::Server &server) const {
     m_selectedServer = server.id;
+    GDPSMain::get()->m_switching = m_selectedServer != GDPSMain::get()->m_currentServer;
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
         node->updateSelected(server);

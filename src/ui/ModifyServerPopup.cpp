@@ -5,6 +5,7 @@
 #include "Types.hpp"
 #include <regex>
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
+#include "../hooks/GManager.hpp"
 
 bool ModifyServerPopup::setup(GDPSTypes::Server server, ServerListLayer * layer) {
     this->m_listLayer = layer;
@@ -157,9 +158,45 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         if (!gdpsMain->m_servers.contains(server.id)) {
             return;
         }
+        auto newSaveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
+        if (newSaveDir != server.saveDir) {
+            auto path = geode::dirs::getSaveDir() / "gdpses" / newSaveDir;
+            if (std::filesystem::exists(path)) {
+                auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
+                if (!std::filesystem::canonical(path).string().starts_with(gdpsesDir.string()) || std::filesystem::equivalent(path, gdpsesDir)) {
+                    log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", path.string());
+                    MDPopup::create("Hold up!", fmt::format("The save directory you chose already exists! GDPS Switcher will not automatically delete anything outside of `{}` or the directory itself to prevent extra data loss.", gdpsesDir.string()), "OK")->show();
+                    return;
+                }
+                geode::createQuickPopup("Hold up!", "The save directory you chose already exists! Do you want to overwrite it?", "No", "Yes", [this, path, newSaveDir, sender](auto, bool yes) {
+                    if (yes) {
+                        auto gdpsMain = GDPSMain::get();
+                        auto &server = gdpsMain->m_servers[m_server.id];
+                        std::filesystem::remove_all(path);
+                        if (std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir)) std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path);
+                        server.saveDir = newSaveDir;
+                        server.name = m_nameInput->getString();
+                        server.url = m_urlInput->getString();
+                        if (gdpsMain->m_currentServer == server.id) {
+                            ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
+                            GSGManager::updateFileNames();
+                        }
+                        ServerInfoManager::get()->fetch(server);
+                        m_listLayer->updateList();
+                        GDPSMain::get()->save();
+                        Popup::onClose(sender);
+                    }
+                });
+                return;
+            }
+            if (std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir)) std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path);
+            server.saveDir = newSaveDir;
+            if (gdpsMain->m_currentServer == server.id) {
+                GSGManager::updateFileNames();
+            }
+        }
         server.name = m_nameInput->getString();
         server.url = m_urlInput->getString();
-        server.saveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
         if (gdpsMain->m_currentServer == server.id) {
             ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
         }

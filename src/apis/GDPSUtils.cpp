@@ -4,7 +4,7 @@
 #include "../ui/ServerListLayer.hpp"
 #include "../utils/GDPSMain.hpp"
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
-
+#include "../utils/ServerInfoManager.hpp"
 using namespace geode::prelude;
 
 Result<int> GDPSUtils::createServer(std::string name, std::string url, std::string saveDir) {
@@ -62,14 +62,26 @@ Result<bool> GDPSUtils::deleteServer(int id) {
     if (it == GDPSMain::get()->m_servers.end()) {
         return Err("Server not found");
     }
-    if (GDPSMain::get()->m_currentServer == id) {
+    auto main = GDPSMain::get();
+    main->m_shouldSaveGameData = false;
+    auto serverPath = geode::dirs::getSaveDir() / "gdpses" / it->second.saveDir;
+    auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
+    if (std::filesystem::exists(serverPath)) {
+        if (std::filesystem::canonical(serverPath).string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
+            log::debug("Deleting {}", serverPath);
+            std::filesystem::remove_all(serverPath);
+        } else {
+            log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
+            return Err(fmt::format("Save directory {} is outside or equal to the gdpses directory and cannot be deleted automatically.", serverPath.string()));
+        }
+    }
+    if (ServerListLayer::m_selectedServer == it->second.id) {
         ServerListLayer::m_selectedServer = -2;
         Mod::get()->setSavedValue("current", -2);
-        GDPSMain::get()->m_shouldSaveGameData = false;
-        std::filesystem::remove_all(geode::dirs::getSaveDir() / "gdpses" / it->second.saveDir);
+        main->m_shouldSaveGameData = false;
     }
-    GDPSMain::get()->m_servers.erase(it);
-    GDPSMain::get()->save();
+    main->m_servers.erase(it);
+    main->save();
     return Ok(true);
 }
 
@@ -91,22 +103,48 @@ Result<GDPSTypes::Server> GDPSUtils::getServerInfo(int id) {
 }
 
 Result<bool> GDPSUtils::setServerInfo(int id, std::string name, std::string url, std::string saveDir) {
-    auto it = GDPSMain::get()->m_servers.find(id);
-    if (it == GDPSMain::get()->m_servers.end()) {
+    auto gdpsMain = GDPSMain::get();
+    auto it = gdpsMain->m_servers.find(id);
+    if (it == gdpsMain->m_servers.end()) {
         return Err("Server not found");
     }
+
     auto &server = it->second;
+
+    if (!saveDir.empty() && saveDir != server.saveDir) {
+        auto newSaveDirPath = geode::dirs::getSaveDir() / "gdpses" / saveDir;
+        auto oldSaveDirPath = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
+
+        if (std::filesystem::exists(newSaveDirPath)) {
+            auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
+            if (!std::filesystem::canonical(newSaveDirPath).string().starts_with(gdpsesDir.string()) || std::filesystem::equivalent(newSaveDirPath, gdpsesDir)) {
+                log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", newSaveDirPath.string());
+                return Err("Save directory already exists and cannot be overwritten.");
+            }
+            std::filesystem::remove_all(newSaveDirPath);
+        }
+
+        if (std::filesystem::exists(oldSaveDirPath)) {
+            std::filesystem::rename(oldSaveDirPath, newSaveDirPath);
+        }
+
+        server.saveDir = saveDir;
+    }
+
     if (!name.empty()) {
         server.name = name;
     }
+
     if (!url.empty()) {
         server.url = url;
     }
-    if (!saveDir.empty()) {
-        server.saveDir = saveDir;
+
+    if (gdpsMain->m_currentServer == id) {
+        ServerAPIEvents::updateServer(gdpsMain->m_serverApiId, server.url);
     }
-    if (GDPSMain::get()->m_currentServer == id) {
-        ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
-    }
+
+    ServerInfoManager::get()->fetch(server);
+    gdpsMain->save();
+
     return Ok(true);
 }

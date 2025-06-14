@@ -250,12 +250,24 @@ void ServerNode::onDelete(CCObject *sender) {
         if (second) {
             auto main = GDPSMain::get();
             main->m_shouldSaveGameData = false;
-            std::filesystem::remove_all(geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir);
-            log::debug("Deleting {}", geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir);
+            auto serverPath = geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir;
+            auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
+            if (std::filesystem::exists(serverPath)) {
+                if (std::filesystem::canonical(serverPath).string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
+                    log::debug("Deleting {}", serverPath);
+                    std::filesystem::remove_all(serverPath);
+                } else {
+                    log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
+                    MDPopup::create("Did not delete save", fmt::format("To prevent unintentional extra data loss, your save was not deleted - only saves within {} will be deleted. If you want to delete this data, do it manually.", gdpsesDir), "OK")->show();
+                }
+            }
+            if (m_listLayer->m_selectedServer == m_server.id) {
+                m_listLayer->m_selectedServer = -2;
+                Mod::get()->setSavedValue("current", -2);
+                GDPSMain::get()->m_shouldSaveGameData = false;
+            }
             main->m_servers.erase(m_server.id);
             main->save();
-            m_listLayer->m_selectedServer = -2;
-            Mod::get()->setSavedValue("current", -2);
             m_listLayer->updateList();
         }
     });

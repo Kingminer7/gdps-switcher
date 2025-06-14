@@ -25,4 +25,5 @@ class GDPSMain {
         int m_currentServer = -2;
         int m_serverApiId = 0;
         bool m_shouldSaveGameData = true;
+        bool m_switching = false;
 };

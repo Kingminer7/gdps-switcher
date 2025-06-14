@@ -2,6 +2,8 @@
 ### Some minor fixes
 - <cy>Fix saving from GDPS Hub and a deletion issue (found by tt_kybersport)</c>
 - <cy>Make deleting a server delete the save file</c>
+- <cy>Moving a server's save dir now moves the save files</c>
+- <cy>Return the old sound library fix while I work on a more permanent solution</c>
 # 1.4.1
 ### API Fix
 - <cy>Fix API for mods like GDPS Hub (found by tt_kybersport)</c>
