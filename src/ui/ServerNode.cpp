@@ -246,10 +246,16 @@ void ServerNode::onEdit(CCObject *sender) {
 
 void ServerNode::onDelete(CCObject *sender) {
     if (m_locked) return;
-    createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}?", m_server.name), "No", "Yes", [this](auto, bool second) {
+    createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}? This will delete your save data for the server.", m_server.name), "No", "Yes", [this](auto, bool second) {
         if (second) {
-            GDPSMain::get()->m_servers.erase(m_server.id);
-            GDPSMain::get()->save();
+            auto main = GDPSMain::get();
+            main->m_shouldSaveGameData = false;
+            std::filesystem::remove_all(geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir);
+            log::debug("Deleting {}", geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir);
+            main->m_servers.erase(m_server.id);
+            main->save();
+            m_listLayer->m_selectedServer = -2;
+            Mod::get()->setSavedValue("current", -2);
             m_listLayer->updateList();
         }
     });

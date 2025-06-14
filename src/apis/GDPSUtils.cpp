@@ -1,7 +1,9 @@
 // MUST be defined before including the header.
 #define GEODE_DEFINE_EVENT_EXPORTS
 #include <GDPSUtils.hpp>
+#include "../ui/ServerListLayer.hpp"
 #include "../utils/GDPSMain.hpp"
+#include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 using namespace geode::prelude;
 
@@ -21,6 +23,7 @@ Result<int> GDPSUtils::createServer(std::string name, std::string url, std::stri
     server.id = id;
     server.saveDir = saveDir.empty() ? fmt::format("{}", id) : saveDir;
     GDPSMain::get()->m_servers[id] = server;
+    GDPSMain::get()->save();
     return Ok(id);
 }
 
@@ -59,10 +62,14 @@ Result<bool> GDPSUtils::deleteServer(int id) {
     if (it == GDPSMain::get()->m_servers.end()) {
         return Err("Server not found");
     }
-    GDPSMain::get()->m_servers.erase(it);
     if (GDPSMain::get()->m_currentServer == id) {
-        GDPSMain::get()->m_currentServer = -1;
+        ServerListLayer::m_selectedServer = -2;
+        Mod::get()->setSavedValue("current", -2);
+        GDPSMain::get()->m_shouldSaveGameData = false;
+        std::filesystem::remove_all(geode::dirs::getSaveDir() / "gdpses" / it->second.saveDir);
     }
+    GDPSMain::get()->m_servers.erase(it);
+    GDPSMain::get()->save();
     return Ok(true);
 }
 
@@ -97,6 +104,9 @@ Result<bool> GDPSUtils::setServerInfo(int id, std::string name, std::string url,
     }
     if (!saveDir.empty()) {
         server.saveDir = saveDir;
+    }
+    if (GDPSMain::get()->m_currentServer == id) {
+        ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
     }
     return Ok(true);
 }

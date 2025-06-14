@@ -1,6 +1,10 @@
+# 1.4.2
+### Some minor fixes
+- <cy>Fix saving from GDPS Hub and a deletion issue (found by tt_kybersport)</c>
+- <cy>Make deleting a server delete the save file</c>
 # 1.4.1
 ### API Fix
-- <cy>Fix API for mods like GDPS Hub</c>
+- <cy>Fix API for mods like GDPS Hub (found by tt_kybersport)</c>
 # 1.4.0
 ### Major changes
 - <cg>Added regex to urls</c>

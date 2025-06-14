@@ -8,7 +8,7 @@ else()
 	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
 
-project(GDPSSwitcher VERSION 1.4.1)
+project(GDPSSwitcher VERSION 1.4.2)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp

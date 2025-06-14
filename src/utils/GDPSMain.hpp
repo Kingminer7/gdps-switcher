@@ -24,4 +24,5 @@ class GDPSMain {
         std::map<int, GDPSTypes::Server> m_servers;
         int m_currentServer = -2;
         int m_serverApiId = 0;
+        bool m_shouldSaveGameData = true;
 };

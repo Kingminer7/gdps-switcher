@@ -161,7 +161,7 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         server.url = m_urlInput->getString();
         server.saveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
         if (gdpsMain->m_currentServer == server.id) {
-            ServerAPIEvents::updateServer(server.id, server.url);
+            ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
         }
         ServerInfoManager::get()->fetch(server);
     }
