@@ -26,7 +26,7 @@ void GSGManager::setup() {
 }
 
 void GSGManager::save() {
-    geode::log::info("Saving data? {}", GDPSMain::get()->m_shouldSaveGameData);
+    geode::log::info("Saving data to {}", m_fileName);
     if (GDPSMain::get()->m_shouldSaveGameData) GManager::save();
 }
 
