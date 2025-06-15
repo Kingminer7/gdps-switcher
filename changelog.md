@@ -1,3 +1,6 @@
+# 1.4.3
+### iOS fix
+- <cy>Fix the mod trying to save to the wrong path on ios (which made it not save at all)</c>
 # 1.4.2
 ### Some minor fixes
 - <cy>Fix saving from GDPS Hub and a deletion issue (found by tt_kybersport)</c>
