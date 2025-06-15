@@ -20,13 +20,15 @@ void GSGManager::setup() {
         main->registerIssue(fmt::format("Failed to setup save file: {}", error.message()));
         return log::error("Failed to create directory '{}', data will not save: {}", dir.string(), error.message());
     }
-
+    #ifdef GEODE_IS_IOS
+    m_fileName = fmt::format("save/gdpses/{}/{}", server.saveDir, m_fileName);
+    #else
     m_fileName = fmt::format("gdpses/{}/{}", server.saveDir, m_fileName);
+    #endif
     GManager::setup();
 }
 
 void GSGManager::save() {
-    geode::log::info("Saving data to {}", m_fileName);
     if (GDPSMain::get()->m_shouldSaveGameData) GManager::save();
 }
 
@@ -43,7 +45,11 @@ void GSGManager::updateFileNames() {
             return log::error("Failed to create directory '{}', data will not save: {}", dir.string(), error.message());
         }
         if (main->isActive()) {
+            #ifdef GEODE_IS_IOS
+            manager->m_fileName = fmt::format("save/gdpses/{}/{}", server.saveDir, manager->m_fields->m_originalFileName);
+            #else
             manager->m_fileName = fmt::format("gdpses/{}/{}", server.saveDir, manager->m_fields->m_originalFileName);
+            #endif
         }
     }
 }
