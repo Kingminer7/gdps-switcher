@@ -69,7 +69,12 @@ Result<bool> GDPSUtils::deleteServer(int id) {
     if (std::filesystem::exists(serverPath)) {
         if (std::filesystem::canonical(serverPath).string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
             log::debug("Deleting {}", serverPath);
-            std::filesystem::remove_all(serverPath);
+            std::error_code err;
+            std::filesystem::remove_all(serverPath, err);
+            if (err) {
+                log::warn("Failed to delete {}: {}", serverPath.string(), err.message());
+                return Err(fmt::format("Failed to delete save directory {}: {}", serverPath.string(), err.message()));
+            }
         } else {
             log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
             return Err(fmt::format("Save directory {} is outside or equal to the gdpses directory and cannot be deleted automatically.", serverPath.string()));
@@ -121,11 +126,21 @@ Result<bool> GDPSUtils::setServerInfo(int id, std::string name, std::string url,
                 log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", newSaveDirPath.string());
                 return Err("Save directory already exists and cannot be overwritten.");
             }
-            std::filesystem::remove_all(newSaveDirPath);
+            std::error_code err;
+            std::filesystem::remove_all(newSaveDirPath, err);
+            if (err) {
+                log::warn("Failed to delete {}: {}", newSaveDirPath.string(), err.message());
+                return Err(fmt::format("Failed to delete existing save directory {}: {}", newSaveDirPath.string(), err.message()));
+            }
         }
 
         if (std::filesystem::exists(oldSaveDirPath)) {
-            std::filesystem::rename(oldSaveDirPath, newSaveDirPath);
+            std::error_code err;
+            std::filesystem::rename(oldSaveDirPath, newSaveDirPath, err);
+            if (err) {
+                log::warn("Failed to rename {} to {}: {}", oldSaveDirPath.string(), newSaveDirPath.string(), err.message());
+                return Err(fmt::format("Failed to rename save directory from {} to {}: {}", oldSaveDirPath.string(), newSaveDirPath.string(), err.message()));
+            }
         }
 
         server.saveDir = saveDir;

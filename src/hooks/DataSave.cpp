@@ -2,34 +2,39 @@
 
 using namespace geode::prelude;
 
-$on_mod(DataSaved) {
-  if (Mod::get()->getRequestedAction() == ModRequestedAction::Disable ||
-      Mod::get()->getRequestedAction() == ModRequestedAction::Uninstall ||
-      Mod::get()->getRequestedAction() ==
-          ModRequestedAction::UninstallWithSaveData ||
-      GDPSMain::get()->m_switching == true) {
+$on_mod(DataSaved)
+{
+  if (
+    Mod::get()->getRequestedAction() == ModRequestedAction::Disable ||
+    Mod::get()->getRequestedAction() == ModRequestedAction::Uninstall ||
+    Mod::get()->getRequestedAction() == ModRequestedAction::UninstallWithSaveData ||
+    GDPSMain::get()->m_switching
+  ) {
+    auto writablePath = std::string(CCFileUtils::sharedFileUtils()->getWritablePath());
+    auto musicPath = writablePath + "musiclibrary.dat";
+    auto sfxPath = writablePath + "sfxlibrary.dat";
+
     log::debug("Deleting music library and SFX library");
-    log::debug("Cache dir: {}",
-              std::string(CCFileUtils::sharedFileUtils()->getWritablePath()));
-    if (std::filesystem::exists(
-            std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) +
-            "musiclibrary.dat"))
-      std::filesystem::remove(
-          std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) +
-          "musiclibrary.dat");
-    else
-      log::debug("Music library was not at {}!",
-                std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) +
-                    "musiclibrary.dat");
-    if (std::filesystem::exists(
-            std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) +
-            "sfxlibrary.dat"))
-      std::filesystem::remove(
-          std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) +
-          "sfxlibrary.dat");
-    else
-      log::debug("SFX library was not at {}!",
-                std::string(CCFileUtils::sharedFileUtils()->getWritablePath()) +
-                    "sfxlibrary.dat");
+    log::debug("Cache dir: {}", writablePath);
+
+    if (std::filesystem::exists(musicPath)) {
+    std::error_code err;
+      std::filesystem::remove(musicPath, err);
+      if (err) {
+        log::warn("Failed to delete music library at {}: {}", musicPath, err.message());
+      }
+    } else {
+      log::debug("Music library was not at {}!", musicPath);
+    }
+
+    if (std::filesystem::exists(sfxPath)) {
+      std::error_code err;
+      std::filesystem::remove(sfxPath, err);
+      if (err) {
+        log::warn("Failed to delete SFX library at {}: {}", sfxPath, err.message());
+      }
+    } else {
+      log::debug("SFX library was not at {}!", sfxPath);
+    }
   }
 }

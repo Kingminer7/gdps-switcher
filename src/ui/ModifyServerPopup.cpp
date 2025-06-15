@@ -172,8 +172,22 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
                     if (yes) {
                         auto gdpsMain = GDPSMain::get();
                         auto &server = gdpsMain->m_servers[m_server.id];
-                        std::filesystem::remove_all(path);
-                        if (std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir)) std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path);
+                        std::error_code err;
+                        std::filesystem::remove_all(path, err);
+                        if (err) {
+                            log::warn("Failed to delete existing save directory at {}: {}", path.string(), err.message());
+                            MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
+                            return;
+                        }
+                        if (std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir)) {
+                            std::error_code err;
+                            std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path, err);
+                            if (err) {
+                                log::warn("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message());
+                                MDPopup::create("Error", fmt::format("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message()), "OK")->show();
+                                return;
+                            }
+                        }
                         server.saveDir = newSaveDir;
                         server.name = m_nameInput->getString();
                         server.url = m_urlInput->getString();

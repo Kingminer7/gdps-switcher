@@ -255,7 +255,12 @@ void ServerNode::onDelete(CCObject *sender) {
             if (std::filesystem::exists(serverPath)) {
                 if (std::filesystem::canonical(serverPath).string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
                     log::debug("Deleting {}", serverPath);
-                    std::filesystem::remove_all(serverPath);
+                    std::error_code err;
+                    std::filesystem::remove_all(serverPath, err);
+                    if (err) {
+                        log::warn("Failed to delete server path {}: {}", serverPath, err.message());
+                        MDPopup::create("Error", fmt::format("Failed to delete save data for {}: {}", m_server.name, err.message()), "OK")->show();
+                    }
                 } else {
                     log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
                     MDPopup::create("Did not delete save", fmt::format("To prevent unintentional extra data loss, your save was not deleted - only saves within {} will be deleted. If you want to delete this data, do it manually.", gdpsesDir), "OK")->show();
