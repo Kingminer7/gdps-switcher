@@ -1,3 +1,7 @@
+# 1.4.4
+### JIT-less and prevent some filesystem based crashes
+- <cg>iOS JIT-less support</c>
+- <cy>Prevent some filesystem based crashes</c>
 # 1.4.3
 ### iOS fix
 - <cy>Fix the mod trying to save to the wrong path on ios (which made it not save at all)</c>

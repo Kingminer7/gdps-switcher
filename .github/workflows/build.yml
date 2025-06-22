@@ -20,6 +20,7 @@ jobs:
   build:
     strategy:
       fail-fast: false
+      
       matrix:
         config:
         - name: Windows
@@ -43,7 +44,7 @@ jobs:
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
-
+    continue-on-error: ${{ github.event.inputs.build_type != 'release' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -56,7 +57,7 @@ jobs:
           bindings: geode-sdk/bindings
           bindings-ref: main
           combine: true
-          build-config: ${{ (matrix.config.target == 'Android64' || matrix.config.target == 'Android32') && 'Release' || (github.event.inputs.build_type != 'release' && 'RelWithDebInfo' || 'Release') }}
+          build-config: ${{ github.event.inputs.build_type != 'release' && 'RelWithDebInfo' || 'Release' }}
           export-pdb: true
           export-symbols: true
           target: ${{ matrix.config.target }}
@@ -88,9 +89,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: './artifacts/'
-
-      #- run: |
-      #    7z x ./artifacts/build-output.zip
 
       - name: Create Nightly Release
         uses: andelf/nightly-release@main
@@ -125,17 +123,7 @@ jobs:
       - name: Read mod version & mod id
         id: read_version
         run: |
-          MOD_VERSION=$(jq -r '.version' mod.json)
-          set +e
-          curl --fail "https://api.github.com/repos/geode-sdk/geode/releases/tags/v$VERSION" --silent --output /dev/null
-          RESULT=$?
-          set -e
-          
-          if [ $RESULT -eq 0 ]; then
-            echo "Release already exists! Not replacing it.."
-            exit 1
-          fi
-          echo "MOD_VERSION=$MOD_VERSION" >> $GITHUB_ENV
+          echo "MOD_VERSION=$(jq -r '.version' mod.json)" >> $GITHUB_ENV
       - name: Create Draft Release
         uses: softprops/action-gh-release@v1
         env:
