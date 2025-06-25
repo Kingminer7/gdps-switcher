@@ -161,7 +161,14 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
         auto newSaveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
         if (newSaveDir != server.saveDir) {
             auto path = geode::dirs::getSaveDir() / "gdpses" / newSaveDir;
-            if (std::filesystem::exists(path)) {
+            std::error_code err;
+            bool exists = std::filesystem::exists(path, err);
+            if (err) {
+                log::error("Failed to check if save directory exists at {}: {}", path.string(), err.message());
+                MDPopup::create("Error", fmt::format("Failed to check if save directory exists at {}: {}", path.string(), err.message()), "OK")->show();
+                return;
+            }
+            if (exists) {
                 auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
                 if (!std::filesystem::canonical(path).string().starts_with(gdpsesDir.string()) || std::filesystem::equivalent(path, gdpsesDir)) {
                     log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", path.string());
@@ -179,7 +186,14 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
                             MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
                             return;
                         }
-                        if (std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir)) {
+                        std::error_code err;
+                        bool exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, err);
+                        if (err) {
+                            log::warn("Failed to check if existing save directory exists at {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), err.message());
+                            MDPopup::create("Error", fmt::format("Failed to check if existing save directory exists at {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), err.message()), "OK")->show();
+                            return;
+                        }
+                        if (exists) {
                             std::error_code err;
                             std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path, err);
                             if (err) {
@@ -203,7 +217,22 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
                 });
                 return;
             }
-            if (std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir)) std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path);
+            std::error_code err;
+            std::string oldSaveDir = server.saveDir.empty() ? fmt::format("{}", server.id) : server.saveDir;
+            bool exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / oldSaveDir, err);
+            if (err) {
+                log::error("Failed to delete existing save directory at {}: {}", path.string(), err.message());
+                MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
+                return;
+            }
+            if (exists) {
+                std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path, err);
+                if (err) {
+                    log::error("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message());
+                    MDPopup::create("Error", fmt::format("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message()), "OK")->show();
+                    return;
+                }
+            }
             server.saveDir = newSaveDir;
             if (gdpsMain->m_currentServer == server.id) {
                 GSGManager::updateFileNames();

@@ -6,12 +6,18 @@
 Result<> MigrationManager::setup() {
     auto savePath = dirs::getSaveDir() / "gdpses";
 
-    if (!std::filesystem::exists(savePath)) {
-        std::error_code ec;
-        if (!std::filesystem::create_directory(savePath, ec)) {
-            return Err(fmt::format("Failed to create directory '{}': {}", savePath.string(), ec.message()));
+    std::error_code err;
+    if (!std::filesystem::exists(savePath, err)) {
+        if (err) {
+            return Err(fmt::format("Failed to check existence of '{}': {}", savePath.string(), err.message()));
         }
-    } else if (!std::filesystem::is_directory(savePath)) {
+        if (!std::filesystem::create_directory(savePath, err)) {
+            return Err(fmt::format("Failed to create directory '{}': {}", savePath.string(), err.message()));
+        }
+    } else if (!std::filesystem::is_directory(savePath, err)) {
+        if (err) {
+            return Err(fmt::format("Failed to check if '{}' is a directory: {}", savePath.string(), err.message()));
+        }
         return Err(fmt::format("'{}' exists but is not a directory.", savePath.string()));
     }
 
@@ -71,18 +77,31 @@ void MigrationManager::migrateData() {
             }
 
             auto dir = gdpsPath / name;
-            std::error_code ec;
-            if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, ec)) {
-                log::error("Failed to create directory '{}': {}", dir.string(), ec.message());
+            std::error_code err;
+            if (!std::filesystem::exists(dir, err)) {
+                if (err) {
+                    log::error("Failed to check existence of directory '{}': {}", dir.string(), err.message());
+                    continue;
+                }
+                if (!std::filesystem::create_directory(dir, err)) {
+                    log::error("Failed to create directory '{}': {}", dir.string(), err.message());
+                    continue;
+                }
+            } else if (!std::filesystem::is_directory(dir, err)) {
+                if (err) {
+                    log::error("Failed to check if '{}' is a directory: {}", dir.string(), err.message());
+                } else {
+                    log::error("'{}' exists but is not a directory.", dir.string());
+                }
                 continue;
             }
 
             auto newName = fname.substr(0, start - 1) + (isBackup ? "2" : "") + fname.substr(end);
             auto newPath = dir / newName;
 
-            std::filesystem::rename(savePath / fname, newPath, ec);
-            if (ec) {
-                log::error("Failed to move file '{}' to '{}': {}", fname, newPath.string(), ec.message());
+            std::filesystem::rename(savePath / fname, newPath, err);
+            if (err) {
+                log::error("Failed to move file '{}' to '{}': {}", fname, newPath.string(), err.message());
             }
         }
     }

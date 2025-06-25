@@ -15,10 +15,20 @@ void GSGManager::setup() {
     auto server = main->m_servers[main->m_currentServer];
     const auto dir = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
 
-    std::error_code error;
-    if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, error)) {
-        main->registerIssue(fmt::format("Failed to setup save file: {}", error.message()));
-        return log::error("Failed to create directory '{}', data will not save: {}", dir.string(), error.message());
+    std::error_code err;
+    if (!std::filesystem::exists(dir, err)) {
+        if (err) {
+            main->registerIssue(fmt::format("Failed to check if directory exists: {}", err.message()));
+            return log::error("Failed to check directory '{}', data will not save: {}", dir.string(), err.message());
+        }
+        if (!std::filesystem::create_directory(dir, err)) {
+            main->registerIssue(fmt::format("Failed to setup save file: {}", err.message()));
+            return log::error("Failed to create directory '{}', data will not save: {}", dir.string(), err.message());
+        }
+        if (err) {
+            main->registerIssue(fmt::format("Error after creating directory: {}", err.message()));
+            return log::error("Error after creating directory '{}', data will not save: {}", dir.string(), err.message());
+        }
     }
     #ifdef GEODE_IS_IOS
     m_fileName = fmt::format("save/gdpses/{}/{}", server.saveDir, m_fileName);
@@ -39,10 +49,23 @@ void GSGManager::updateFileNames() {
         const auto main = GDPSMain::get();
         auto server = main->m_servers[main->m_currentServer];
         const auto dir = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
-        std::error_code error;
-        if (!std::filesystem::exists(dir) && !std::filesystem::create_directory(dir, error)) {
-            main->registerIssue(fmt::format("Failed to setup save file: {}", error.message()));
-            return log::error("Failed to create directory '{}', data will not save: {}", dir.string(), error.message());
+        std::error_code err;
+        if (!std::filesystem::exists(dir, err)) {
+            if (err) {
+                main->registerIssue(fmt::format("Failed to check if directory exists: {}", err.message()));
+                log::error("Failed to check directory '{}', data will not save: {}", dir.string(), err.message());
+                continue;
+            }
+            if (!std::filesystem::create_directory(dir, err)) {
+                main->registerIssue(fmt::format("Failed to create directory: {}", err.message()));
+                log::error("Failed to create directory '{}', data will not save: {}", dir.string(), err.message());
+                continue;
+            }
+            if (err) {
+                main->registerIssue(fmt::format("Error after creating directory: {}", err.message()));
+                log::error("Error after creating directory '{}', data will not save: {}", dir.string(), err.message());
+                continue;
+            }
         }
         if (main->isActive()) {
             #ifdef GEODE_IS_IOS

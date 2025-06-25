@@ -66,8 +66,18 @@ Result<bool> GDPSUtils::deleteServer(int id) {
     main->m_shouldSaveGameData = false;
     auto serverPath = geode::dirs::getSaveDir() / "gdpses" / it->second.saveDir;
     auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
-    if (std::filesystem::exists(serverPath)) {
-        if (std::filesystem::canonical(serverPath).string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
+    std::error_code ec;
+    if (std::filesystem::exists(serverPath, ec)) {
+        if (ec) {
+            log::warn("Failed to check existence of {}: {}", serverPath.string(), ec.message());
+            return Err(fmt::format("Failed to check existence of save directory {}: {}", serverPath.string(), ec.message()));
+        }
+        auto can = std::filesystem::canonical(serverPath, ec);
+        if (ec) {
+            log::warn("Failed to get canonical path of {}: {}", serverPath.string(), ec.message());
+            return Err(fmt::format("Failed to get canonical path of save directory {}: {}", serverPath.string(), ec.message()));
+        }
+        if (can.string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
             log::debug("Deleting {}", serverPath);
             std::error_code err;
             std::filesystem::remove_all(serverPath, err);
@@ -79,6 +89,9 @@ Result<bool> GDPSUtils::deleteServer(int id) {
             log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
             return Err(fmt::format("Save directory {} is outside or equal to the gdpses directory and cannot be deleted automatically.", serverPath.string()));
         }
+    } else if (ec) {
+        log::warn("Failed to check existence of {}: {}", serverPath.string(), ec.message());
+        return Err(fmt::format("Failed to check existence of save directory {}: {}", serverPath.string(), ec.message()));
     }
     if (ServerListLayer::m_selectedServer == it->second.id) {
         ServerListLayer::m_selectedServer = -2;
@@ -120,27 +133,49 @@ Result<bool> GDPSUtils::setServerInfo(int id, std::string name, std::string url,
         auto newSaveDirPath = geode::dirs::getSaveDir() / "gdpses" / saveDir;
         auto oldSaveDirPath = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
 
-        if (std::filesystem::exists(newSaveDirPath)) {
+        std::error_code existsEc;
+        if (std::filesystem::exists(newSaveDirPath, existsEc)) {
+            if (existsEc) {
+            log::warn("Failed to check existence of {}: {}", newSaveDirPath.string(), existsEc.message());
+            return Err(fmt::format("Failed to check existence of save directory {}: {}", newSaveDirPath.string(), existsEc.message()));
+            }
             auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
-            if (!std::filesystem::canonical(newSaveDirPath).string().starts_with(gdpsesDir.string()) || std::filesystem::equivalent(newSaveDirPath, gdpsesDir)) {
-                log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", newSaveDirPath.string());
-                return Err("Save directory already exists and cannot be overwritten.");
+            std::error_code canonEc;
+            auto canonicalNewSaveDirPath = std::filesystem::canonical(newSaveDirPath, canonEc);
+            if (canonEc) {
+            log::warn("Failed to get canonical path of {}: {}", newSaveDirPath.string(), canonEc.message());
+            return Err(fmt::format("Failed to get canonical path of save directory {}: {}", newSaveDirPath.string(), canonEc.message()));
+            }
+            if (!canonicalNewSaveDirPath.string().starts_with(gdpsesDir.string()) || std::filesystem::equivalent(newSaveDirPath, gdpsesDir)) {
+            log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", newSaveDirPath.string());
+            return Err("Save directory already exists and cannot be overwritten.");
             }
             std::error_code err;
             std::filesystem::remove_all(newSaveDirPath, err);
             if (err) {
-                log::warn("Failed to delete {}: {}", newSaveDirPath.string(), err.message());
-                return Err(fmt::format("Failed to delete existing save directory {}: {}", newSaveDirPath.string(), err.message()));
+            log::warn("Failed to delete {}: {}", newSaveDirPath.string(), err.message());
+            return Err(fmt::format("Failed to delete existing save directory {}: {}", newSaveDirPath.string(), err.message()));
             }
+        } else if (existsEc) {
+            log::warn("Failed to check existence of {}: {}", newSaveDirPath.string(), existsEc.message());
+            return Err(fmt::format("Failed to check existence of save directory {}: {}", newSaveDirPath.string(), existsEc.message()));
         }
 
-        if (std::filesystem::exists(oldSaveDirPath)) {
+        std::error_code existsEcOld;
+        if (std::filesystem::exists(oldSaveDirPath, existsEcOld)) {
+            if (existsEcOld) {
+            log::warn("Failed to check existence of {}: {}", oldSaveDirPath.string(), existsEcOld.message());
+            return Err(fmt::format("Failed to check existence of old save directory {}: {}", oldSaveDirPath.string(), existsEcOld.message()));
+            }
             std::error_code err;
             std::filesystem::rename(oldSaveDirPath, newSaveDirPath, err);
             if (err) {
-                log::warn("Failed to rename {} to {}: {}", oldSaveDirPath.string(), newSaveDirPath.string(), err.message());
-                return Err(fmt::format("Failed to rename save directory from {} to {}: {}", oldSaveDirPath.string(), newSaveDirPath.string(), err.message()));
+            log::warn("Failed to rename {} to {}: {}", oldSaveDirPath.string(), newSaveDirPath.string(), err.message());
+            return Err(fmt::format("Failed to rename save directory from {} to {}: {}", oldSaveDirPath.string(), newSaveDirPath.string(), err.message()));
             }
+        } else if (existsEcOld) {
+            log::warn("Failed to check existence of {}: {}", oldSaveDirPath.string(), existsEcOld.message());
+            return Err(fmt::format("Failed to check existence of old save directory {}: {}", oldSaveDirPath.string(), existsEcOld.message()));
         }
 
         server.saveDir = saveDir;

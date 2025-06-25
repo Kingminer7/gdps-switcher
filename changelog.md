@@ -1,3 +1,7 @@
+# 1.4.5
+### More bugfixes
+- <cy>Fix an issue with renaming saves that either crashed your game or messed with other saves</c>
+- <cy>Fix servers not showing for some people</c>
 # 1.4.4
 ### JIT-less and prevent some filesystem based crashes
 - <cg>iOS JIT-less support</c>

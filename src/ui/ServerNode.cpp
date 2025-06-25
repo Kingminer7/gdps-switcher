@@ -252,19 +252,33 @@ void ServerNode::onDelete(CCObject *sender) {
             main->m_shouldSaveGameData = false;
             auto serverPath = geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir;
             auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
-            if (std::filesystem::exists(serverPath)) {
-                if (std::filesystem::canonical(serverPath).string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
-                    log::debug("Deleting {}", serverPath);
-                    std::error_code err;
-                    std::filesystem::remove_all(serverPath, err);
-                    if (err) {
-                        log::warn("Failed to delete server path {}: {}", serverPath, err.message());
-                        MDPopup::create("Error", fmt::format("Failed to delete save data for {}: {}", m_server.name, err.message()), "OK")->show();
-                    }
+            std::error_code err;
+            if (std::filesystem::exists(serverPath, err)) {
+                if (err) {
+                    log::warn("Failed to check existence of {}: {}", serverPath, err.message());
+                    MDPopup::create("Error", fmt::format("Failed to check save data for {}: {}", m_server.name, err.message()), "OK")->show();
                 } else {
-                    log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
-                    MDPopup::create("Did not delete save", fmt::format("To prevent unintentional extra data loss, your save was not deleted - only saves within {} will be deleted. If you want to delete this data, do it manually.", gdpsesDir), "OK")->show();
+                    std::filesystem::path canonicalServerPath;
+                    canonicalServerPath.clear();
+                    canonicalServerPath = std::filesystem::canonical(serverPath, err);
+                    if (err) {
+                        log::warn("Failed to get canonical path for {}: {}", serverPath, err.message());
+                        MDPopup::create("Error", fmt::format("Failed to resolve save data path for {}: {}", m_server.name, err.message()), "OK")->show();
+                    } else if (canonicalServerPath.string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
+                        log::debug("Deleting {}", serverPath);
+                        std::filesystem::remove_all(serverPath, err);
+                        if (err) {
+                            log::warn("Failed to delete server path {}: {}", serverPath, err.message());
+                            MDPopup::create("Error", fmt::format("Failed to delete save data for {}: {}", m_server.name, err.message()), "OK")->show();
+                        }
+                    } else {
+                        log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
+                        MDPopup::create("Did not delete save", fmt::format("To prevent unintentional extra data loss, your save was not deleted - only saves within {} will be deleted. If you want to delete this data, do it manually.", gdpsesDir), "OK")->show();
+                    }
                 }
+            } else if (err) {
+                log::warn("Failed to check existence of {}: {}", serverPath, err.message());
+                MDPopup::create("Error", fmt::format("Failed to check save data for {}: {}", m_server.name, err.message()), "OK")->show();
             }
             if (m_listLayer->m_selectedServer == m_server.id) {
                 m_listLayer->m_selectedServer = -2;

@@ -141,22 +141,7 @@ bool ServerListLayer::init() {
             ->setMainAxisAlignment(MainAxisAlignment::Start)
             ->setMainAxisScaling(AxisScaling::Grow)
     );
-    // addChildAtPosition(m_scroll, geode::Anchor::Center, { 0.f, 0.f}, false);
-
-    auto clip = cocos2d::CCClippingNode::create();
-    clip->setID("server-list");
-    clip->setZOrder(0);
-    clip->setContentSize({356, 220});
-    clip->setAnchorPoint({0.5, 0.5});
-    clip->setAlphaThreshold(0.05f);
-    clip->addChildAtPosition(m_scroll, geode::Anchor::Center);
-    scrollFrame->addChildAtPosition(clip, geode::Anchor::Center, {0.f, 0.f}, false);
-
-    auto stencil = CCSprite::create("square.png");
-    stencil->setScaleX(356 / stencil->getContentWidth());
-    stencil->setScaleY(220 / stencil->getContentHeight());
-    stencil->setPosition({178, 110});
-    clip->setStencil(stencil);
+    scrollFrame->addChildAtPosition(m_scroll, geode::Anchor::Center, {0.f, 0.f}, false);
 
     updateList();
 

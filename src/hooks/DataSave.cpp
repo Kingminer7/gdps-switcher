@@ -17,24 +17,39 @@ $on_mod(DataSaved)
     log::debug("Deleting music library and SFX library");
     log::debug("Cache dir: {}", writablePath);
 
-    if (std::filesystem::exists(musicPath)) {
     std::error_code err;
-      std::filesystem::remove(musicPath, err);
+    if (std::filesystem::exists(musicPath, err)) {
       if (err) {
-        log::warn("Failed to delete music library at {}: {}", musicPath, err.message());
+        log::warn("Failed to check existence of music library at {}: {}", musicPath, err.message());
+      } else {
+        std::filesystem::remove(musicPath, err);
+        if (err) {
+          log::warn("Failed to delete music library at {}: {}", musicPath, err.message());
+        }
       }
     } else {
-      log::debug("Music library was not at {}!", musicPath);
+      if (err) {
+        log::warn("Failed to check existence of music library at {}: {}", musicPath, err.message());
+      } else {
+        log::debug("Music library was not at {}!", musicPath);
+      }
     }
 
-    if (std::filesystem::exists(sfxPath)) {
-      std::error_code err;
-      std::filesystem::remove(sfxPath, err);
+    if (std::filesystem::exists(sfxPath, err)) {
       if (err) {
-        log::warn("Failed to delete SFX library at {}: {}", sfxPath, err.message());
+        log::warn("Failed to check existence of SFX library at {}: {}", sfxPath, err.message());
+      } else {
+        std::filesystem::remove(sfxPath, err);
+        if (err) {
+          log::warn("Failed to delete SFX library at {}: {}", sfxPath, err.message());
+        }
       }
     } else {
-      log::debug("SFX library was not at {}!", sfxPath);
+      if (err) {
+        log::warn("Failed to check existence of SFX library at {}: {}", sfxPath, err.message());
+      } else {
+        log::debug("SFX library was not at {}!", sfxPath);
+      }
     }
   }
 }
