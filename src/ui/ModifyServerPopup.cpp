@@ -186,7 +186,6 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
                             MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
                             return;
                         }
-                        std::error_code err;
                         bool exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, err);
                         if (err) {
                             log::warn("Failed to check if existing save directory exists at {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), err.message());
@@ -194,7 +193,6 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
                             return;
                         }
                         if (exists) {
-                            std::error_code err;
                             std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path, err);
                             if (err) {
                                 log::warn("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message());
@@ -217,9 +215,8 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
                 });
                 return;
             }
-            std::error_code err;
             std::string oldSaveDir = server.saveDir.empty() ? fmt::format("{}", server.id) : server.saveDir;
-            bool exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / oldSaveDir, err);
+            exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / oldSaveDir, err);
             if (err) {
                 log::error("Failed to delete existing save directory at {}: {}", path.string(), err.message());
                 MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
