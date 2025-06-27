@@ -1,3 +1,6 @@
+# 1.4.6
+### New logo
+- <cg>New logo</c>
 # 1.4.5
 ### More bugfixes
 - <cy>Fix an issue with renaming saves that either crashed your game or messed with other saves</c>
