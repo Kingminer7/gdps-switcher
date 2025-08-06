@@ -1,3 +1,6 @@
+# 1.4.7
+### Emergency bugfix
+- <cy>Fixed empty save directory putting files in root dir.</c>
 # 1.4.6
 ### New logo
 - <cg>New logo</c>

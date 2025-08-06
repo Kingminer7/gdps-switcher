@@ -95,6 +95,7 @@ ModifyServerPopup *ModifyServerPopup::create(GDPSTypes::Server server, ServerLis
 }
 
 void ModifyServerPopup::checkValidity() {
+    // Regex is scary!
     static std::basic_regex urlRegex = std::regex("(http|https):\\/\\/([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:\\/~+#-]*[\\w@?^=%&\\/~+#-])");
     bool valid = true;
     
@@ -143,6 +144,19 @@ void ModifyServerPopup::onClose(cocos2d::CCObject *sender) {
     }
 }
 
+static std::string urlToFilenameSafe(std::string_view url) {
+    std::string ret = "";
+    ret.reserve(url.size());
+    for (char c : url) {
+        if (std::isalnum(c) || c == '.' || c == '-' || c == '_') {
+            ret += c;
+        } else {
+            ret += '_';
+        }
+    }
+    return ret;
+}
+
 void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
     if (m_server.url == "" || m_server.name == "") return;
     
@@ -152,6 +166,9 @@ void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
             return;
         }
         gdpsMain->m_servers[m_server.id] = m_server;
+        if (m_saveInput->getString().empty()) {
+            gdpsMain->m_servers[m_server.id].saveDir = fmt::format("{}", m_server.id);
+        }
         ServerInfoManager::get()->fetch(m_server);
     } else {
         auto &server = gdpsMain->m_servers[m_server.id];
