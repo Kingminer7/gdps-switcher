@@ -14,5 +14,5 @@ class MigrationManager {
         GDPSTypes::Server fromOldServer(GDPSTypes::OldServer server);
     public:
         Result<> setup();
-        static std::string urlToFilenameSafe(std::string url);
+        static std::string urlToFilenameSafe(std::string_view url);
 };

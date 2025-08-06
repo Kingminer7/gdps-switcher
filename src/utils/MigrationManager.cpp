@@ -28,8 +28,9 @@ Result<> MigrationManager::setup() {
     return Ok();
 }
 
-std::string MigrationManager::urlToFilenameSafe(const std::string url) {
+std::string MigrationManager::urlToFilenameSafe(std::string_view url) {
     std::string ret = "";
+    ret.reserve(url.size());
     for (char c : url) {
         if (std::isalnum(c) || c == '.' || c == '-' || c == '_') {
             ret += c;
@@ -46,7 +47,7 @@ void MigrationManager::migrateData() {
     auto main = GDPSMain::get();
     auto oldSel = Mod::get()->getSavedValue<std::string>("server", "https://www.boomlings.com/database/");
 
-    for (auto old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
+    for (auto& old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
         auto serv = fromOldServer(old);
         main->m_servers[serv.id] = serv;
         if (oldSel == serv.url) {

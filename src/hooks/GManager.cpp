@@ -1,6 +1,12 @@
 #include "GManager.hpp"
 #include "../utils/GDPSMain.hpp"
 
+#ifdef GEODE_IS_IOS
+    static constexpr const char* const gdpsesPath = "save/gdpses";
+#else
+    static constexpr const char* const gdpsesPath = "gdpses";
+#endif
+
 std::vector<GSGManager*> GSGManager::Fields::m_managers = {};
 
 void GSGManager::setup() {
@@ -30,11 +36,7 @@ void GSGManager::setup() {
             return log::error("Error after creating directory '{}', data will not save: {}", dir.string(), err.message());
         }
     }
-    #ifdef GEODE_IS_IOS
-    m_fileName = fmt::format("save/gdpses/{}/{}", server.saveDir, m_fileName);
-    #else
-    m_fileName = fmt::format("gdpses/{}/{}", server.saveDir, m_fileName);
-    #endif
+    m_fileName = fmt::format("{}/{}/{}", gdpsesPath, server.saveDir, m_fileName);
     GManager::setup();
 }
 
@@ -68,11 +70,7 @@ void GSGManager::updateFileNames() {
             }
         }
         if (main->isActive()) {
-            #ifdef GEODE_IS_IOS
-            manager->m_fileName = fmt::format("save/gdpses/{}/{}", server.saveDir, manager->m_fields->m_originalFileName);
-            #else
-            manager->m_fileName = fmt::format("gdpses/{}/{}", server.saveDir, manager->m_fields->m_originalFileName);
-            #endif
+            manager->m_fileName = fmt::format("{}/{}/{}", gdpsesPath, server.saveDir, manager->m_fields->m_originalFileName);
         }
     }
 }
