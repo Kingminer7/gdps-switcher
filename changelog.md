@@ -1,3 +1,8 @@
+# 1.4.8
+### Internal changes
+- <cb>Internal refactors</c>
+- <cg>Update Geode SDK to 4.7.0</c>
+- <cr>Removed ability to overwrite save directories.</c>
 # 1.4.7
 ### Emergency bugfix
 - <cy>Fixed empty save directory putting files in root dir.</c>

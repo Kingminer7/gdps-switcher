@@ -1,15 +1,15 @@
 {
-	"geode": "4.6.1",
+	"geode": "4.7.0",
 	"gd": {
 		"win": "2.2074",
 		"android": "2.2074",
 		"mac": "2.2074",
 		"ios": "2.2074"
 	},
-	"version": "1.4.7",
+	"version": "1.4.8",
 	"id": "km7dev.gdps-switcher",
 	"name": "GDPS Switcher",
-	"developer": "km7dev",
+	"developers": ["km7dev", "Alphii"],
 	"description": "Switch between GDPS servers easily.",
 	"tags": [
 		"customization",

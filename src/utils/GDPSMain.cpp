@@ -4,6 +4,8 @@
 #include <km7dev.server_api/include/ServerAPIEvents.hpp>
 
 #include <Geode/Geode.hpp>
+#include "ServerInfoManager.hpp"
+#include "../hooks/GManager.hpp"
 
 using namespace geode::prelude;
 
@@ -32,6 +34,57 @@ void GDPSMain::save() const {
         servers.erase(-2);
     }
     Mod::get()->setSavedValue<std::map<int, GDPSTypes::Server>>("servers", servers);
+}
+
+geode::Result<> GDPSMain::registerServer(GDPSTypes::Server& server) {
+    if (m_servers.contains(server.id)) {
+        return geode::Err("Server registery already contains this ID.\nContact developers for help.");
+    }
+
+    if (server.saveDir.empty()) {
+        server.saveDir = fmt::format("{}", server.id);
+    }
+
+    ServerInfoManager::get()->fetch(server);
+    return geode::Ok();
+}
+
+geode::Result<> GDPSMain::modifyRegisteredServer(GDPSTypes::Server& server) {
+    if (!m_servers.contains(server.id)) {
+        return geode::Err("Server with this ID does not exist.\nContact developers for help.");
+    }
+    
+    if (server.saveDir.empty()) {
+        server.saveDir = fmt::format("{}", server.id);
+    }
+
+    auto newSaveDir = server.saveDir;
+    if (newSaveDir != m_servers[server.id].saveDir) {
+        auto path = geode::dirs::getSaveDir() / "gdpses" / newSaveDir;
+        std::error_code errCode;
+        bool exists = std::filesystem::exists(path, errCode);
+
+        if (exists) {
+            return geode::Err(fmt::format("Save directory \"{}\" already exists!", path));
+        }
+        if (errCode) {
+            return geode::Err("Error checking validity of save directory!");
+        }
+
+        std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / m_servers[server.id].saveDir, path);
+    }
+
+    m_servers[server.id].name = server.name;
+    m_servers[server.id].url = server.url;
+    m_servers[server.id].saveDir = server.saveDir;
+
+    if (m_currentServer == server.id) {
+        ServerAPIEvents::updateServer(m_serverApiId, server.url);
+        GSGManager::updateFileNames();
+    }
+
+    ServerInfoManager::get()->fetch(server);
+    return geode::Ok();
 }
 
 GDPSMain *GDPSMain::m_instance = nullptr;

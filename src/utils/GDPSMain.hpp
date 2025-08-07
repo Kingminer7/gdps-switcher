@@ -15,6 +15,8 @@ class GDPSMain {
         void registerIssue(const std::string& issue);
         std::vector<std::string> getIssues();
         bool isBase() const;
+        geode::Result<> registerServer(GDPSTypes::Server& server);
+        geode::Result<> modifyRegisteredServer(GDPSTypes::Server& server);
         static bool isBase(std::string url);
 
         void save() const;

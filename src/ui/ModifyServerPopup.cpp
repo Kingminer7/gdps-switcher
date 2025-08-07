@@ -157,108 +157,27 @@ static std::string urlToFilenameSafe(std::string_view url) {
     return ret;
 }
 
-void ModifyServerPopup::onSave(cocos2d::CCObject *sender) {
-    if (m_server.url == "" || m_server.name == "") return;
-    
+void ModifyServerPopup::onSave(cocos2d::CCObject* sender) {
+    if (m_server.url.empty() || m_server.name.empty()) return;
+
     auto gdpsMain = GDPSMain::get();
+
+    m_server.saveDir = m_saveInput->getString();
+
     if (m_isNew) {
-        if (gdpsMain->m_servers.contains(m_server.id)) {
+        auto registerRes = gdpsMain->registerServer(m_server);
+        if (!registerRes) {
+            MDPopup::create("Error creating server!", registerRes.unwrapErr(), "OK");
             return;
         }
-        gdpsMain->m_servers[m_server.id] = m_server;
-        if (m_saveInput->getString().empty()) {
-            gdpsMain->m_servers[m_server.id].saveDir = fmt::format("{}", m_server.id);
-        }
-        ServerInfoManager::get()->fetch(m_server);
     } else {
-        auto &server = gdpsMain->m_servers[m_server.id];
-        if (!gdpsMain->m_servers.contains(server.id)) {
+        auto modifyRes = gdpsMain->modifyRegisteredServer(m_server);
+        if (!modifyRes) {
+            MDPopup::create("Error modifying server!", modifyRes.unwrapErr(), "OK");
             return;
         }
-        auto newSaveDir = m_saveInput->getString().empty() ? fmt::format("{}", m_server.id) : m_saveInput->getString();
-        if (newSaveDir != server.saveDir) {
-            auto path = geode::dirs::getSaveDir() / "gdpses" / newSaveDir;
-            std::error_code err;
-            bool exists = std::filesystem::exists(path, err);
-            if (err) {
-                log::error("Failed to check if save directory exists at {}: {}", path.string(), err.message());
-                MDPopup::create("Error", fmt::format("Failed to check if save directory exists at {}: {}", path.string(), err.message()), "OK")->show();
-                return;
-            }
-            if (exists) {
-                auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
-                if (!std::filesystem::canonical(path).string().starts_with(gdpsesDir.string()) || std::filesystem::equivalent(path, gdpsesDir)) {
-                    log::warn("{} already exists and is not part of the gdpses subdirectory or is the gdpses directory itself - will not delete.", path.string());
-                    MDPopup::create("Hold up!", fmt::format("The save directory you chose already exists! GDPS Switcher will not automatically delete anything outside of `{}` or the directory itself to prevent extra data loss.", gdpsesDir.string()), "OK")->show();
-                    return;
-                }
-                geode::createQuickPopup("Hold up!", "The save directory you chose already exists! Do you want to overwrite it?", "No", "Yes", [this, path, newSaveDir, sender](auto, bool yes) {
-                    if (yes) {
-                        auto gdpsMain = GDPSMain::get();
-                        auto &server = gdpsMain->m_servers[m_server.id];
-                        std::error_code err;
-                        std::filesystem::remove_all(path, err);
-                        if (err) {
-                            log::warn("Failed to delete existing save directory at {}: {}", path.string(), err.message());
-                            MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
-                            return;
-                        }
-                        bool exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, err);
-                        if (err) {
-                            log::warn("Failed to check if existing save directory exists at {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), err.message());
-                            MDPopup::create("Error", fmt::format("Failed to check if existing save directory exists at {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), err.message()), "OK")->show();
-                            return;
-                        }
-                        if (exists) {
-                            std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path, err);
-                            if (err) {
-                                log::warn("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message());
-                                MDPopup::create("Error", fmt::format("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message()), "OK")->show();
-                                return;
-                            }
-                        }
-                        server.saveDir = newSaveDir;
-                        server.name = m_nameInput->getString();
-                        server.url = m_urlInput->getString();
-                        if (gdpsMain->m_currentServer == server.id) {
-                            ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
-                            GSGManager::updateFileNames();
-                        }
-                        ServerInfoManager::get()->fetch(server);
-                        m_listLayer->updateList();
-                        GDPSMain::get()->save();
-                        Popup::onClose(sender);
-                    }
-                });
-                return;
-            }
-            std::string oldSaveDir = server.saveDir.empty() ? fmt::format("{}", server.id) : server.saveDir;
-            exists = std::filesystem::exists(geode::dirs::getSaveDir() / "gdpses" / oldSaveDir, err);
-            if (err) {
-                log::error("Failed to delete existing save directory at {}: {}", path.string(), err.message());
-                MDPopup::create("Error", fmt::format("Failed to delete existing save directory at {}: {}", path.string(), err.message()), "OK")->show();
-                return;
-            }
-            if (exists) {
-                std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / server.saveDir, path, err);
-                if (err) {
-                    log::error("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message());
-                    MDPopup::create("Error", fmt::format("Failed to rename save directory from {} to {}: {}", (geode::dirs::getSaveDir() / "gdpses" / server.saveDir).string(), path.string(), err.message()), "OK")->show();
-                    return;
-                }
-            }
-            server.saveDir = newSaveDir;
-            if (gdpsMain->m_currentServer == server.id) {
-                GSGManager::updateFileNames();
-            }
-        }
-        server.name = m_nameInput->getString();
-        server.url = m_urlInput->getString();
-        if (gdpsMain->m_currentServer == server.id) {
-            ServerAPIEvents::updateServer(GDPSMain::get()->m_serverApiId, server.url);
-        }
-        ServerInfoManager::get()->fetch(server);
     }
+    
     m_listLayer->updateList();
     GDPSMain::get()->save();
     Popup::onClose(sender);
