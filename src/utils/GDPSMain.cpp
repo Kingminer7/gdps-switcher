@@ -87,6 +87,46 @@ geode::Result<> GDPSMain::modifyRegisteredServer(GDPSTypes::Server& server) {
     return geode::Ok();
 }
 
+geode::Result<> GDPSMain::deleteServer(GDPSTypes::Server& server) {
+    m_shouldSaveGameData = false;
+
+    std::filesystem::path serverPath = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
+    std::filesystem::path gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
+    std::error_code err;
+
+    if (!std::filesystem::exists(serverPath, err) && err) {
+        return geode::Err("Failed to check existence of path: {}\n\nnerd shit: std::error_code message: {}", serverPath, err.message());
+    }
+
+    err.clear();
+    std::filesystem::path canonicalServerPath;
+    canonicalServerPath.clear();
+    canonicalServerPath = std::filesystem::canonical(serverPath, err);
+    if (err) {
+        return geode::Err("Failed to get canonical path for {}: {}", serverPath, err.message());
+    }
+
+    if (!canonicalServerPath.string().starts_with(gdpsesDir.string()) || serverPath != gdpsesDir) {
+        return geode::Err(
+            "Attempted to delete a path outside or equal to the gdpses directory: {}\n\n"
+            "To prevent unintentional extra data loss, your save was not deleted - "
+            "only saves within {} will be deleted. If you want to delete this data, do it manually.",
+            serverPath, gdpsesDir
+        );
+    }
+
+    log::debug("Deleting {}", serverPath);
+    std::filesystem::remove_all(serverPath, err);
+    if (err) {
+        return geode::Err("Failed to delete save data for {}: {}", server.name, err.message());
+    }
+
+    m_servers.erase(server.id);
+    this->save();
+
+    return geode::Ok();
+}
+
 GDPSMain *GDPSMain::m_instance = nullptr;
 
 void GDPSMain::init() {

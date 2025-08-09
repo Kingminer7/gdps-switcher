@@ -17,6 +17,7 @@ class GDPSMain {
         bool isBase() const;
         geode::Result<> registerServer(GDPSTypes::Server& server);
         geode::Result<> modifyRegisteredServer(GDPSTypes::Server& server);
+        geode::Result<> deleteServer(GDPSTypes::Server& server);
         static bool isBase(std::string url);
 
         void save() const;
