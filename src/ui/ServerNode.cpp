@@ -246,50 +246,31 @@ void ServerNode::onEdit(CCObject *sender) {
 
 void ServerNode::onDelete(CCObject *sender) {
     if (m_locked) return;
-    createQuickPopup("Delete Server", fmt::format("Are you sure you want to delete {}? This will delete your save data for the server.", m_server.name), "No", "Yes", [this](auto, bool second) {
-        if (second) {
+    createQuickPopup(
+        "Delete Server",
+        fmt::format("Are you sure you want to delete {}? This will delete your save data for the server.", m_server.name),
+        "No", "Yes",
+        [this](auto, bool yes) {
+            if (!yes) return;
+
             auto main = GDPSMain::get();
-            main->m_shouldSaveGameData = false;
-            auto serverPath = geode::dirs::getSaveDir() / "gdpses" / m_server.saveDir;
-            auto gdpsesDir = geode::dirs::getSaveDir() / "gdpses";
-            std::error_code err;
-            if (std::filesystem::exists(serverPath, err)) {
-                if (err) {
-                    log::warn("Failed to check existence of {}: {}", serverPath, err.message());
-                    MDPopup::create("Error", fmt::format("Failed to check save data for {}: {}", m_server.name, err.message()), "OK")->show();
-                } else {
-                    std::filesystem::path canonicalServerPath;
-                    canonicalServerPath.clear();
-                    canonicalServerPath = std::filesystem::canonical(serverPath, err);
-                    if (err) {
-                        log::warn("Failed to get canonical path for {}: {}", serverPath, err.message());
-                        MDPopup::create("Error", fmt::format("Failed to resolve save data path for {}: {}", m_server.name, err.message()), "OK")->show();
-                    } else if (canonicalServerPath.string().starts_with(gdpsesDir.string()) && serverPath != gdpsesDir) {
-                        log::debug("Deleting {}", serverPath);
-                        std::filesystem::remove_all(serverPath, err);
-                        if (err) {
-                            log::warn("Failed to delete server path {}: {}", serverPath, err.message());
-                            MDPopup::create("Error", fmt::format("Failed to delete save data for {}: {}", m_server.name, err.message()), "OK")->show();
-                        }
-                    } else {
-                        log::warn("Attempted to delete a path outside or equal to the gdpses directory: {}", serverPath);
-                        MDPopup::create("Did not delete save", fmt::format("To prevent unintentional extra data loss, your save was not deleted - only saves within {} will be deleted. If you want to delete this data, do it manually.", gdpsesDir), "OK")->show();
-                    }
-                }
-            } else if (err) {
-                log::warn("Failed to check existence of {}: {}", serverPath, err.message());
-                MDPopup::create("Error", fmt::format("Failed to check save data for {}: {}", m_server.name, err.message()), "OK")->show();
+            auto res = main->deleteServer(m_server);
+
+            if (!res) {
+                MDPopup::create("Error!", res.unwrapErr(), "OK")->show();
             }
+
             if (m_listLayer->m_selectedServer == m_server.id) {
                 m_listLayer->m_selectedServer = -2;
                 Mod::get()->setSavedValue("current", -2);
-                GDPSMain::get()->m_shouldSaveGameData = false;
+                main->m_shouldSaveGameData = false;
+            } else {
+                main->m_shouldSaveGameData = true;
             }
-            main->m_servers.erase(m_server.id);
-            main->save();
+
             m_listLayer->updateList();
         }
-    });
+    );
 }
 
 void ServerNode::setEditing(bool editing) {

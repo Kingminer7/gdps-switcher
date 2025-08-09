@@ -167,13 +167,13 @@ void ModifyServerPopup::onSave(cocos2d::CCObject* sender) {
     if (m_isNew) {
         auto registerRes = gdpsMain->registerServer(m_server);
         if (!registerRes) {
-            MDPopup::create("Error creating server!", registerRes.unwrapErr(), "OK");
+            MDPopup::create("Error creating server!", registerRes.unwrapErr(), "OK")->show();
             return;
         }
     } else {
         auto modifyRes = gdpsMain->modifyRegisteredServer(m_server);
         if (!modifyRes) {
-            MDPopup::create("Error modifying server!", modifyRes.unwrapErr(), "OK");
+            MDPopup::create("Error modifying server!", modifyRes.unwrapErr(), "OK")->show();
             return;
         }
     }
