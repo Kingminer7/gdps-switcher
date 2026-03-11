@@ -22,7 +22,7 @@ class ServerInfoManager {
 		static ServerInfoManager *m_instance;
 		std::map<int, geode::async::TaskHolder<geode::utils::web::WebResponse>> m_listeners;
 	public:
-		void fetch(GDPSTypes::Server& server);
+		void fetch(std::weak_ptr<GDPSTypes::Server> server);
 
 		static ServerInfoManager *get();
 };

@@ -1,3 +1,5 @@
+#if 0
+
 // MUST be defined before including the header.
 #define GEODE_DEFINE_EVENT_EXPORTS
 #include <GDPSUtils.hpp>
@@ -11,7 +13,7 @@ Result<int> GDPSUtils::createServer(std::string name, std::string url, std::stri
     int id = 0;
     for (auto &[serverId, server] : GDPSMain::get()->m_servers) {
         if (serverId < 0) continue;
-        if (server.url == url) {
+        if (server->url == url) {
             return Err("Server already saved as {}", name);
         }
         if (serverId == id) id++;
@@ -22,18 +24,24 @@ Result<int> GDPSUtils::createServer(std::string name, std::string url, std::stri
     server.url = url;
     server.id = id;
     server.saveDir = saveDir.empty() ? fmt::format("{}", id) : saveDir;
-    GDPSMain::get()->m_servers[id] = server;
+    GDPSMain::get()->m_servers[id] = std::make_shared<GDPSTypes::Server>(std::move(server));
     GDPSMain::get()->save();
     return Ok(id);
 }
 
 Result<std::map<int, GDPSTypes::Server>> GDPSUtils::getServers() {
-    return Ok(GDPSMain::get()->m_servers);
+    std::map<int, GDPSTypes::Server> ret;
+    for (auto [id, server] : GDPSMain::get()->m_servers) {
+        ret[id] = *server.get();
+    }
+    return Ok(ret);
 }
 
 // This gets a Server by copy and not by modifiable reference but I don't know if that is intentional.
 Result<GDPSTypes::Server> GDPSUtils::getCurrentServer() {
-    return GDPSMain::get()->getCurrentServer();
+    auto res = GDPSMain::get()->getCurrentServer();
+    if (!res) return Err(res.unwrapErr());
+    return Ok(*res.unwrap().get());
 }
 
 Result<bool> GDPSUtils::setCurrentServer(int id) {
@@ -47,8 +55,8 @@ Result<bool> GDPSUtils::setCurrentServer(int id) {
 
 Result<GDPSTypes::Server> GDPSUtils::findServer(std::string url, std::string saveDir) {
     for (auto &[id, server] : GDPSMain::get()->m_servers) {
-        if (server.url == url && server.saveDir == saveDir) {
-            return Ok(server);
+        if (server->url == url && server->saveDir == saveDir) {
+            return Ok(*server.get());
         }
     }
     return Err("Server not found");
@@ -76,7 +84,7 @@ Result<GDPSTypes::Server> GDPSUtils::getServerInfo(int id) {
     if (it == GDPSMain::get()->m_servers.end()) {
         return Err("Server not found");
     }
-    return Ok(it->second);
+    return Ok(*it->second.get());
 }
 
 Result<bool> GDPSUtils::setServerInfo(int id, std::string name, std::string url, std::string saveDir) {
@@ -86,3 +94,5 @@ Result<bool> GDPSUtils::setServerInfo(int id, std::string name, std::string url,
     }
     return Ok(true);
 }
+
+#endif

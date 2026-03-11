@@ -175,22 +175,24 @@ bool ServerListLayer::init() {
 void ServerListLayer::updateList() {
     auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
     for (auto server : std::ranges::views::values(GDPSMain::get()->m_servers)) {
-        if (server.id < 0 && server.id != -2) continue;
-        if (std::find(order.begin(), order.end(), server.id) == order.end()) {
-            order.push_back(server.id);
+        if (server->id < 0 && server->id != -2) continue;
+        if (std::find(order.begin(), order.end(), server->id) == order.end()) {
+            order.push_back(server->id);
         }
     }
     Mod::get()->setSavedValue("server-order", order);
 
-    m_servers = GDPSMain::get()->m_servers;
     m_scroll->m_contentLayer->removeAllChildren();
     int index = 0;
     for (int id : order) {
-        auto it = m_servers.find(id);
-        if (it == m_servers.end()) continue;
-        auto& server = it->second;
-        auto node = ServerNode::create(server, {356, 55}, this, index++);
-        if (server.id == -2) {
+        auto res = GDPSMain::get()->getServer(id);
+        if (!res) {
+            log::error("{}", res.unwrapErr());
+            continue;
+        }
+        auto& server = res.unwrap();
+        auto node = ServerNode::create(*server.get(), {356, 55}, this, index++);
+        if (server->id == -2) {
             node->m_locked = true;
         }
         node->setEditing(m_isEditing);
@@ -234,9 +236,9 @@ cocos2d::CCScene *ServerListLayer::scene() {
     return scene;
 }
 
-void ServerListLayer::onSelect(const GDPSTypes::Server &server) const {
+void ServerListLayer::onSelect(const GDPSTypes::Server& server) const {
     m_selectedServer = server.id;
-    GDPSMain::get()->m_switching = m_selectedServer != GDPSMain::get()->m_currentServer;
+    GDPSMain::get()->m_switching = m_selectedServer != GDPSMain::get()->currentServer();
     for (auto node : CCArrayExt<ServerNode>(m_scroll->m_contentLayer->getChildren())) {
         if (!node) return;
         node->updateSelected(server);
@@ -246,7 +248,7 @@ void ServerListLayer::onSelect(const GDPSTypes::Server &server) const {
 
 void ServerListLayer::onAdd(CCObject *sender) {
     int id = 0;
-    for (const auto &serverId: m_servers | std::views::keys) {
+    for (const auto &serverId: GDPSMain::get()->m_servers | std::views::keys) {
         if (serverId < 0) continue;
         if (serverId == id) id++;
         else break;

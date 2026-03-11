@@ -1,3 +1,4 @@
+#if 0
 #ifndef GDPSUTILS_HPP
 #define GDPSUTILS_HPP
 
@@ -76,4 +77,5 @@ namespace GDPSUtils {
     inline geode::Result<bool> setServerInfo(int id, std::string name = "", std::string url = "", std::string saveDir = "") GEODE_EVENT_EXPORT(&setServerInfo, (id, name, url, saveDir));
 };
 
+#endif
 #endif

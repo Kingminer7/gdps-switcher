@@ -170,7 +170,7 @@ void ModifyServerPopup::onSave(cocos2d::CCObject* sender) {
     m_server.saveDir = m_saveInput->getString();
 
     if (m_isNew) {
-        auto registerRes = gdpsMain->registerServer(m_server);
+        auto registerRes = gdpsMain->registerServer(std::make_shared<GDPSTypes::Server>(std::move(m_server)));
         if (!registerRes) {
             MDPopup::create("Error creating server!", registerRes.unwrapErr(), "OK")->show();
             return;

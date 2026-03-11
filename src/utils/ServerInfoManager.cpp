@@ -5,23 +5,30 @@ using namespace geode::prelude;
 
 ServerInfoManager *ServerInfoManager::m_instance = nullptr;
 
-void ServerInfoManager::fetch(GDPSTypes::Server& server) {
-    if (server.infoLoaded) return;
-    server.infoLoaded = true;
-    if (server.id < 0) return;
+void ServerInfoManager::fetch(std::weak_ptr<GDPSTypes::Server> server) {
+    auto serverLock = server.lock();
+    if (!serverLock) return;
+    if (serverLock->infoLoaded) return;
+    serverLock->infoLoaded = true;
+    if (serverLock->id < 0) return;
     // idk weird stuff
-    int id = server.id;
-    std::string url = server.url;
+    int id = serverLock->id;
+    std::string url = serverLock->url;
     
     auto req = web::WebRequest();
-    std::string endpoint = server.url;
+    std::string endpoint = serverLock->url;
     if (!endpoint.empty() && endpoint.back() != '/')
         endpoint += '/';
     endpoint += "switcher/getInfo.php";
 
-    m_listeners[server.id].spawn(
-        req.get(server.url),
-        [this, &server] (web::WebResponse value) {
+    m_listeners[serverLock->id].spawn(
+        req.get(endpoint),
+        [this, server, url = std::move(url)] (web::WebResponse value) {
+            auto serverLock = server.lock();
+            if (!serverLock) {
+                log::warn("Server object for ({}) destroyed before fetch could finish", url);
+                return;
+            }
             auto json = value.json();
             if (json.isErr()) {
                 // This little guy right here explodes GD if run.
@@ -30,12 +37,12 @@ void ServerInfoManager::fetch(GDPSTypes::Server& server) {
                 return;
             }
             auto info = json.unwrap();
-            server.motd = info["motd"].asString().unwrapOr("No MOTD found.");
-            server.icon = info["icon"].asString().unwrapOr("");
+            serverLock->motd = info["motd"].asString().unwrapOr("No MOTD found.");
+            serverLock->icon = info["icon"].asString().unwrapOr("");
             // serverData.modPolicy = info["mods"]["policy"].asString().unwrapOr(serverData.modPolicy);
             // serverData.dependencies = info["mods"]["dependencies"].as<std::map<std::string, std::string>>().unwrapOr(serverData.dependencies);
             // serverData.modList = info["mods"]["modList"].as<std::vector<std::string>>().unwrapOr(serverData.modList);
-            auto ev = LoadDataEventData(server);
+            auto ev = LoadDataEventData(*serverLock.get());
             LoadDataEvent().send(&ev);
         }
     );

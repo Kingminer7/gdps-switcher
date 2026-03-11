@@ -1,8 +1,9 @@
-# 1.4.12
-### Migrate to Geode v5
-- <cg>Migrated to Geode v5. (5.0.0-alpha.1)</c>
+# 2.0.0
+### Migrate to Geode v5 and removal of legacy GDPSUtils API
+- <cg>Migrated to Geode v5.</c>
 - <cg>Updated to GD 2.2081.</c>
 - <cy>Internal changes.</c>
+- <cr>Removed legacy GDPSUtils API.</c>
 
 # 1.4.11
 ### Sound effect separation

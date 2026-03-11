@@ -19,7 +19,7 @@ void GSGManager::setup() {
     GSGManager::Fields::m_managers.push_back(this);
 
     auto server = main->m_servers[main->m_currentServer];
-    const auto dir = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
+    const auto dir = geode::dirs::getSaveDir() / "gdpses" / server->saveDir;
 
     std::error_code err;
     if (!std::filesystem::exists(dir, err)) {
@@ -36,7 +36,7 @@ void GSGManager::setup() {
             return log::error("Error after creating directory '{}', data will not save: {}", geode::utils::string::pathToString(dir), err.message());
         }
     }
-    m_fileName = fmt::format("{}/{}/{}", gdpsesPath, server.saveDir, m_fileName);
+    m_fileName = fmt::format("{}/{}/{}", gdpsesPath, server->saveDir, m_fileName);
     GManager::setup();
 }
 
@@ -52,7 +52,7 @@ void GSGManager::updateFileNames() {
         auto res = main->getCurrentServer();
         if (!res) log::error("{}", res.unwrapErr());
         auto server = res.unwrap(); // We probably should just crash if the result is Err.
-        const auto dir = geode::dirs::getSaveDir() / "gdpses" / server.saveDir;
+        const auto dir = geode::dirs::getSaveDir() / "gdpses" / server->saveDir;
         std::error_code err;
         if (!std::filesystem::exists(dir, err)) {
             if (err) {
@@ -72,7 +72,7 @@ void GSGManager::updateFileNames() {
             }
         }
         if (main->isActive()) {
-            manager->m_fileName = fmt::format("{}/{}/{}", gdpsesPath, server.saveDir, manager->m_fields->m_originalFileName);
+            manager->m_fileName = fmt::format("{}/{}/{}", gdpsesPath, server->saveDir, manager->m_fields->m_originalFileName);
         }
     }
 }

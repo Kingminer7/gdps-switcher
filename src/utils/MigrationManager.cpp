@@ -49,11 +49,12 @@ void MigrationManager::migrateData() {
 
     for (auto& old : Mod::get()->getSavedValue<std::vector<GDPSTypes::OldServer>>("saved-servers")) {
         auto serv = fromOldServer(old);
-        main->m_servers[serv.id] = serv;
-        if (oldSel == serv.url) {
-            main->m_currentServer = serv.id;
-            ServerAPIEvents::updateServer(main->m_serverApiId, serv.url);
-            Mod::get()->setSavedValue<int>("current", serv.id);
+        int id = serv.id;
+        main->m_servers[id] = std::make_shared<GDPSTypes::Server>(std::move(serv));
+        if (oldSel == main->m_servers[id]->url) {
+            main->m_currentServer = id;
+            ServerAPIEvents::updateServer(main->m_serverApiId, main->m_servers[id]->url);
+            Mod::get()->setSavedValue<int>("current", id);
         }
     }
 

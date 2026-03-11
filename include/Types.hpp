@@ -150,6 +150,11 @@ namespace GDPSTypes {
 
         Server(const int id, std::string name, std::string url, std::string saveDir) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)) {}
         Server() = default;
+        Server(const Server&) = default;
+        Server(Server&&) = default;
+
+        Server& operator=(const Server&) = default;
+        Server& operator=(Server&&) = default;
 
         // Comparison operators
         bool operator==(const Server& other) const {

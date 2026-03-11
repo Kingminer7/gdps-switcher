@@ -17,19 +17,21 @@ class GDPSMain {
     friend class GSGManager;
     protected:
         static GDPSMain *m_instance;
+        geode::ListenerHandle m_ServerAPIUpdateListener;
         std::vector<std::string> m_issues = {};
         void init();
-        [[nodiscard]] geode::Result<> setServerSaveDir(GDPSTypes::Server& server, std::string_view saveDir); // Caller is responsible for managing save state.
+        [[nodiscard]] geode::Result<> setServerSaveDir(std::shared_ptr<GDPSTypes::Server> server, std::string_view saveDir); // Caller is responsible for managing save state.
     public:
         bool isActive() const;
         void registerIssue(const std::string& issue);
         std::vector<std::string> getIssues();
         bool isBase() const;
-        geode::Result<GDPSTypes::Server> getCurrentServer();
+        geode::Result<std::shared_ptr<GDPSTypes::Server>> getCurrentServer();
+        geode::Result<std::shared_ptr<GDPSTypes::Server>> getServer(int id);
         geode::Result<> setServerInfo(int id, std::string_view name = "", std::string_view url = "", std::string_view saveDir = "");
-        geode::Result<> registerServer(GDPSTypes::Server& server);
-        geode::Result<> modifyRegisteredServer(GDPSTypes::Server& server);
-        geode::Result<> deleteServer(GDPSTypes::Server& server);
+        geode::Result<> registerServer(std::shared_ptr<GDPSTypes::Server> server);
+        geode::Result<> modifyRegisteredServer(const GDPSTypes::Server& server);
+        geode::Result<> deleteServer(std::shared_ptr<GDPSTypes::Server> server);
         geode::Result<> deleteServer(int id);
         geode::Result<> switchServer(int id);
         GDPSTypes::ServerInvalidity isValidServer(const GDPSTypes::Server& server) const; // Will check if server info can be saved to disk.
@@ -44,7 +46,7 @@ class GDPSMain {
         static GDPSMain *get();
 
         // One of these days I will make this shit private without breaking everything.
-        std::map<int, GDPSTypes::Server> m_servers;
+        std::map<int, std::shared_ptr<GDPSTypes::Server>> m_servers;
         int m_currentServer = ServerID::RobTop;
         int m_serverApiId = 0;
         bool m_shouldSaveGameData = true;

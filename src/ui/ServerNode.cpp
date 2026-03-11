@@ -5,12 +5,20 @@
 
 #include <Geode/ui/LazySprite.hpp>
 
-bool ServerNode::init(CCSize size, ServerListLayer* list, int index) {
+bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::Server& server) {
     if (!CCNode::init()) return false;
+
+    auto serverRes = GDPSMain::get()->getServer(server.id);
+    if (!serverRes) {
+        log::error("ServerNode (index {}) failed to get server for ID {}", index, server.id);
+        return false;
+    }
+    m_server = serverRes.unwrap();
+
     m_index = index;
 
     m_listener = LoadDataEvent().listen([this](LoadDataEventData* data) {
-        if (data->getServer().id != m_server.id) {
+        if (data->getServer().id != m_server->id) {
             return ListenerResult::Propagate;
         }
 
@@ -42,7 +50,7 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index) {
     bg->ignoreAnchorPointForPosition(false);
     this->addChildAtPosition(bg, Anchor::Center);
 
-    auto nameLab = CCLabelBMFont::create(m_server.name.c_str(), "bigFont.fnt");
+    auto nameLab = CCLabelBMFont::create(m_server->name.c_str(), "bigFont.fnt");
     nameLab->setID("name");
     nameLab->limitLabelWidth(size.width - 150, .6f, 0.f);
     nameLab->setAnchorPoint({0.f, 0.f});
@@ -77,7 +85,7 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index) {
     auto useBtn = CCMenuItemSpriteExtra::create(useSpr, this, menu_selector(ServerNode::onSelect));
     useBtn->setID("use-btn");
     useSpr->setCascadeOpacityEnabled(true);
-    useBtn->setEnabled(list->m_selectedServer != m_server.id);
+    useBtn->setEnabled(list->m_selectedServer != m_server->id);
     m_useMenu->addChildAtPosition(useBtn, Anchor::Right, {-useBtn->getContentWidth() / 2, 0});
 
     auto editSpr = CCSprite::create("GJ_button_04.png");
@@ -102,7 +110,7 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index) {
         this,
         menu_selector(ServerNode::onDelete)
     );
-    if (m_server.id == GDPSMain::get()->currentServer()) {
+    if (m_server->id == GDPSMain::get()->currentServer()) {
         deleteBtn->setEnabled(false);
         deleteSpr->setColor(ccGRAY);
         xSpr->setColor(ccGRAY);
@@ -142,14 +150,17 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index) {
 
     m_editMenu->updateLayout();
 
-    updateSelected(m_listLayer->m_servers[m_listLayer->m_selectedServer]);
+    auto res = GDPSMain::get()->getServer(m_listLayer->m_selectedServer);
+    if (!res) return false;
+    updateSelected(*res.unwrap().get());
+    //updateSelected(m_listLayer->m_servers[m_listLayer->m_selectedServer]);
 
     return true;
 };
 
 ServerNode* ServerNode::create(GDPSTypes::Server& server, CCSize size, ServerListLayer* list, int index) {
-    auto ret = new ServerNode(server);
-    if (ret && ret->init(size, list, index)) {
+    auto ret = new ServerNode();
+    if (ret && ret->init(size, list, index, server)) {
         ret->autorelease();
         return ret;
     }
@@ -158,15 +169,15 @@ ServerNode* ServerNode::create(GDPSTypes::Server& server, CCSize size, ServerLis
 }
 
 void ServerNode::onSelect(CCObject* sender) {
-    m_listLayer->onSelect(m_server);
+    m_listLayer->onSelect(*m_server.get());
 }
 
-void ServerNode::updateSelected(GDPSTypes::Server server) {
+void ServerNode::updateSelected(const GDPSTypes::Server& server) {
     auto btn = static_cast<CCMenuItemSpriteExtra *>(m_useMenu->getChildByID("use-btn"));
     if (!btn) return;
     auto spr = btn->getChildByType<ButtonSprite *>(0);
     if (!spr) return;
-    if (server == m_server) {
+    if (server == *m_server.get()) {
         spr->updateBGImage("GJ_button_02.png");
         spr->setString("In Use");
         btn->setEnabled(false);
@@ -185,9 +196,9 @@ void ServerNode::updateSelected(GDPSTypes::Server server) {
 }
 
 void ServerNode::updateInfo() {
-    m_server = GDPSMain::get()->m_servers[m_server.id];
+    //m_server = GDPSMain::get()->m_servers[m_server.id];
     if (auto nameLab = static_cast<CCLabelBMFont*>(this->getChildByID("name"))) {
-        nameLab->setString(m_server.name.c_str());
+        nameLab->setString(m_server->name.c_str());
         nameLab->limitLabelWidth(this->m_obContentSize.width - 150, .6f, 0.f);
     }
 
@@ -195,7 +206,7 @@ void ServerNode::updateInfo() {
     auto motdArea = static_cast<ColorLabel *>(this->getChildByID("motd"));
     if (!motdArea) {
         // motdArea = MDTextArea::create(m_server.motd, {205.f, getContentHeight() - 27.f});
-        motdArea = ColorLabel::create(m_server.motd, {205.f, getContentHeight() - 30.f}, .75f, 70);
+        motdArea = ColorLabel::create(m_server->motd, {205.f, getContentHeight() - 30.f}, .75f, 70);
         motdArea->setID("motd");
 	    // motdArea->getChildByType<CCScale9Sprite>(0)->setVisible(false);
         // motdArea->getScrollLayer()->setTouchEnabled(false);
@@ -203,22 +214,22 @@ void ServerNode::updateInfo() {
         motdArea->setAnchorPoint({0.f, 0.f});
         this->addChildAtPosition(motdArea, Anchor::BottomLeft, {61.f, 4.5f});
     }
-    motdArea->setText(m_server.motd.c_str());
+    motdArea->setText(m_server->motd.c_str());
     if (auto icon = this->getChildByID("icon")) {
         icon->removeFromParent();
     }
 
     CCSprite* icon;
 
-    if (m_server.iconIsSprite) {
-        icon = CCSprite::createWithSpriteFrameName(m_server.icon.c_str());
+    if (m_server->iconIsSprite) {
+        icon = CCSprite::createWithSpriteFrameName(m_server->icon.c_str());
         if (icon && !icon->getUserObject("geode.texture-loader/fallback")) {
             icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
         } else {
             icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
             icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
         }
-    } else if (m_server.icon.empty()) {
+    } else if (m_server->icon.empty()) {
         icon = CCSpriteGrayscale::createWithSpriteFrameName("gdlogo.png"_spr);
         icon->setScale((getContentHeight() - 12.5f) / icon->getContentHeight());
     } else {
@@ -234,7 +245,7 @@ void ServerNode::updateInfo() {
                 this->addChildAtPosition(icon, Anchor::Left, {m_obContentSize.height / 2 + 2.5f, 0});
             }
         });
-        ls->loadFromUrl(m_server.icon);
+        ls->loadFromUrl(m_server->icon);
         icon = ls;
     }
 
@@ -244,19 +255,19 @@ void ServerNode::updateInfo() {
     }
 }
 
-GDPSTypes::Server& ServerNode::getServer() {
+std::shared_ptr<GDPSTypes::Server> ServerNode::getServer() {
     return m_server;
 }
 
 void ServerNode::onEdit(CCObject* sender) {
     if (m_locked) return;
-    ModifyServerPopup::create(m_server, m_listLayer)->show();
+    ModifyServerPopup::create(*m_server.get(), m_listLayer)->show();
 }
 
 void ServerNode::onDelete(CCObject* sender) {
     if (m_locked) return;
 
-    if (m_listLayer->m_selectedServer == m_server.id) {
+    if (m_listLayer->m_selectedServer == m_server->id) {
         return MDPopup::create(
             "Nope!",
             "Lindings.",
@@ -266,7 +277,7 @@ void ServerNode::onDelete(CCObject* sender) {
 
     createQuickPopup(
         "Delete Server",
-        fmt::format("Are you sure you want to delete {}? This will delete your save data for the server.", m_server.name),
+        fmt::format("Are you sure you want to delete {}? This will delete your save data for the server.", m_server->name),
         "No", "Yes",
         [this](auto, bool yes) {
             if (!yes) return;
@@ -288,7 +299,7 @@ void ServerNode::setEditing(bool editing) {
     m_useMenu->setVisible(!m_editing);
     m_editMenu->setVisible(m_editing && !m_locked);
     auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
-    auto it = std::find(order.begin(), order.end(), m_server.id);
+    auto it = std::find(order.begin(), order.end(), m_server->id);
     if (auto btn = m_editMenu->getChildByID("up-btn")) {
         bool isSecond = it != order.end() && std::next(order.begin()) == it;
         btn->setVisible(!isSecond);
@@ -313,7 +324,7 @@ void ServerNode::onMove(CCObject* sender) {
     else if (btn->getID() == "down-btn") dir = 1;
 
     auto order = Mod::get()->getSavedValue<std::vector<int>>("server-order", {});
-    auto it = std::find(order.begin(), order.end(), m_server.id);
+    auto it = std::find(order.begin(), order.end(), m_server->id);
     if (it == order.end()) return;
 
     int index = std::distance(order.begin(), it);

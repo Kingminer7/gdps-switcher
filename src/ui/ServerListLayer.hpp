@@ -45,7 +45,6 @@ class ServerListLayer : public cocos2d::CCLayer {
         void onSettings(CCObject *sender);
 
         static int m_selectedServer;
-        std::map<int, GDPSTypes::Server> m_servers;
 
         int m_konamiPos = 0;
 };
