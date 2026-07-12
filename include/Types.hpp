@@ -14,6 +14,7 @@
 
 #include <ranges>
 #include <utility>
+#include <string>
 
 namespace GDPSTypes {
 
@@ -136,6 +137,8 @@ namespace GDPSTypes {
         std::string name;
         std::string url;
         std::string saveDir;
+        std::string addedByModId;
+        bool modRequired = false;
 
         // Many issues and stuff
         // std::string modPolicy = "blacklist";
@@ -148,7 +151,7 @@ namespace GDPSTypes {
         bool iconIsSprite = false;
         std::string icon;
 
-        Server(const int id, std::string name, std::string url, std::string saveDir) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)) {}
+        Server(const int id, std::string name, std::string url, std::string saveDir, std::string addedByModId, bool modRequired) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)), addedByModId(addedByModId), modRequired(modRequired) {}
         Server() = default;
         Server(const Server&) = default;
         Server(Server&&) = default;
@@ -192,11 +195,10 @@ struct matjson::Serialize<GDPSTypes::Server>
             value["id"].asInt().unwrapOr(-1),
             value["name"].asString().unwrapOr("Failed to load name."),
             value["url"].asString().unwrapOr("Failed to load url."),
-            value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory."))
+            value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory.")),
+            value["addedByModId"].asString().unwrapOrDefault(),
+            value["modRequired"].asBool().unwrapOrDefault()
         );
-        // server.dependencies = value["mods"]["dependencies"].as<std::map<std::string, std::string>>().unwrapOr(std::map<std::string, std::string>());
-        // server.modPolicy = value["mods"]["policy"].asString().unwrapOr("whitelist");
-        // server.modList = value["mods"]["modList"].as<std::vector<std::string>>().unwrapOr(std::vector<std::string>());
         return geode::Ok(server);
     }
 
@@ -207,11 +209,8 @@ struct matjson::Serialize<GDPSTypes::Server>
             {"name", value.name},
             {"url", value.url},
             {"saveDir", value.saveDir},
-            // {"mods", matjson::makeObject({
-            //     {"dependencies", value.dependencies},
-            //     {"policy", value.modPolicy},
-            //     {"modList", value.modList}
-            // })}
+            {"addedByModId", value.addedByModId},
+            {"modRequired", value.modRequired},
         });
         return obj;
     }

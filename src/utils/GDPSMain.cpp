@@ -288,13 +288,18 @@ void GDPSMain::init() {
     m_currentServer =
         Mod::get()->getSavedValue<int>("current", -2);
 
-    auto base = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
+    auto base = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), "..", "", false};
     base.iconIsSprite = true;
     base.icon = "gdlogo.png"_spr;
     base.motd = "Vanilla Geometry Dash servers.";
     // ReSharper disable once CppDFAArrayIndexOutOfBounds
     m_servers[-2] = std::make_shared<GDPSTypes::Server>(base);
-    const auto &server = m_servers[m_currentServer];
+    auto* server = m_servers[m_currentServer].get();
+    if(server->modRequired && !Loader::get()->getLoadedMod(server->addedByModId)) {
+        m_currentServer = ServerID::RobTop;
+        server = m_servers[m_currentServer].get();
+    }
+
     if (m_currentServer >= 0 && isActive()) {
         log::info("Loading into GDPS: {}", server->url);
         m_serverApiId = ServerAPIEvents::registerServer(server->url, -40).id;

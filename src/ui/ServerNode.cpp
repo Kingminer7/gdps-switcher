@@ -56,6 +56,26 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::
     nameLab->setAnchorPoint({0.f, 0.f});
     this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -nameLab->getContentHeight()/2 - 8});
 
+    if(!m_server->addedByModId.empty()) {
+        std::string label;
+        auto modReqLab = CCLabelBMFont::create("", "bigFont.fnt");
+
+        if(auto mod = Loader::get()->getLoadedMod(m_server->addedByModId)) {
+            label = fmt::format("GDPS {} by {}", m_server->modRequired ? "Managed" : "Added", mod->getName());
+        } else if(m_server->modRequired) {
+            label = fmt::format("GDPS Managed by {} (Mod not loaded!)", m_server->addedByModId);
+            modReqLab->setColor({ 255, 104, 104 });
+        }
+        else {
+            label = fmt::format("GDPS Added by {}", m_server->addedByModId);
+        }
+        modReqLab->setString(label.c_str(), true);
+        modReqLab->setID("mod-required");
+        modReqLab->limitLabelWidth(size.width - 150, .6f, 0.f);
+        modReqLab->setAnchorPoint({0.f, 0.f});
+        this->addChildAtPosition(modReqLab, Anchor::BottomLeft, {60, modReqLab->getContentHeight()/2 + 8});
+    }
+
     updateInfo();
 
     m_editMenu = CCMenu::create();
@@ -93,12 +113,17 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::
     auto pencilSpr = CCSprite::createWithSpriteFrameName("edit.png"_spr);
     pencilSpr->setScale(1.3f);
     editSpr->addChildAtPosition(pencilSpr, Anchor::Center);
-    auto editBtn = CCMenuItemSpriteExtra::create(
-        editSpr,
-        this,
-        menu_selector(ServerNode::onEdit)
-    );
-    editBtn->setID("edit-btn");
+
+    if(!m_server->addedByModId.empty()) {
+        auto editBtn = CCMenuItemSpriteExtra::create(
+            editSpr,
+            this,
+            menu_selector(ServerNode::onEdit)
+        );
+        editBtn->setID("edit-btn");
+        m_editMenu->addChild(editBtn);
+    }
+
 
     auto deleteSpr = CCSprite::create("GJ_button_06.png");
     deleteSpr->setScale(.5475f);
@@ -143,7 +168,6 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::
     );
     downBtn->setID("down-btn");
 
-    m_editMenu->addChild(editBtn);
     m_editMenu->addChild(upBtn);
     m_editMenu->addChild(deleteBtn);
     m_editMenu->addChild(downBtn);

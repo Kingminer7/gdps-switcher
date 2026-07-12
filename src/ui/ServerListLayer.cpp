@@ -253,7 +253,7 @@ void ServerListLayer::onAdd(CCObject *sender) {
         if (serverId == id) id++;
         else break;
     }
-    ModifyServerPopup::create({id, "", "", ""}, this)->show();
+    ModifyServerPopup::create({id, "", "", "", "", false}, this)->show();
 }
 
 void ServerListLayer::onEdit(CCObject *sender) {
