@@ -1,6 +1,7 @@
 
 // MUST be defined before including the header.
 #include "../utils/GDPSMain.hpp"
+#include "Types.hpp"
 
 // Dispatch.hpp is #pragma once, so we must manually redefine
 // the macros to the "define" (export) variants here.
@@ -14,33 +15,45 @@
 #include <GDPSUtils.hpp>
 using namespace geode::prelude;
 
-Result<int> GDPSUtils::createServer(std::string name, std::string url, bool modRequired, std::string saveDir, geode::Mod* mod) {
+Result<int> GDPSUtils::createServer(CreateServerArgs args) {
     int id = 0;
     for (auto &[serverId, server] : GDPSMain::get()->m_servers) {
         if (serverId < 0) continue;
-        if (server->url == url) {
-            return Err("Server already saved as {}", name);
+        if (server->url == args.url) {
+            return Err("Server already saved as {}", args.name);
         }
         if (serverId == id) id++;
         else break;
     }
     auto server = GDPSTypes::Server();
-    server.name = name;
-    server.url = url;
+    server.name = args.name;
+    server.url = args.url;
     server.id = id;
-    server.saveDir = saveDir.empty() ? fmt::format("{}", id) : saveDir;
-    server.addedByModId = mod->getID();
-    server.modRequired = modRequired;
+    server.saveDir = args.saveDir;
+    server.motd = args.motd;
+    server.modInfo.emplace(args.mod->getID(), args.modRequired, args.customData);
     auto res = GDPSMain::get()->registerServer(std::make_shared<GDPSTypes::Server>(std::move(server)));
     if (!res) return Err(res.unwrapErr());
     GDPSMain::get()->save();
     return Ok(id);
 }
 
+Result<> GDPSUtils::updateServer(UpdateServerArgs args) {
+    GDPSTypes::Server server;
+    server.id = args.id;
+    server.name = args.name;
+    server.url = args.url;
+    server.saveDir = args.saveDir;
+    server.motd = args.motd;
+    server.modInfo.emplace(args.mod->getID(), args.modRequired, args.customData);
+    return GDPSMain::get()->modifyRegisteredServer(server);
+}
+
+
 Result<std::map<int, GDPSTypes::Server>> GDPSUtils::getModServers(geode::Mod* mod) {
     std::map<int, GDPSTypes::Server> ret;
     for (auto [id, server] : GDPSMain::get()->m_servers) {
-        if (server->addedByModId != mod->getID()) continue;
+        if (!server->modInfo.has_value() || server->modInfo->modId != mod->getID()) continue;
         ret[id] = *server.get();
     }
     return Ok(ret);
@@ -59,7 +72,7 @@ Result<bool> GDPSUtils::deleteServer(int id, geode::Mod* mod) {
     if (it == GDPSMain::get()->m_servers.end()) {
         return Err("Server not found");
     }
-    if (it->second->addedByModId != mod->getID()) {
+    if (!it->second->modInfo.has_value() || it->second->modInfo->modId != mod->getID()) {
         return Err("Server not owned by this mod");
     }
     auto res = GDPSMain::get()->deleteServer(id);

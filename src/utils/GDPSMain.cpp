@@ -97,41 +97,6 @@ geode::Result<std::shared_ptr<GDPSTypes::Server>> GDPSMain::getServer(int id) {
     return geode::Ok(m_servers[id]);
 }
 
-geode::Result<> GDPSMain::setServerInfo(int id, std::string_view name, std::string_view url, std::string_view saveDir) {
-    auto it = m_servers.find(id);
-    if (it == m_servers.end()) {
-        return geode::Err("Server not found.");
-    }
-
-    bool shouldRestore = m_shouldSaveGameData;
-    m_shouldSaveGameData = false;
-    auto& server = it->second;
-
-    auto res = setServerSaveDir(server, saveDir); // This function handles empty strings for us.
-    if (!res) {
-        return geode::Err(res.unwrapErr());
-    }
-
-    if (!name.empty()) {
-        server->name = name;
-    }
-
-    if (!url.empty()) {
-        server->url = url;
-    }
-
-    if (m_currentServer == id) {
-        ServerAPIEvents::updateServer(m_serverApiId, server->url);
-        GSGManager::updateFileNames();
-    }
-
-    server->infoLoaded = false; // To force the fetch to work after we change the URL.
-    ServerInfoManager::get()->fetch(server);
-    m_shouldSaveGameData = shouldRestore;
-    this->save();
-    return geode::Ok();
-}
-
 geode::Result<> GDPSMain::registerServer(std::shared_ptr<GDPSTypes::Server> server) {
     if (m_servers.contains(server->id)) {
         return geode::Err("Server registery already contains this ID.\nContact developers for help.");
@@ -146,17 +111,17 @@ geode::Result<> GDPSMain::registerServer(std::shared_ptr<GDPSTypes::Server> serv
     return geode::Ok();
 }
 
-geode::Result<> GDPSMain::modifyRegisteredServer(const GDPSTypes::Server& server) {
-    if (!m_servers.contains(server.id)) {
+geode::Result<> GDPSMain::modifyRegisteredServer(const GDPSTypes::Server& newServerData) {
+    if (!m_servers.contains(newServerData.id)) {
         return geode::Err("Server with this ID does not exist.\nContact developers for help.");
     }
     
-    auto newSaveDir = server.saveDir;
-    if (server.saveDir.empty()) {
-        newSaveDir = fmt::format("{}", server.id);
+    auto newSaveDir = newServerData.saveDir;
+    if (newServerData.saveDir.empty()) {
+        newSaveDir = fmt::format("{}", newServerData.id);
     }
 
-    if (newSaveDir != m_servers[server.id]->saveDir) {
+    if (newSaveDir != m_servers[newServerData.id]->saveDir) {
         auto path = geode::dirs::getSaveDir() / "gdpses" / newSaveDir;
         std::error_code errCode;
         bool exists = std::filesystem::exists(path, errCode);
@@ -168,27 +133,29 @@ geode::Result<> GDPSMain::modifyRegisteredServer(const GDPSTypes::Server& server
 	        return geode::Err("Error checking validity of save directory: {}", errCode.message());
         }
 
-	    log::info("{}", geode::dirs::getSaveDir() / "gdpses" / m_servers[server.id]->saveDir);
+	    log::info("{}", geode::dirs::getSaveDir() / "gdpses" / m_servers[newServerData.id]->saveDir);
 
-        std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / m_servers[server.id]->saveDir, path, errCode);
+        std::filesystem::rename(geode::dirs::getSaveDir() / "gdpses" / m_servers[newServerData.id]->saveDir, path, errCode);
 	    if (errCode) {
 	        return geode::Err("Error moving save directory: {}", errCode.message());
         }
     }
 
-    bool infoLoaded = (server.url == m_servers[server.id]->url);
+    bool infoLoaded = (newServerData.url == m_servers[newServerData.id]->url);
 
-    m_servers[server.id]->name = server.name;
-    m_servers[server.id]->url = server.url;
-    m_servers[server.id]->saveDir = newSaveDir;
-    m_servers[server.id]->infoLoaded = infoLoaded;
-
-    if (m_currentServer == server.id) {
-        ServerAPIEvents::updateServer(m_serverApiId, server.url);
+    auto& server = m_servers[newServerData.id];
+    server->name = newServerData.name;
+    server->url = newServerData.url;
+    server->saveDir = newSaveDir;
+    server->infoLoaded = infoLoaded;
+    server->modInfo = newServerData.modInfo;
+    
+    if (m_currentServer == newServerData.id) {
+        ServerAPIEvents::updateServer(m_serverApiId, newServerData.url);
         GSGManager::updateFileNames();
     }
 
-    ServerInfoManager::get()->fetch(m_servers[server.id]);
+    ServerInfoManager::get()->fetch(m_servers[newServerData.id]);
     return geode::Ok();
 }
 
@@ -250,14 +217,6 @@ geode::Result<> GDPSMain::deleteServer(int id) {
     return deleteServer(it->second);
 }
 
-geode::Result<> GDPSMain::switchServer(int id) {
-    if (!serverExists(id)) {
-        return geode::Err("Server does not exist!");
-    }
-
-    m_currentServer = id;
-    return geode::Ok();
-}
 
 GDPSTypes::ServerInvalidity GDPSMain::isValidServer(const GDPSTypes::Server& server) const {
     using namespace GDPSTypes;
@@ -295,7 +254,7 @@ void GDPSMain::init() {
     // ReSharper disable once CppDFAArrayIndexOutOfBounds
     m_servers[-2] = std::make_shared<GDPSTypes::Server>(base);
     auto* server = m_servers[m_currentServer].get();
-    if(server->modRequired && !Loader::get()->getLoadedMod(server->addedByModId)) {
+    if(server->modInfo.has_value() && server->modInfo->modRequired && !Loader::get()->getLoadedMod(server->modInfo->modId)) {
         m_currentServer = ServerID::RobTop;
         server = m_servers[m_currentServer].get();
     }

@@ -137,8 +137,12 @@ namespace GDPSTypes {
         std::string name;
         std::string url;
         std::string saveDir;
-        std::string addedByModId;
-        bool modRequired = false;
+        struct ModInfo {
+            std::string modId;
+            bool modRequired = false;
+            matjson::Value customData;
+        };
+        std::optional<ModInfo> modInfo;
 
         // Many issues and stuff
         // std::string modPolicy = "blacklist";
@@ -151,7 +155,11 @@ namespace GDPSTypes {
         bool iconIsSprite = false;
         std::string icon;
 
-        Server(const int id, std::string name, std::string url, std::string saveDir, std::string addedByModId, bool modRequired) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)), addedByModId(addedByModId), modRequired(modRequired) {}
+        Server(const int id, std::string name, std::string url, std::string saveDir, std::string addedByModId, bool modRequired) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)) {
+            if (!addedByModId.empty()) {
+                modInfo = ModInfo{std::move(addedByModId), modRequired, {}};
+            }
+        }
         Server() = default;
         Server(const Server&) = default;
         Server(Server&&) = default;
@@ -191,14 +199,18 @@ struct matjson::Serialize<GDPSTypes::Server>
 {
     static geode::Result<GDPSTypes::Server> fromJson(matjson::Value const &value)
     {
+        auto modId = value["addedByModId"].asString().unwrapOrDefault();
+        auto modRequired = value["modRequired"].asBool().unwrapOrDefault();
         GDPSTypes::Server server(
             value["id"].asInt().unwrapOr(-1),
             value["name"].asString().unwrapOr("Failed to load name."),
             value["url"].asString().unwrapOr("Failed to load url."),
             value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory.")),
-            value["addedByModId"].asString().unwrapOrDefault(),
-            value["modRequired"].asBool().unwrapOrDefault()
+            modId, modRequired
         );
+        if (server.modInfo.has_value()) {
+            server.modInfo->customData = value["customData"];
+        }
         return geode::Ok(server);
     }
 
@@ -209,9 +221,12 @@ struct matjson::Serialize<GDPSTypes::Server>
             {"name", value.name},
             {"url", value.url},
             {"saveDir", value.saveDir},
-            {"addedByModId", value.addedByModId},
-            {"modRequired", value.modRequired},
         });
+        if (value.modInfo.has_value()) {
+            obj["addedByModId"] = value.modInfo->modId;
+            obj["modRequired"] = value.modInfo->modRequired;
+            obj["customData"] = value.modInfo->customData;
+        }
         return obj;
     }
 };

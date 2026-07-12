@@ -56,18 +56,18 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::
     nameLab->setAnchorPoint({0.f, 0.f});
     this->addChildAtPosition(nameLab, Anchor::TopLeft, {60, -nameLab->getContentHeight()/2 - 8});
 
-    if(!m_server->addedByModId.empty()) {
+    if(m_server->modInfo.has_value() && !m_server->modInfo->modId.empty()) {
         std::string label;
-        auto modReqLab = CCLabelBMFont::create("", "bigFont.fnt");
+        auto modReqLab = CCLabelBMFont::create("", "chatFont.fnt");
 
-        if(auto mod = Loader::get()->getLoadedMod(m_server->addedByModId)) {
-            label = fmt::format("GDPS {} by {}", m_server->modRequired ? "Managed" : "Added", mod->getName());
-        } else if(m_server->modRequired) {
-            label = fmt::format("GDPS Managed by {} (Mod not loaded!)", m_server->addedByModId);
+        if(auto mod = Loader::get()->getLoadedMod(m_server->modInfo->modId)) {
+            label = fmt::format("GDPS {} by {}", m_server->modInfo->modRequired ? "Managed" : "Added", mod->getName());
+        } else if(m_server->modInfo->modRequired) {
+            label = fmt::format("GDPS Managed by {} (Mod not loaded!)", m_server->modInfo->modId);
             modReqLab->setColor({ 255, 104, 104 });
         }
         else {
-            label = fmt::format("GDPS Added by {}", m_server->addedByModId);
+            label = fmt::format("GDPS Added by {}", m_server->modInfo->modId);
         }
         modReqLab->setString(label.c_str(), true);
         modReqLab->setID("mod-required");
@@ -114,7 +114,7 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::
     pencilSpr->setScale(1.3f);
     editSpr->addChildAtPosition(pencilSpr, Anchor::Center);
 
-    if(!m_server->addedByModId.empty()) {
+    if(!m_server->modInfo.has_value()) {
         auto editBtn = CCMenuItemSpriteExtra::create(
             editSpr,
             this,

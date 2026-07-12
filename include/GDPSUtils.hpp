@@ -2,6 +2,7 @@
 #define GDPSUTILS_HPP
 
 #include "Types.hpp"
+#include <matjson.hpp>
 #include <string>
 #include <Geode/loader/Dispatch.hpp>
 #define MY_MOD_ID "km7dev.gdps-switcher"
@@ -13,9 +14,32 @@ namespace GDPSUtils {
     * @param name The name of the server.
     * @param url The URL of the server.
     * @param saveDir Save directory for the server, don't pass for default.
+    * @param modRequired Whether the server requires the mod to work. if true, the GDPS will not load if the mod is not loaded.
     * @return The id of the server.
     */
-    inline geode::Result<int> createServer(std::string name, std::string url, bool modRequired = true, std::string saveDir = "", geode::Mod* mod = geode::Mod::get()) GEODE_EVENT_EXPORT(&createServer, (name, url, modRequired, saveDir, mod));
+
+    struct CreateServerArgs {
+        std::string name;
+        std::string url;
+        bool modRequired = false;
+        std::string saveDir = "";
+        matjson::Value customData;
+        std::string motd = "";
+        geode::Mod* mod = geode::Mod::get();
+    };
+    inline geode::Result<int> createServer(CreateServerArgs args) GEODE_EVENT_EXPORT(&createServer, (args));
+    
+    struct UpdateServerArgs {
+        int id;
+        std::string name;
+        std::string url;
+        bool modRequired = false;
+        std::string saveDir = "";
+        matjson::Value customData;
+        std::string motd = "";
+        geode::Mod* mod = geode::Mod::get();
+    };
+    inline geode::Result<> updateServer(UpdateServerArgs args) GEODE_EVENT_EXPORT(&updateServer, (args));
     /**
     * @brief Retrieves a list of all available servers.
     * 
