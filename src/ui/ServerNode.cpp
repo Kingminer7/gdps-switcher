@@ -73,7 +73,7 @@ bool ServerNode::init(CCSize size, ServerListLayer* list, int index, GDPSTypes::
         modReqLab->setID("mod-required");
         modReqLab->limitLabelWidth(size.width - 150, .6f, 0.f);
         modReqLab->setAnchorPoint({0.f, 0.f});
-        this->addChildAtPosition(modReqLab, Anchor::BottomLeft, {60, modReqLab->getContentHeight()/2 + 8});
+        this->addChildAtPosition(modReqLab, Anchor::BottomLeft, {60, modReqLab->getContentHeight() / 2});
     }
 
     updateInfo();

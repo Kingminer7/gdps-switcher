@@ -92,7 +92,7 @@ geode::Result<std::shared_ptr<GDPSTypes::Server>> GDPSMain::getCurrentServer() {
 
 geode::Result<std::shared_ptr<GDPSTypes::Server>> GDPSMain::getServer(int id) {
     if (!m_servers.contains(id)) {
-        return geode::Err("Server at {} not found");
+        return geode::Err(fmt::format("Server at {} not found", id));
     }
     return geode::Ok(m_servers[id]);
 }
@@ -180,26 +180,23 @@ geode::Result<> GDPSMain::deleteServer(std::shared_ptr<GDPSTypes::Server> server
     std::filesystem::path canonicalServerPath;
     canonicalServerPath.clear();
     canonicalServerPath = std::filesystem::canonical(serverPath, err);
-    if (err) {
-        return geode::Err("Failed to get canonical path for {}: {}", serverPath, err.message());
-    }
 
-    if (
-        !geode::utils::string::pathToString(canonicalServerPath).starts_with(geode::utils::string::pathToString(gdpsesDir))
-        || serverPath == gdpsesDir
-    ) {
-        return geode::Err(
-            "Attempted to delete a path outside or equal to the gdpses directory: {}\n\n"
-            "To prevent unintentional extra data loss, your save was not deleted - "
-            "only saves within {} will be deleted. If you want to delete this data, do it manually.",
-            serverPath, gdpsesDir
-        );
-    }
+        if (
+            !geode::utils::string::pathToString(canonicalServerPath).starts_with(geode::utils::string::pathToString(gdpsesDir))
+            || serverPath == gdpsesDir
+        ) {
+            return geode::Err(
+                "Attempted to delete a path outside or equal to the gdpses directory: {}\n\n"
+                "To prevent unintentional extra data loss, your save was not deleted - "
+                "only saves within {} will be deleted. If you want to delete this data, do it manually.",
+                serverPath, gdpsesDir
+            );
+        }
 
-    log::debug("Deleting {}", serverPath);
-    std::filesystem::remove_all(serverPath, err);
-    if (err) {
-        return geode::Err("Failed to delete save data for {}: {}", server->name, err.message());
+        log::debug("Deleting {}", serverPath);
+        std::filesystem::remove_all(serverPath, err);
+        if (err) {
+            return geode::Err("Failed to delete save data for {}: {}", server->name, err.message());
     }
 
     m_servers.erase(server->id);
@@ -247,18 +244,13 @@ void GDPSMain::init() {
     m_currentServer =
         Mod::get()->getSavedValue<int>("current", -2);
 
-    auto base = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), "..", "", false};
+    auto base = GDPSTypes::Server{-2, "Built-in Servers", ServerAPIEvents::getBaseUrl(), ".."};
     base.iconIsSprite = true;
     base.icon = "gdlogo.png"_spr;
     base.motd = "Vanilla Geometry Dash servers.";
     // ReSharper disable once CppDFAArrayIndexOutOfBounds
     m_servers[-2] = std::make_shared<GDPSTypes::Server>(base);
     auto* server = m_servers[m_currentServer].get();
-    if(server->modInfo.has_value() && server->modInfo->modRequired && !Loader::get()->getLoadedMod(server->modInfo->modId)) {
-        m_currentServer = ServerID::RobTop;
-        server = m_servers[m_currentServer].get();
-    }
-
     if (m_currentServer >= 0 && isActive()) {
         log::info("Loading into GDPS: {}", server->url);
         m_serverApiId = ServerAPIEvents::registerServer(server->url, -40).id;

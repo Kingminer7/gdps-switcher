@@ -155,10 +155,7 @@ namespace GDPSTypes {
         bool iconIsSprite = false;
         std::string icon;
 
-        Server(const int id, std::string name, std::string url, std::string saveDir, std::string addedByModId, bool modRequired) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)) {
-            if (!addedByModId.empty()) {
-                modInfo = ModInfo{std::move(addedByModId), modRequired, {}};
-            }
+        Server(const int id, std::string name, std::string url, std::string saveDir, std::optional<ModInfo> modInfo = std::nullopt) : id(id), name(std::move(name)), url(std::move(url)), saveDir(std::move(saveDir)), modInfo(modInfo) {
         }
         Server() = default;
         Server(const Server&) = default;
@@ -199,18 +196,22 @@ struct matjson::Serialize<GDPSTypes::Server>
 {
     static geode::Result<GDPSTypes::Server> fromJson(matjson::Value const &value)
     {
-        auto modId = value["addedByModId"].asString().unwrapOrDefault();
-        auto modRequired = value["modRequired"].asBool().unwrapOrDefault();
+        std::optional<GDPSTypes::Server::ModInfo> modInfo;
+        if(value.contains("modInfo")) {
+            modInfo = GDPSTypes::Server::ModInfo{
+                value["modInfo"]["modId"].asString().unwrapOr(""),
+                value["modInfo"]["modRequired"].asBool().unwrapOr(false),
+                value["modInfo"]["customData"]
+            };
+        }
         GDPSTypes::Server server(
             value["id"].asInt().unwrapOr(-1),
             value["name"].asString().unwrapOr("Failed to load name."),
             value["url"].asString().unwrapOr("Failed to load url."),
             value["saveDir"].asString().unwrapOr(value["url"].asString().unwrapOr("Failed to load save directory.")),
-            modId, modRequired
+            modInfo
         );
-        if (server.modInfo.has_value()) {
-            server.modInfo->customData = value["customData"];
-        }
+
         return geode::Ok(server);
     }
 
@@ -223,9 +224,11 @@ struct matjson::Serialize<GDPSTypes::Server>
             {"saveDir", value.saveDir},
         });
         if (value.modInfo.has_value()) {
-            obj["addedByModId"] = value.modInfo->modId;
-            obj["modRequired"] = value.modInfo->modRequired;
-            obj["customData"] = value.modInfo->customData;
+            obj["modInfo"] = matjson::makeObject({
+                {"modId", value.modInfo->modId},
+                {"modRequired", value.modInfo->modRequired},
+                {"customData", value.modInfo->customData}
+            });
         }
         return obj;
     }
